@@ -1,0 +1,5 @@
+.git
+.vscode
+**/config.json
+**/fly.toml
+node_modules
