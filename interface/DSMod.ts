@@ -14,7 +14,7 @@ interface DSMod {
 	 * @type {boolean}
 	 * @memberof DSMod
 	 */
-	disabled: boolean
+	disabled?: boolean
 	/**
 	 * A mod name
 	 *
@@ -63,7 +63,7 @@ interface DSMod {
 	 * @type {string}
 	 * @memberof DSMod
 	 */
-	usage?: string,
+	usage: string,
 	/**
 	 * Mod's callback function for setup
 	 *

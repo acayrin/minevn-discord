@@ -1,8 +1,8 @@
 import { Intents } from "discord.js"
-import { VM } from "./vote"
+import { VUM } from "./vote"
 
 export = {
-    name: "Vote mute",
+    name: "Vote un-mute",
     author: "acayrin",
     intents: [
         Intents.FLAGS.GUILDS,
@@ -10,9 +10,9 @@ export = {
         Intents.FLAGS.GUILD_MESSAGES,
 		Intents.FLAGS.GUILD_MESSAGE_REACTIONS
     ],
-    command: "votemute",
-    aliases: [ "vm" ],
+    command: "voteunmute",
+    aliases: [ "vum" ],
     description: "Vote somebody cuz democracy is kul",
     usage: "%prefix% %command% <Username>[/<Tag>/<User ID>]]",
-    onMsgCreate: VM
+    onMsgCreate: VUM
 }
