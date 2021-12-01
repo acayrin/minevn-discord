@@ -9,6 +9,13 @@ import { Bot } from "../bot";
  */
 interface DSMod {
 	/**
+	 * Whether the mod is disabled
+	 *
+	 * @type {boolean}
+	 * @memberof DSMod
+	 */
+	disabled: boolean
+	/**
 	 * A mod name
 	 *
 	 * @type {string}

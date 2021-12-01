@@ -49,7 +49,7 @@ var Bot = (function () {
         this.command = new Discord.Collection();
         this.cli = function () { return _this.client; };
         this.init = function () {
-            _this.logger.log("Node ".concat(process.version));
+            _this.logger.log("Node ".concat(process.version.match(/^v(\d+\.\d+)/)[1]));
             var intents = [];
             fs.readdirSync("".concat(__dirname, "/mods")).forEach(function (item) {
                 if (!item.endsWith('.js'))
@@ -57,6 +57,8 @@ var Bot = (function () {
                 var mod = require("".concat(__dirname, "/mods/").concat(item));
                 if (!mod.command || mod.command.length === 0)
                     return _this.logger.warn("File mods/".concat(item, " is not a valid mod"));
+                if (mod.disabled)
+                    return;
                 mod.intents.forEach(function (intent) {
                     if (!intents.includes(intent))
                         intents.push(intent);

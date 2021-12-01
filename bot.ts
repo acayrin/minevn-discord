@@ -98,6 +98,9 @@ class Bot {
             const mod: DSMod = require(`${__dirname}/mods/${item}`)
             if (!mod.command || mod.command.length === 0)
                 return this.logger.warn(`File mods/${item} is not a valid mod`)
+        
+            // ignore disabled
+            if (mod.disabled) return
             
             // add required intents
             mod.intents.forEach(intent => {

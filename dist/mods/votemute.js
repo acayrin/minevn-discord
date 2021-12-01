@@ -2,6 +2,7 @@
 var discord_js_1 = require("discord.js");
 var votemute_1 = require("./votemute/");
 module.exports = {
+    disabled: true,
     name: "Vote mute",
     author: "acayrin",
     intents: [

@@ -1,11 +1,9 @@
-import { Intents, Message, MessageEmbed } from "discord.js"
+import { Intents, Message, MessageAttachment, MessageEmbed } from "discord.js"
 import { Bot } from "../bot"
 import { DSChatRecord } from "../interface/DSChatRecord"
 
-const _m1: DSChatRecord[] = []   // store newly created messages here
-let   _m2: DSChatRecord   = null // store deleted message here
-let   _m3: DSChatRecord   = null // store edited message here
-
+const record_D: DSChatRecord[] = []
+const record_U: DSChatRecord[] = []
 /**
  * Triggers when a message is sent
  *
@@ -14,17 +12,6 @@ let   _m3: DSChatRecord   = null // store edited message here
  * @param {Bot} bot The bot instance
  */
 const Snipe = (message: Message, args: string[], bot: Bot) => {
-    // remove last one
-	if (_m1.length >= bot.config.snipe.limit) 
-        _m1.pop()
-	    _m1.push({
-		    id     : message.id,
-		    content: message.cleanContent,
-		    files  : message.attachments || null,
-		    owner  : message.author.tag,
-		    avatar : message.author.avatarURL()
-	    })
-
     // if message is not a command
     if (!args)
         return
@@ -32,26 +19,45 @@ const Snipe = (message: Message, args: string[], bot: Bot) => {
     const arg = message.content.split(/ +/)
           arg.shift()
     const cmd = arg.shift().toLocaleLowerCase()
+	const num = -1 - Math.abs(Number(arg.shift()))
 
 	switch (cmd) {
 		// normal snipe
 		case 's'    :
         case 'snipe': {
-			if (!_m2) return
+			if (record_D.length < 1)
+				return
+
+			const rep = record_D.at(num || -1)
 			message.reply({
-				embeds: [ _e(_m2) ],
-				files : _m2.files || null
+				embeds: [ _e(rep) ],
+				files : rep.files || null
 			})
 			break
 		}
 		// edit snipe
         case 'es'       :
 		case 'editsnipe': {
-			if (!_m3) return
+			if (record_U.length < 1)
+				return
+
+			const rep = record_U.at(num || -1)
 			message.reply({
-				embeds: [ _e(_m3) ],
-				files : _m3.files || null
+				embeds: [ _e(rep) ],
+				files : rep.files || null
 			})
+			break
+		}
+		// clear everything
+		case 'clear': {
+			if (message.member.permissions.has('MANAGE_MESSAGES')) {
+				record_U.length = 0
+				record_D.length = 0
+
+				// debug
+				if (bot.debug)
+					bot.logger.debug(`[Snipe] Cleared local cache`)
+			}
 			break
 		}
 		default:
@@ -78,10 +84,28 @@ const Snipe = (message: Message, args: string[], bot: Bot) => {
  * @param {Bot} bot The bot instance
  */
 const SnipeDelete = (message: Message, args: any, bot: Bot) => {
-    const find: DSChatRecord = _m1.find((m: DSChatRecord) => m.id.includes(message.id))
-    if (bot.debug && find)
-        bot.logger.debug(`[Snipe] Delete - ${message.id} => found ${find.id || null}`)
-	return _m2 = find
+	// shift oldest record
+	if (record_D.length > bot.config.snipe.limit)
+		record_D.shift()
+
+	// debug
+	if (bot.debug)
+		bot.logger.debug(`[Snipe] Deleted +${message.id} (${record_D.length}/${bot.config.snipe.limit})`)
+
+	// get attachments
+	const files: MessageAttachment[] = []
+	message.attachments.forEach(file => {
+		files.push(new MessageAttachment(file.attachment, file.name))
+	})
+
+	// add record
+   	return record_D.push({
+		id		: message.id,
+	   	content	: message.content,
+	   	files	: files,
+		owner	: message.author.tag,
+		avatar	: message.author.avatarURL()
+	})
 }
 
 /**
@@ -93,10 +117,28 @@ const SnipeDelete = (message: Message, args: any, bot: Bot) => {
  * @param {Bot} bot The bot instance
  */
 const SnipeUpdate = (oldMsg: Message, newMsg: Message, bot: Bot) => {
-    const find: DSChatRecord = _m1.find((m: DSChatRecord) => m.id.includes(newMsg.id))
-    if (bot.debug && find)
-        bot.logger.debug(`[Snipe] Update - ${newMsg.id} => found ${find.id || null}`)
-	return _m3 = find
+	// shift oldest record
+	if (record_U.length > bot.config.snipe.limit)
+		record_U.shift()
+
+	// debug
+	if (bot.debug)
+		bot.logger.debug(`[Snipe] Updated +${oldMsg.id} (${record_U.length}/${bot.config.snipe.limit})`)
+
+	// get attachments
+	const files: MessageAttachment[] = []
+	oldMsg.attachments.forEach(file => {
+		files.push(new MessageAttachment(file.attachment, file.name))
+	})
+
+	// add record
+	return record_U.push({
+		id		: oldMsg.id,
+		content : oldMsg.content,
+		files	: files,
+		owner	: oldMsg.author.tag,
+		avatar	: oldMsg.author.avatarURL()
+	})
 }
 
 /**
@@ -120,7 +162,7 @@ export = {
         Intents.FLAGS.GUILDS,
         Intents.FLAGS.GUILD_MESSAGES
     ],
-    command: [ "snipe", "editsnipe" ],
+    command: [ "snipe", "editsnipe", "clear" ],
     aliases: [ "s", "es" ],
     description: "Vote mute somebody cuz democracy is kul",
     usage: "%prefix% mute <Username>[/<Tag>/<User ID>]]",
