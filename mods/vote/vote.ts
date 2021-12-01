@@ -1,6 +1,6 @@
 import * as crypto from "crypto"
 import { GuildMember, Message, MessageEmbed, MessageReaction, TextChannel, User } from "discord.js"
-import { Bot } from "../../bot"
+import { Bot } from "../../core/bot"
 
 /**
  * A Vote instance, to mute anyone

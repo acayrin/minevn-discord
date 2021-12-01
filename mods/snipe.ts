@@ -1,6 +1,6 @@
 import { Intents, Message, MessageAttachment, MessageEmbed } from "discord.js"
-import { Bot } from "../bot"
-import { DSChatRecord } from "../interface/DSChatRecord"
+import { Bot } from "../core/bot"
+import { DSChatRecord } from "./snipe/DSChatRecord"
 
 const record_D: DSChatRecord[] = []
 const record_U: DSChatRecord[] = []
@@ -23,7 +23,7 @@ const Snipe = (message: Message, args: string[], bot: Bot) => {
 
 	switch (cmd) {
 		// normal snipe
-		case 's'    :
+		case 's':
         case 'snipe': {
 			if (record_D.length < 1)
 				return
@@ -36,7 +36,7 @@ const Snipe = (message: Message, args: string[], bot: Bot) => {
 			break
 		}
 		// edit snipe
-        case 'es'       :
+        case 'es':
 		case 'editsnipe': {
 			if (record_U.length < 1)
 				return
@@ -60,19 +60,9 @@ const Snipe = (message: Message, args: string[], bot: Bot) => {
 			}
 			break
 		}
-		default:
-			message.reply({
-				embeds: [
-					new MessageEmbed()
-					.setColor('#ed2261')
-					.setTitle(`Sniper`)
-					.setThumbnail(bot.cli().user.avatarURL())
-					.setDescription(`sus`)
-					.addField('snipe', 'snipe a deleted message')
-					.addField('editsnipe', 'snipe an edited message')
-					.setTimestamp()
-				]
-			})
+		default: {
+			// how tf did you get here
+		}
 	}
 }
 
@@ -126,9 +116,9 @@ const SnipeUpdate = (oldMsg: Message, newMsg: Message, bot: Bot) => {
 		bot.logger.debug(`[Snipe] Updated +${oldMsg.id} (${record_U.length}/${bot.config.snipe.limit})`)
 
 	// get attachments
-	const files: MessageAttachment[] = []
+	const files: { attachment: any, name: string }[] = []
 	oldMsg.attachments.forEach(file => {
-		files.push(new MessageAttachment(file.attachment, file.name))
+		files.push({ attachment: file.attachment, name: file.name })
 	})
 
 	// add record
@@ -164,8 +154,8 @@ export = {
     ],
     command: [ "snipe", "editsnipe", "clear" ],
     aliases: [ "s", "es" ],
-    description: "Vote mute somebody cuz democracy is kul",
-    usage: "%prefix% mute <Username>[/<Tag>/<User ID>]]",
+    description: "Snipe somebody and make their day miserable",
+    usage: "%prefix% <command/alias> [step]",
     onMsgCreate : Snipe,
     onMsgDelete : SnipeDelete,
     onMsgUpdate : SnipeUpdate,

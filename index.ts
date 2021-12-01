@@ -1,4 +1,16 @@
-import { Bot } from './bot'
+import { Bot } from './core/bot'
 
-const minevn = new Bot(null,true)
-      minevn.start()
+new Bot({
+      debug: true,
+      clientOptions: {
+            intents: [],
+            presence: {
+                activities: [
+                    {
+                        name: "over the people",
+                        type: "WATCHING"
+                    }
+                ]
+            }
+      }
+}).start()

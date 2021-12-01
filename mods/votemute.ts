@@ -12,7 +12,7 @@ export = {
     ],
     command: "votemute",
     aliases: [ "vm" ],
-    description: "Vote somebody cuz democracy is kul",
-    usage: "%prefix% %command% <Username>[/<Tag>/<User ID>]]",
+    description: "Vote mute somebody cuz democracy is kul",
+    usage: "%prefix% <command/alias> <mention>[/<user ID>/<username>]",
     onMsgCreate: VM
 }

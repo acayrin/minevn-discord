@@ -39,22 +39,24 @@ exports.__esModule = true;
 exports.Bot = void 0;
 var Discord = require("discord.js");
 var fs = require("fs");
+var commandmanager_1 = require("./commandmanager");
 var logger_1 = require("./logger");
 var Bot = (function () {
-    function Bot(token, debug) {
+    function Bot(options) {
         var _this = this;
         this.debug = false;
+        this.cmdMgr = new commandmanager_1.CommandManager();
         this.logger = new logger_1.Logger();
-        this.config = JSON.parse(fs.readFileSync("".concat(__dirname, "/config.json"), 'utf-8'));
-        this.command = new Discord.Collection();
+        this.config = JSON.parse(fs.readFileSync("".concat(__dirname, "/../../config.json"), 'utf-8'));
+        this.mods = [];
         this.cli = function () { return _this.client; };
         this.init = function () {
-            _this.logger.log("Node ".concat(process.version.match(/^v(\d+\.\d+)/)[1]));
+            _this.logger.log("Platform ".concat(process.platform, " ").concat(process.arch, " - Node ").concat(process.version.match(/^v(\d+\.\d+)/)[1]));
             var intents = [];
-            fs.readdirSync("".concat(__dirname, "/mods")).forEach(function (item) {
+            fs.readdirSync("".concat(__dirname, "/../mods")).forEach(function (item) {
                 if (!item.endsWith('.js'))
                     return;
-                var mod = require("".concat(__dirname, "/mods/").concat(item));
+                var mod = require("".concat(__dirname, "/../mods/").concat(item));
                 if (!mod.command || mod.command.length === 0)
                     return _this.logger.warn("File mods/".concat(item, " is not a valid mod"));
                 if (mod.disabled)
@@ -63,15 +65,8 @@ var Bot = (function () {
                     if (!intents.includes(intent))
                         intents.push(intent);
                 });
-                if (mod.aliases)
-                    if (Array.isArray(mod.aliases))
-                        mod.aliases.forEach(function (alias) { return _this.command.set(alias, mod); });
-                    else
-                        _this.command.set(mod.aliases, mod);
-                if (Array.isArray(mod.command))
-                    mod.command.forEach(function (cmd) { return _this.command.set(cmd, mod); });
-                else
-                    _this.command.set(mod.command, mod);
+                _this.cmdMgr.register(mod);
+                _this.mods.push(mod);
                 if (mod.onInit)
                     mod.onInit(_this);
                 _this.logger.log("Loaded mod: ".concat(mod.name, " (").concat(item, ")"));
@@ -82,8 +77,11 @@ var Bot = (function () {
                     _this.logger.debug("[STARTUP] ".concat(mod.name, " requested Intents: ").concat(mod.intents));
                 }
             });
-            _this.logger.log("Allowed Intents: ".concat(intents));
-            _this.client = new Discord.Client({ intents: intents });
+            if (_this.clientOptions.intents.toString() !== "")
+                intents = _this.clientOptions.intents;
+            _this.logger.log("Requested Intents: ".concat(intents));
+            _this.logger.log("Allowed Intents: ".concat(intents, " ").concat(_this.clientOptions.intents.toString() !== "" ? "(as in Bot options)" : "(from mods)"));
+            _this.client = new Discord.Client(Object.assign({}, _this.clientOptions, { intents: intents }));
         };
         this.onConnect = function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -95,13 +93,13 @@ var Bot = (function () {
             var arg = message.content.split(/ +/);
             if (arg.length === 1
                 || !message.content.startsWith(_this.config.prefix))
-                return _this.command.forEach(function (mod) { return mod.onMsgCreate(message, null, _this); });
+                return _this.mods.forEach(function (mod) { return mod.onMsgCreate(message, undefined, _this); });
             arg.shift();
             var cmd = arg.shift().toLocaleLowerCase();
-            if (!_this.command.has(cmd))
-                return _this.command.forEach(function (mod) { return mod.onMsgCreate(message, null, _this); });
+            if (!_this.cmdMgr.get(cmd))
+                return _this.mods.forEach(function (mod) { return mod.onMsgCreate(message, undefined, _this); });
             try {
-                _this.command.get(cmd).onMsgCreate(message, arg, _this);
+                _this.cmdMgr.get(cmd).onMsgCreate(message, arg, _this);
             }
             catch (error) {
                 _this.logger.error("Error while executing command '".concat(message.content, "'\n").concat(error));
@@ -109,7 +107,7 @@ var Bot = (function () {
         };
         this.onDelete = function (message) {
             var mods = [];
-            _this.command.forEach(function (mod) {
+            _this.mods.forEach(function (mod) {
                 if (!mods.includes(mod))
                     mods.push(mod);
             });
@@ -120,7 +118,7 @@ var Bot = (function () {
         };
         this.onUpdate = function (oldMessage, newMessage) {
             var mods = [];
-            _this.command.forEach(function (mod) {
+            _this.mods.forEach(function (mod) {
                 if (!mods.includes(mod))
                     mods.push(mod);
             });
@@ -129,16 +127,20 @@ var Bot = (function () {
                     mod.onMsgUpdate(oldMessage, newMessage, _this);
             });
         };
-        this.token = token || this.config.token;
-        this.debug = debug;
+        this.token = options.token || this.config.token;
+        this.debug = options.debug;
+        this.clientOptions = options.clientOptions;
     }
     Bot.prototype.start = function () {
+        var _this = this;
         this.init();
         this.client.login(this.token);
         this.client.on('ready', this.onConnect.bind(this));
         this.client.on('messageCreate', this.onMessage.bind(this));
         this.client.on('messageDelete', this.onDelete.bind(this));
         this.client.on('messageUpdate', this.onUpdate.bind(this));
+        if (this.debug)
+            this.client.on('debug', function (e) { return _this.logger.debug(e); });
     };
     return Bot;
 }());

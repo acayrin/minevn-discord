@@ -41,19 +41,8 @@ var Snipe = function (message, args, bot) {
             }
             break;
         }
-        default:
-            message.reply({
-                embeds: [
-                    new discord_js_1.MessageEmbed()
-                        .setColor('#ed2261')
-                        .setTitle("Sniper")
-                        .setThumbnail(bot.cli().user.avatarURL())
-                        .setDescription("sus")
-                        .addField('snipe', 'snipe a deleted message')
-                        .addField('editsnipe', 'snipe an edited message')
-                        .setTimestamp()
-                ]
-            });
+        default: {
+        }
     }
 };
 var SnipeDelete = function (message, args, bot) {
@@ -80,7 +69,7 @@ var SnipeUpdate = function (oldMsg, newMsg, bot) {
         bot.logger.debug("[Snipe] Updated +".concat(oldMsg.id, " (").concat(record_U.length, "/").concat(bot.config.snipe.limit, ")"));
     var files = [];
     oldMsg.attachments.forEach(function (file) {
-        files.push(new discord_js_1.MessageAttachment(file.attachment, file.name));
+        files.push({ attachment: file.attachment, name: file.name });
     });
     return record_U.push({
         id: oldMsg.id,
@@ -106,8 +95,8 @@ module.exports = {
     ],
     command: ["snipe", "editsnipe", "clear"],
     aliases: ["s", "es"],
-    description: "Vote mute somebody cuz democracy is kul",
-    usage: "%prefix% mute <Username>[/<Tag>/<User ID>]]",
+    description: "Snipe somebody and make their day miserable",
+    usage: "%prefix% <command/alias> [step]",
     onMsgCreate: Snipe,
     onMsgDelete: SnipeDelete,
     onMsgUpdate: SnipeUpdate

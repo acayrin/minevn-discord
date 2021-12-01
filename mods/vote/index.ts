@@ -1,5 +1,5 @@
 import { Message } from "discord.js"
-import { Bot } from "../../bot"
+import { Bot } from "../../core/bot"
 import { VoteMute } from "./votemute"
 import { VoteUnmute } from "./voteunmute"
 
@@ -12,7 +12,7 @@ import { VoteUnmute } from "./voteunmute"
  */
 async function VM (message: Message, args: string[], bot: Bot) {
     if (!args) return
-    const com = args.join()
+    const com = args.join(' ')
 
     // user check
     let user = message.mentions.members.first()
@@ -23,6 +23,8 @@ async function VM (message: Message, args: string[], bot: Bot) {
             user = (await message.guild.members.fetch({ query: com, limit: 1 })).first()
     if (!user) 
         return message.channel.send(`Looking for a ghost? Try that again but be sure to mention someone`)
+    if (user.user.bot)
+        return message.channel.send(`**${user.user.tag}** is a robot u sussy baka`)
 
     // create vote
     const vote = new VoteMute(user, message.channel, bot, null)
@@ -38,7 +40,7 @@ async function VM (message: Message, args: string[], bot: Bot) {
  */
  async function VUM (message: Message, args: string[], bot: Bot) {
     if (!args) return
-    const com = args.join()
+    const com = args.join(' ')
 
     // user check
     let user = message.mentions.members.first()
@@ -49,7 +51,9 @@ async function VM (message: Message, args: string[], bot: Bot) {
             user = (await message.guild.members.fetch({ query: com, limit: 1 })).first()
     if (!user) 
         return message.channel.send(`Looking for a ghost? Try that again but be sure to mention someone`)
-
+    if (user.user.bot)
+        return message.channel.send(`**${user.user.tag}** is a robot u sussy baka`)
+        
     // create vote
     const vote = new VoteUnmute(user, message.channel, bot, null)
           vote.vote()

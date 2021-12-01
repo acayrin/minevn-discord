@@ -1,5 +1,6 @@
 import * as Discord from "discord.js"
 import * as fs from "fs"
+import { CommandManager } from "./commandmanager"
 import { DSMod } from "./interface/DSMod"
 import { Logger } from "./logger"
 
@@ -12,13 +13,15 @@ import { Logger } from "./logger"
 class Bot {
     /**
      * Creates an instance of Bot.
-     * @param {string} token? Your Discord bot token, if not specified, will use one in configuration instead
-     * @param {boolean} debug? Enable debug mode
+     * @param {string} token Your Discord bot token, if not specified, will use one in configuration instead
+     * @param {boolean} debug Enable debug mode
+     * @param {Discord.ClientOptions} clientOptions Client options, leave 'intents' empty, else if 'intents' are specified, they will override mods intents requirements
      * @memberof Bot
      */
-    constructor (token?: string, debug?: boolean) {
-        this.token = token || this.config.token
-        this.debug = debug
+    constructor (options?: { token?: string, debug?: boolean, clientOptions?: Discord.ClientOptions }) {
+        this.token = options.token || this.config.token
+        this.debug = options.debug
+        this.clientOptions = options.clientOptions
     }
     
     /**
@@ -49,27 +52,44 @@ class Bot {
     private client : Discord.Client
 
     /**
+     * Bot's Client options
+     *
+     * @private
+     * @type {Discord.ClientOptions}
+     * @memberof Bot
+     */
+    private clientOptions : Discord.ClientOptions
+    
+    /**
+     * Bot's Command manager instace
+     *
+     * @type {CommandManager}
+     * @memberof Bot
+     */
+    public cmdMgr : CommandManager = new CommandManager()
+
+    /**
      * Bot's Logger instance
      *
      * @private
      * @memberof Bot
      */
-    public logger = new Logger()
+    public logger : Logger = new Logger()
 
     /**
      * Bot's configuration, contains token so DO NOT SHARE THIS !!
      *
-     * @private
+     * @public
      * @memberof Bot
      */
-    public readonly config = JSON.parse(fs.readFileSync(`${__dirname}/config.json`, 'utf-8'))
+    public readonly config = JSON.parse(fs.readFileSync(`${__dirname}/../../config.json`, 'utf-8'))
 
     /**
-     * Bot's command collection
+     * Bot's mods collection
      *
      * @memberof Bot
      */
-    public command = new Discord.Collection<string, DSMod>()
+    public mods : DSMod[] = []
 
     /**
      * Get the Bot's client
@@ -85,17 +105,17 @@ class Bot {
      * @memberof Bot
      */
     private init = () => {
-        this.logger.log(`Node ${process.version.match(/^v(\d+\.\d+)/)[1]}`)
+        this.logger.log(`Platform ${process.platform} ${process.arch} - Node ${process.version.match(/^v(\d+\.\d+)/)[1]}`)
 
-        const intents: Discord.Intents[] = []
+        let intents: any = []
 
-        fs.readdirSync(`${__dirname}/mods`).forEach(item => {
+        fs.readdirSync(`${__dirname}/../mods`).forEach(item => {
             // ignore any that isn't javascript
             if(!item.endsWith('.js'))
                 return
 
             // temp to load any mods
-            const mod: DSMod = require(`${__dirname}/mods/${item}`)
+            const mod: DSMod = require(`${__dirname}/../mods/${item}`)
             if (!mod.command || mod.command.length === 0)
                 return this.logger.warn(`File mods/${item} is not a valid mod`)
         
@@ -110,15 +130,8 @@ class Bot {
 
             // add aliases first, then commands
             // to prevent aliases overlapping base commands
-            if (mod.aliases)
-                if (Array.isArray(mod.aliases))
-                    mod.aliases.forEach(alias => this.command.set(alias, mod))
-                else
-                    this.command.set(mod.aliases, mod)
-            if (Array.isArray(mod.command))
-                mod.command.forEach(cmd => this.command.set(cmd, mod))
-            else
-                this.command.set(mod.command, mod)
+            this.cmdMgr.register(mod)
+            this.mods.push(mod)
 
             // mod's init phase (if any)
             if (mod.onInit)
@@ -126,6 +139,7 @@ class Bot {
 
             // logger
             this.logger.log(`Loaded mod: ${mod.name} (${item})`)
+
             // debug
             if (this.debug) {
                 if (mod.aliases)
@@ -134,8 +148,14 @@ class Bot {
                 this.logger.debug(`[STARTUP] ${mod.name} requested Intents: ${mod.intents}`)
             }
         })
-        this.logger.log(`Allowed Intents: ${intents}`)
-        this.client = new Discord.Client({ intents: intents })
+
+        // if bot is configured with intents, use those instead
+        if (this.clientOptions.intents.toString() !== "")
+            intents = this.clientOptions.intents
+
+        this.logger.log(`Requested Intents: ${intents}`)
+        this.logger.log(`Allowed Intents: ${intents} ${this.clientOptions.intents.toString() !== "" ? `(as in Bot options)` : `(from mods)`}`)
+        this.client = new Discord.Client(Object.assign({}, this.clientOptions, { intents: intents }))
     }
 
     /**
@@ -150,6 +170,8 @@ class Bot {
         this.client.on('messageCreate', this.onMessage.bind(this))
         this.client.on('messageDelete', this.onDelete.bind(this))
         this.client.on('messageUpdate', this.onUpdate.bind(this))
+        if (this.debug)
+            this.client.on('debug', e => this.logger.debug(e))
     }
 
     /**
@@ -173,16 +195,16 @@ class Bot {
         const arg = message.content.split(/ +/)
         if (arg.length === 1                                    // not enough arguments
             || !message.content.startsWith(this.config.prefix)) // doesnt start with prefix)
-            return this.command.forEach(mod => mod.onMsgCreate(message, null, this))
+            return this.mods.forEach(mod => mod.onMsgCreate(message, undefined, this))
         
                     arg.shift()                     // prefix
         const cmd = arg.shift().toLocaleLowerCase() // command
 
-        if (!this.command.has(cmd)) 
-            return this.command.forEach(mod => mod.onMsgCreate(message, null, this))
+        if (!this.cmdMgr.get(cmd)) 
+            return this.mods.forEach(mod => mod.onMsgCreate(message, undefined, this))
         
         try {
-            this.command.get(cmd).onMsgCreate(message, arg, this)
+            this.cmdMgr.get(cmd).onMsgCreate(message, arg, this)
         } catch (error) {
             this.logger.error(`Error while executing command '${message.content}'\n${error}`)
         }
@@ -197,7 +219,7 @@ class Bot {
      */
     private onDelete = (message: Discord.Message) => {
         const mods: DSMod[] = []
-        this.command.forEach(mod => {
+        this.mods.forEach(mod => {
             if (!mods.includes(mod))
                 mods.push(mod)
         })
@@ -217,7 +239,7 @@ class Bot {
      */
     private onUpdate = (oldMessage: Discord.Message, newMessage: Discord.Message) => {
         const mods: DSMod[] = []
-        this.command.forEach(mod => {
+        this.mods.forEach(mod => {
             if (!mods.includes(mod))
                 mods.push(mod)
         })

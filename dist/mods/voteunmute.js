@@ -12,7 +12,7 @@ module.exports = {
     ],
     command: "voteunmute",
     aliases: ["vum"],
-    description: "Vote somebody cuz democracy is kul",
-    usage: "%prefix% %command% <Username>[/<Tag>/<User ID>]]",
+    description: "Vote un-mute somebody cuz democracy is kul",
+    usage: "%prefix% <command/alias> <mention>[/<user id>/<username>]",
     onMsgCreate: vote_1.VUM
 };

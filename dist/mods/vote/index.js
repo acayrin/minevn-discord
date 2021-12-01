@@ -47,7 +47,7 @@ function VM(message, args, bot) {
                 case 0:
                     if (!args)
                         return [2];
-                    com = args.join();
+                    com = args.join(' ');
                     user = message.mentions.members.first();
                     if (!(!user && com.length > 0)) return [3, 4];
                     if (!!isNaN(Number(com))) return [3, 2];
@@ -62,6 +62,8 @@ function VM(message, args, bot) {
                 case 4:
                     if (!user)
                         return [2, message.channel.send("Looking for a ghost? Try that again but be sure to mention someone")];
+                    if (user.user.bot)
+                        return [2, message.channel.send("**".concat(user.user.tag, "** is a robot u sussy baka"))];
                     vote = new votemute_1.VoteMute(user, message.channel, bot, null);
                     vote.vote();
                     return [2];
@@ -78,7 +80,7 @@ function VUM(message, args, bot) {
                 case 0:
                     if (!args)
                         return [2];
-                    com = args.join();
+                    com = args.join(' ');
                     user = message.mentions.members.first();
                     if (!(!user && com.length > 0)) return [3, 4];
                     if (!!isNaN(Number(com))) return [3, 2];
@@ -93,6 +95,8 @@ function VUM(message, args, bot) {
                 case 4:
                     if (!user)
                         return [2, message.channel.send("Looking for a ghost? Try that again but be sure to mention someone")];
+                    if (user.user.bot)
+                        return [2, message.channel.send("**".concat(user.user.tag, "** is a robot u sussy baka"))];
                     vote = new voteunmute_1.VoteUnmute(user, message.channel, bot, null);
                     vote.vote();
                     return [2];
