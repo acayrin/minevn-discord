@@ -35,7 +35,7 @@ export class VoteMute extends Vote {
                         `Muted: ${this.target.user.tag} [${this.bot.config.mute.duration}m]`
                     )
                     .setDescription(
-                        `reason: mob vote\namount ${this.vote_Y} 👍 : ${this.vote_N} 👎`
+                        `reason: ${this.reason}\namount ${this.vote_Y} 👍 : ${this.vote_N} 👎`
                     ),
             ],
         });

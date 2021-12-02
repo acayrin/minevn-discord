@@ -30,7 +30,7 @@ export class VoteUnmute extends Vote {
                 this.embed
                     .setTitle(`Un-muted: ${this.target.user.tag}`)
                     .setDescription(
-                        `reason: mob vote\namount ${this.vote_Y} 👍 : ${this.vote_N} 👎`
+                        `reason: ${this.reason}\namount ${this.vote_Y} 👍 : ${this.vote_N} 👎`
                     ),
             ],
         });

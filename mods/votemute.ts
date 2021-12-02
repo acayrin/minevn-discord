@@ -13,6 +13,6 @@ export = {
     command: "votemute",
     aliases: ["vm"],
     description: "Vote mute somebody cuz democracy is kul",
-    usage: "%prefix% <command/alias> <mention>[/<user ID>/<username>]",
+    usage: "%prefix% <command/alias> <mention>[/<user ID>/<username>] [reason]",
     onMsgCreate: VM,
 };

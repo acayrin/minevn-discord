@@ -83,7 +83,7 @@ var VoteMute = (function (_super) {
                             embeds: [
                                 this.embed
                                     .setTitle("Muted: ".concat(this.target.user.tag, " [").concat(this.bot.config.mute.duration, "m]"))
-                                    .setDescription("reason: mob vote\namount ".concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E")),
+                                    .setDescription("reason: ".concat(this.reason, "\namount ").concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E")),
                             ]
                         });
                         this.target.roles.add(role)["catch"](function (e) { return __awaiter(_this, void 0, void 0, function () {
