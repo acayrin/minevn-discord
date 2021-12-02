@@ -92,7 +92,7 @@ var VoteUnmute = (function (_super) {
     };
     VoteUnmute.prototype.onWin = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var role;
+            var role, e_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4, (0, func_1.getRole)(this.bot.config.mute.role || "mute", this.channel.guild)];
@@ -103,8 +103,18 @@ var VoteUnmute = (function (_super) {
                                     .setTitle("Un-muted: ".concat(this.target.user.tag))
                                     .setDescription("reason: mob vote\namount ".concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E"))
                             ] });
-                        this.target.roles.remove(role);
-                        return [2];
+                        _a.label = 2;
+                    case 2:
+                        _a.trys.push([2, 3, , 5]);
+                        this.target.roles.add(role);
+                        return [3, 5];
+                    case 3:
+                        e_1 = _a.sent();
+                        return [4, this.channel.guild.members.fetch(this.target.id)];
+                    case 4:
+                        (_a.sent()).roles.add(role);
+                        return [3, 5];
+                    case 5: return [2];
                 }
             });
         });

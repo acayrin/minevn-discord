@@ -1,3 +1,4 @@
+import { DiscordAPIError } from "discord.js"
 import { getRole } from "./func"
 import { Vote } from "./vote"
 
@@ -39,11 +40,19 @@ export class VoteMute extends Vote {
                 .setTitle(`Muted: ${this.target.user.tag} [${this.bot.config.mute.duration}m]`)
                 .setDescription(`reason: mob vote\namount ${this.vote_Y} 👍 : ${this.vote_N} 👎`)
         ] })
-        this.target.roles.add(role)
+        try {
+            this.target.roles.add(role)
+        } catch(e) {
+            (await this.channel.guild.members.fetch(this.target.id)).roles.add(role)
+        }
 
-        setTimeout(_ => {
-            this.target.roles.remove(role)
-            this.channel.send(`Un-muted **${this.target.user.tag}**`)
+        setTimeout(async () => {
+            try {
+                this.target.roles.remove(role)
+            } catch(e) {
+                (await this.channel.guild.members.fetch(this.target.id)).roles.remove(role)
+            }
+            //this.channel.send(`Un-muted **${this.target.user.tag}**`)
 
             // debug
             if (this.bot.debug)

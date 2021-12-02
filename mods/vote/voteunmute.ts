@@ -39,6 +39,10 @@ export class VoteUnmute extends Vote {
                 .setTitle(`Un-muted: ${this.target.user.tag}`)
                 .setDescription(`reason: mob vote\namount ${this.vote_Y} 👍 : ${this.vote_N} 👎`)
         ] })
-        this.target.roles.remove(role)
+        try {
+            this.target.roles.add(role)
+        } catch(e) {
+            (await this.channel.guild.members.fetch(this.target.id)).roles.add(role)
+        }
     }
 }

@@ -92,7 +92,7 @@ var VoteMute = (function (_super) {
     };
     VoteMute.prototype.onWin = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var role;
+            var role, e_1;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -104,13 +104,39 @@ var VoteMute = (function (_super) {
                                     .setTitle("Muted: ".concat(this.target.user.tag, " [").concat(this.bot.config.mute.duration, "m]"))
                                     .setDescription("reason: mob vote\namount ".concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E"))
                             ] });
+                        _a.label = 2;
+                    case 2:
+                        _a.trys.push([2, 3, , 5]);
                         this.target.roles.add(role);
-                        setTimeout(function (_) {
-                            _this.target.roles.remove(role);
-                            _this.channel.send("Un-muted **".concat(_this.target.user.tag, "**"));
-                            if (_this.bot.debug)
-                                _this.bot.logger.debug("[Vote - ".concat(_this.id, "] Un-muted user ").concat(_this.target.id));
-                        }, this.bot.config.mute.duration * 60000);
+                        return [3, 5];
+                    case 3:
+                        e_1 = _a.sent();
+                        return [4, this.channel.guild.members.fetch(this.target.id)];
+                    case 4:
+                        (_a.sent()).roles.add(role);
+                        return [3, 5];
+                    case 5:
+                        setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
+                            var e_2;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        _a.trys.push([0, 1, , 3]);
+                                        this.target.roles.remove(role);
+                                        return [3, 3];
+                                    case 1:
+                                        e_2 = _a.sent();
+                                        return [4, this.channel.guild.members.fetch(this.target.id)];
+                                    case 2:
+                                        (_a.sent()).roles.remove(role);
+                                        return [3, 3];
+                                    case 3:
+                                        if (this.bot.debug)
+                                            this.bot.logger.debug("[Vote - ".concat(this.id, "] Un-muted user ").concat(this.target.id));
+                                        return [2];
+                                }
+                            });
+                        }); }, this.bot.config.mute.duration * 60000);
                         return [2];
                 }
             });
