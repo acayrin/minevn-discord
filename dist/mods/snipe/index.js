@@ -13,8 +13,8 @@ var Snipe = function (message, args, bot) {
     var cmd = arg.shift().toLocaleLowerCase();
     var num = -1 - Math.abs(Number(arg.shift()));
     switch (cmd) {
-        case 's':
-        case 'snipe': {
+        case "s":
+        case "snipe": {
             if (record_D[message.channelId].length < 1)
                 return;
             var rep = record_D[message.channelId].at(num || -1);
@@ -24,8 +24,8 @@ var Snipe = function (message, args, bot) {
             });
             break;
         }
-        case 'es':
-        case 'editsnipe': {
+        case "es":
+        case "editsnipe": {
             if (record_U[message.channelId].length < 1)
                 return;
             var rep = record_U[message.channelId].at(num || -1);
@@ -35,10 +35,10 @@ var Snipe = function (message, args, bot) {
             });
             break;
         }
-        case 'clear': {
-            if (message.member.permissions.has('MANAGE_MESSAGES')) {
-                record_U.length = 0;
-                record_D.length = 0;
+        case "clear": {
+            if (message.member.permissions.has("MANAGE_MESSAGES")) {
+                record_U[message.channelId].length = 0;
+                record_D[message.channelId].length = 0;
                 if (bot.debug)
                     bot.logger.debug("[Snipe] Cleared local cache");
             }
@@ -95,7 +95,7 @@ var _c = function (ch) {
 };
 var _e = function (a) {
     return new discord_js_1.MessageEmbed()
-        .setColor('#ed2261')
+        .setColor("#ed2261")
         .setAuthor(a.owner, a.avatar)
         .setDescription(a.content)
         .setTimestamp();

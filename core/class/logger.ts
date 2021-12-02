@@ -1,4 +1,4 @@
-import * as chalk from 'chalk'
+import * as chalk from "chalk";
 
 /**
  * A Console Logger
@@ -6,7 +6,13 @@ import * as chalk from 'chalk'
  * @class Logger
  */
 class Logger {
-    private time = (new Date()).toLocaleString()
+    /**
+     * Local time string
+     *
+     * @private
+     * @memberof Logger
+     */
+    private time = new Date().toLocaleString();
 
     /**
      * Print a debug message
@@ -15,8 +21,8 @@ class Logger {
      * @memberof Logger
      */
     public debug = (msg: string) => {
-        console.log(`${chalk.gray(`[${this.time} - DEBUG] ${msg}`)}`)
-    }
+        console.log(`${chalk.gray(`[${this.time} - DEBUG] ${msg}`)}`);
+    };
 
     /**
      * Print an info message
@@ -25,8 +31,8 @@ class Logger {
      * @memberof Logger
      */
     public log = (msg: string) => {
-        console.log(`[${this.time} - INFO] ${msg}`)
-    }
+        console.log(`[${this.time} - INFO] ${msg}`);
+    };
 
     /**
      * Print a warning message
@@ -35,8 +41,8 @@ class Logger {
      * @memberof Logger
      */
     public warn = (msg: string) => {
-        console.log(`${chalk.yellow(`[${this.time} - WARN] ${msg}`)}`)
-    }
+        console.log(`${chalk.yellow(`[${this.time} - WARN] ${msg}`)}`);
+    };
 
     /**
      * Print an error message
@@ -45,8 +51,8 @@ class Logger {
      * @memberof Logger
      */
     public error = (msg: string) => {
-        console.log(`${chalk.red(`[${this.time} - ERROR] ${msg}`)}`)
-    }
+        console.log(`${chalk.red(`[${this.time} - ERROR] ${msg}`)}`);
+    };
 }
 
-export { Logger }
+export { Logger };

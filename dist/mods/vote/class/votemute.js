@@ -51,74 +51,92 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.VoteUnmute = void 0;
-var func_1 = require("./func");
+exports.VoteMute = void 0;
+var __1 = require("..");
+var utils_1 = require("../../../core/utils");
 var vote_1 = require("./vote");
-var VoteUnmute = (function (_super) {
-    __extends(VoteUnmute, _super);
-    function VoteUnmute() {
+var VoteMute = (function (_super) {
+    __extends(VoteMute, _super);
+    function VoteMute() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    VoteUnmute.prototype.vote = function () {
+    VoteMute.prototype.vote = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 this.run({
-                    embed: this.embed.setTitle("Un-mute: ".concat(this.target.user.tag))
+                    embed: this.embed.setTitle("Mute: ".concat(this.target.user.tag, " for ").concat(this.bot.config.mute.duration, "m"))
                 });
                 return [2];
             });
         });
     };
-    VoteUnmute.prototype.preload = function () {
+    VoteMute.prototype.onWin = function () {
         return __awaiter(this, void 0, void 0, function () {
             var role;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, (0, func_1.getRole)(this.bot.config.mute.role || "mute", this.channel.guild)];
+                    case 0: return [4, (0, utils_1.getRole)(this.bot.config.mute.role || "mute", this.channel.guild)];
                     case 1:
                         role = _a.sent();
-                        if (!role.first()) {
-                            this.channel.send("Can't find any **muted** role, stop abusing now");
-                            return [2, true];
-                        }
-                        if (!this.target.roles.cache.has(role.first().id)) {
-                            this.channel.send("User **".concat(this.target.user.tag, "** is not ~~abused~~ muted so ignoring"));
-                            return [2, true];
-                        }
+                        this.msg.edit({
+                            embeds: [
+                                this.embed
+                                    .setTitle("Muted: ".concat(this.target.user.tag, " [").concat(this.bot.config.mute.duration, "m]"))
+                                    .setDescription("reason: mob vote\namount ".concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E")),
+                            ]
+                        });
+                        this.target.roles.add(role)["catch"](function (e) { return __awaiter(_this, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4, this.getTarget()];
+                                    case 1:
+                                        (_a.sent()).roles.add(role);
+                                        return [2];
+                                }
+                            });
+                        }); });
+                        setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
+                            var _this = this;
+                            return __generator(this, function (_a) {
+                                this.target.roles.remove(role)["catch"](function (e) { return __awaiter(_this, void 0, void 0, function () {
+                                    return __generator(this, function (_a) {
+                                        switch (_a.label) {
+                                            case 0: return [4, this.getTarget()];
+                                            case 1:
+                                                (_a.sent()).roles.remove(role);
+                                                return [2];
+                                        }
+                                    });
+                                }); });
+                                __1.recentMutes.push(this.target.id);
+                                setTimeout(function () {
+                                    __1.recentMutes.splice(__1.recentMutes.indexOf(_this.target.id), 1);
+                                }, this.bot.config.mute.duration * 2 * 1000);
+                                if (this.bot.debug)
+                                    this.bot.logger.debug("[Vote - ".concat(this.id, "] Un-muted user ").concat(this.target.id));
+                                return [2];
+                            });
+                        }); }, this.bot.config.mute.duration * 60000);
                         return [2];
                 }
             });
         });
     };
-    VoteUnmute.prototype.onWin = function () {
+    VoteMute.prototype.onLose = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var role, e_1;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4, (0, func_1.getRole)(this.bot.config.mute.role || "mute", this.channel.guild)];
-                    case 1:
-                        role = _a.sent();
-                        this.msg.edit({ embeds: [
-                                this.embed
-                                    .setTitle("Un-muted: ".concat(this.target.user.tag))
-                                    .setDescription("reason: mob vote\namount ".concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E"))
-                            ] });
-                        _a.label = 2;
-                    case 2:
-                        _a.trys.push([2, 3, , 5]);
-                        this.target.roles.add(role);
-                        return [3, 5];
-                    case 3:
-                        e_1 = _a.sent();
-                        return [4, this.channel.guild.members.fetch(this.target.id)];
-                    case 4:
-                        (_a.sent()).roles.add(role);
-                        return [3, 5];
-                    case 5: return [2];
-                }
+                this.msg.edit({
+                    embeds: [
+                        this.embed
+                            .setTitle("Vote ended, nobody was abused")
+                            .setDescription("amount ".concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E")),
+                    ]
+                });
+                return [2];
             });
         });
     };
-    return VoteUnmute;
+    return VoteMute;
 }(vote_1.Vote));
-exports.VoteUnmute = VoteUnmute;
+exports.VoteMute = VoteMute;

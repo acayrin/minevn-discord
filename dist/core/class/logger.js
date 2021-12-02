@@ -5,7 +5,7 @@ var chalk = require("chalk");
 var Logger = (function () {
     function Logger() {
         var _this = this;
-        this.time = (new Date()).toLocaleString();
+        this.time = new Date().toLocaleString();
         this.debug = function (msg) {
             console.log("".concat(chalk.gray("[".concat(_this.time, " - DEBUG] ").concat(msg))));
         };

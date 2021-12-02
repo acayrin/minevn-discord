@@ -11,7 +11,7 @@ export interface DSChatRecord {
      * @type {string}
      * @memberof DSChatRecord
      */
-    id: string,
+    id: string;
 
     /**
      * Message content
@@ -19,7 +19,7 @@ export interface DSChatRecord {
      * @type {string}
      * @memberof DSChatRecord
      */
-    content: string,
+    content: string;
 
     /**
      * Message attachments
@@ -27,7 +27,7 @@ export interface DSChatRecord {
      * @type {*}
      * @memberof DSChatRecord
      */
-    files: any,   // MessageAttachment | BufferResolvable | FileOptions
+    files: any; // MessageAttachment | BufferResolvable | FileOptions
 
     /**
      * Message author
@@ -35,13 +35,13 @@ export interface DSChatRecord {
      * @type {string}
      * @memberof DSChatRecord
      */
-    owner: string,
-    
+    owner: string;
+
     /**
      * Message author's avatar
      *
      * @type {string}
      * @memberof DSChatRecord
      */
-    avatar: string,
+    avatar: string;
 }

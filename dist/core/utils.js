@@ -36,20 +36,48 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.getRole = void 0;
+exports.getUser = exports.getRole = void 0;
 var getRole = function (query, guild) { return __awaiter(void 0, void 0, void 0, function () {
-    var gr;
+    var gr, e_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4, guild.roles.fetch()];
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4, guild.roles.fetch()];
             case 1:
                 gr = _a.sent();
                 if (!isNaN(Number(query)))
-                    return [2, gr.filter(function (r) { return r.id.includes(query); })];
+                    return [2, gr.filter(function (r) { return r.id.includes(query); }).first()];
                 else
-                    return [2, gr.filter(function (r) { return r.name.toLowerCase().includes(query); })];
-                return [2];
+                    return [2, gr
+                            .filter(function (r) { return r.name.toLowerCase().includes(query); })
+                            .first()];
+                return [3, 3];
+            case 2:
+                e_1 = _a.sent();
+                return [2, undefined];
+            case 3: return [2];
         }
     });
 }); };
 exports.getRole = getRole;
+var getUser = function (query, guild) { return __awaiter(void 0, void 0, void 0, function () {
+    var e_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 5, , 6]);
+                if (!!isNaN(Number(query))) return [3, 2];
+                return [4, guild.members.fetch({ user: query })];
+            case 1: return [2, _a.sent()];
+            case 2: return [4, guild.members.fetch({ query: query, limit: 1 })];
+            case 3: return [2, (_a.sent()).first()];
+            case 4: return [3, 6];
+            case 5:
+                e_2 = _a.sent();
+                return [2, undefined];
+            case 6: return [2];
+        }
+    });
+}); };
+exports.getUser = getUser;

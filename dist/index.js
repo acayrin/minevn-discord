@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-var bot_1 = require("./core/bot");
+var bot_1 = require("./core/class/bot");
 new bot_1.Bot({
     debug: true,
     clientOptions: {
@@ -10,7 +10,7 @@ new bot_1.Bot({
                 {
                     name: "over the people",
                     type: "WATCHING"
-                }
+                },
             ]
         }
     }

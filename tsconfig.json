@@ -1,10 +1,10 @@
 {
     "compilerOptions": {
-      "module": "commonjs",
-      "moduleResolution": "Node",
-      "noImplicitAny": true,
-      "removeComments": true,
-      "outDir": "./dist"
+        "module": "commonjs",
+        "moduleResolution": "Node",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "outDir": "./dist"
     },
     "include": ["**/*"],
     "exclude": ["node_modules"]

@@ -39,6 +39,7 @@ exports.__esModule = true;
 exports.Bot = void 0;
 var Discord = require("discord.js");
 var fs = require("fs");
+var path_1 = require("path");
 var commandmanager_1 = require("./commandmanager");
 var logger_1 = require("./logger");
 var Bot = (function () {
@@ -47,16 +48,17 @@ var Bot = (function () {
         this.debug = false;
         this.cmdMgr = new commandmanager_1.CommandManager();
         this.logger = new logger_1.Logger();
-        this.config = JSON.parse(fs.readFileSync("".concat(__dirname, "/../../config.json"), 'utf-8'));
+        this.config = JSON.parse(fs.readFileSync("".concat(__dirname, "/../../../config.json"), "utf-8"));
         this.mods = [];
         this.cli = function () { return _this.client; };
         this.init = function () {
             _this.logger.log("Platform ".concat(process.platform, " ").concat(process.arch, " - Node ").concat(process.version.match(/^v(\d+\.\d+)/)[1]));
+            var path = (0, path_1.dirname)(require.main.filename);
             var intents = [];
-            fs.readdirSync("".concat(__dirname, "/../mods")).forEach(function (item) {
-                if (!item.endsWith('.js'))
+            fs.readdirSync("".concat(path, "/mods")).forEach(function (item) {
+                if (!item.endsWith(".js"))
                     return;
-                var mod = require("".concat(__dirname, "/../mods/").concat(item));
+                var mod = require("".concat(path, "/mods/").concat(item));
                 if (!mod.command || mod.command.length === 0)
                     return _this.logger.warn("File mods/".concat(item, " is not a valid mod"));
                 if (mod.disabled)
@@ -80,7 +82,9 @@ var Bot = (function () {
             if (_this.clientOptions.intents.toString() !== "")
                 intents = _this.clientOptions.intents;
             _this.logger.log("Requested Intents: ".concat(intents));
-            _this.logger.log("Allowed Intents: ".concat(intents, " ").concat(_this.clientOptions.intents.toString() !== "" ? "(as in Bot options)" : "(from mods)"));
+            _this.logger.log("Allowed Intents: ".concat(intents, " ").concat(_this.clientOptions.intents.toString() !== ""
+                ? "(as in Bot options)"
+                : "(from mods)"));
             _this.client = new Discord.Client(Object.assign({}, _this.clientOptions, { intents: intents }));
         };
         this.onConnect = function () { return __awaiter(_this, void 0, void 0, function () {
@@ -91,15 +95,19 @@ var Bot = (function () {
         }); };
         this.onMessage = function (message) {
             var arg = message.content.split(/ +/);
-            if (arg.length === 1
-                || !message.content.startsWith(_this.config.prefix))
-                return _this.mods.forEach(function (mod) { return mod.onMsgCreate(message, undefined, _this); });
+            if (arg.length === 1 ||
+                !message.content.startsWith(_this.config.prefix))
+                return _this.mods.forEach(function (mod) {
+                    return mod.onMsgCreate(message, undefined, _this);
+                });
             arg.shift();
             var cmd = arg.shift().toLocaleLowerCase();
-            if (!_this.cmdMgr.get(cmd))
-                return _this.mods.forEach(function (mod) { return mod.onMsgCreate(message, undefined, _this); });
+            if (!_this.cmdMgr.getMod(cmd))
+                return _this.mods.forEach(function (mod) {
+                    return mod.onMsgCreate(message, undefined, _this);
+                });
             try {
-                _this.cmdMgr.get(cmd).onMsgCreate(message, arg, _this);
+                _this.cmdMgr.getMod(cmd).onMsgCreate(message, arg, _this);
             }
             catch (error) {
                 _this.logger.error("Error while executing command '".concat(message.content, "'\n").concat(error));
@@ -135,12 +143,12 @@ var Bot = (function () {
         var _this = this;
         this.init();
         this.client.login(this.token);
-        this.client.on('ready', this.onConnect.bind(this));
-        this.client.on('messageCreate', this.onMessage.bind(this));
-        this.client.on('messageDelete', this.onDelete.bind(this));
-        this.client.on('messageUpdate', this.onUpdate.bind(this));
+        this.client.on("ready", this.onConnect.bind(this));
+        this.client.on("messageCreate", this.onMessage.bind(this));
+        this.client.on("messageDelete", this.onDelete.bind(this));
+        this.client.on("messageUpdate", this.onUpdate.bind(this));
         if (this.debug)
-            this.client.on('debug', function (e) { return _this.logger.debug(e); });
+            this.client.on("debug", function (e) { return _this.logger.debug(e); });
     };
     return Bot;
 }());

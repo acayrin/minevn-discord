@@ -31,7 +31,7 @@ var CommandManager = (function () {
             this.aliases.push(mod.aliases);
         }
     };
-    CommandManager.prototype.get = function (command) {
+    CommandManager.prototype.getMod = function (command) {
         if (!command)
             return null;
         return this.links.get(command);

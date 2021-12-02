@@ -4,10 +4,7 @@ var snipe_1 = require("./snipe/");
 module.exports = {
     name: "Snipe",
     author: "acayrin",
-    intents: [
-        discord_js_1.Intents.FLAGS.GUILDS,
-        discord_js_1.Intents.FLAGS.GUILD_MESSAGES
-    ],
+    intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES],
     command: ["snipe", "editsnipe", "clear"],
     aliases: ["s", "es"],
     description: "Snipe somebody and make their day miserable",
