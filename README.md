@@ -1,16 +1,37 @@
-# A Somewhat-Suckless-Discord-Bot
+# A Somewhat Suckless Discord Bot
 
-as the title, mainly used in MineVN's Discord server
+As the title, mainly used in MineVN's Discord server
 
-## Usage
+This project was made mainly for fun, don't take it too serious for all the so-called jokes i put around this README kekw
+
+## Current features
+
+-   Vote system - vote (un)mute someone (with anti-spam, channel lock and vote cooldown)
+-   Message snipe - snipe a deleted/modified message (with files support\* and custom history lookup)
+-   Minecraft status - a simple minecraft server tracker (Hẻo đã hẻo)
+-   To be added:
+    -   basic moderation features? most likely no
+    -   full size minecraft server tracker?
+    -   credit syste- wait wut
+    -   image options??? wtf does that even mean
+    -   clowns - we need happiness
+    -   _ded cuz of depression_
+
+<hr>
+
+## Requirements
+
+-   NodeJS `16.x`
+-   Knowledge about Typescript/Javascript
+-   Time to rethink about the purpose of this thing that i made
+
+## Installation and Usage
 
 ```
 npm i           // install dependencies
 npm run build   // compile the project
 npm start       // start the bot
 ```
-
-<hr>
 
 ## Configuration
 
@@ -78,7 +99,7 @@ Whether the mod will be disabled
 
 ## Example
 
-### `SucklessMod.ts`
+### `mods/SucklessMod.ts`
 
 ```ts
 export = {
@@ -98,7 +119,7 @@ export = {
 };
 ```
 
-### `SomeSuckLessFunction.ts`
+### `mods/SomeSuckLessFunction.ts`
 
 ```ts
 export function SomeSucklessFunction(message: Discord.Message, args: string[], bot: Bot) {
@@ -107,6 +128,8 @@ export function SomeSucklessFunction(message: Discord.Message, args: string[], b
 ```
 
 You may find more "interest" things inside the `mods` folder
+
+<hr>
 
 ## Todos
 

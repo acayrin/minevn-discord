@@ -1,12 +1,11 @@
 import { Message } from "discord.js";
-import { Bot } from "../../core/class/bot";
+import { SucklessBot } from "../../core/class/sucklessbot";
 import { getRole, getUser } from "../../core/utils";
 import { VoteManager } from "./class/votemanager";
 import { VoteMute } from "./class/votemute";
 import { VoteUnmute } from "./class/voteunmute";
+import * as recentmutes from "./recentmute";
 
-// recent mutes
-const recentMutes: string[] = [];
 // vote manager
 const voteMgr: VoteManager = new VoteManager();
 
@@ -15,16 +14,28 @@ const voteMgr: VoteManager = new VoteManager();
  *
  * @param {Message} message
  * @param {string[]} args
- * @param {Bot} bot
+ * @param {SucklessBot} bot
  * @param {boolean} unmute
  */
 async function VoteSomebody(
     message: Message,
     args: string[],
-    bot: Bot,
+    bot: SucklessBot,
     unmute?: boolean
 ) {
     if (!args) return;
+
+    // channel lock
+    if (bot.config.mute.channel)
+        if (!bot.config.mute.channel.includes(message.channelId)) {
+            const channel = message.guild.channels.cache
+                .filter((ch) => bot.config.mute.channel.includes(ch.id))
+                .first();
+            return message.reply(
+                `Buddy, ya can't vote someone outside of ${channel}`
+            );
+        }
+
     const lookup = args.shift();
     const reason = args.join(" ").length > 0 ? args.join(" ") : undefined;
 
@@ -47,7 +58,7 @@ async function VoteSomebody(
     }
 
     // if user is recent muted
-    if (recentMutes.find((rec) => rec.includes(user.id))) {
+    if (recentmutes.has(user.id)) {
         return message.channel.send(
             `User **${user.user.tag}** was recently abused, please refrain yourself`
         );
@@ -69,7 +80,7 @@ async function VoteSomebody(
     // check if user is already muted
     if (user.roles.cache.has(role.id)) {
         return message.channel.send(
-            `User **${user.user.tag}** is already muted, give them some break will ya`
+            `User **${user.user.tag}** is already muted, give them a break will ya`
         );
     }
 
@@ -94,9 +105,11 @@ async function VoteSomebody(
     const vote = unmute
         ? new VoteUnmute(user, message.channel, bot, {
               reason: reason || undefined,
+              timer: bot.config.mute.timer,
           })
         : new VoteMute(user, message.channel, bot, {
               reason: reason || undefined,
+              timer: bot.config.mute.timer,
           });
     vote.vote();
 }
@@ -106,9 +119,9 @@ async function VoteSomebody(
  *
  * @param {Message} message
  * @param {string[]} args
- * @param {Bot} bot
+ * @param {SucklessBot} bot
  */
-function VM(message: Message, args: string[], bot: Bot) {
+function VM(message: Message, args: string[], bot: SucklessBot) {
     VoteSomebody(message, args, bot);
 }
 
@@ -117,9 +130,10 @@ function VM(message: Message, args: string[], bot: Bot) {
  *
  * @param {Message} message
  * @param {string[]} args
- * @param {Bot} bot
+ * @param {SucklessBot} bot
  */
-function VUM(message: Message, args: string[], bot: Bot) {
+function VUM(message: Message, args: string[], bot: SucklessBot) {
     VoteSomebody(message, args, bot, true);
 }
-export { VM, VUM, recentMutes, voteMgr };
+
+export { VM, VUM, voteMgr };

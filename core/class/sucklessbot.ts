@@ -6,19 +6,19 @@ import { DSMod } from "../interface/DSMod";
 import { Logger } from "./logger";
 
 /**
- * Discord Bot instance, wooo weee
+ * Discord SucklessBot instance, wooo weee
  *
  * @export
- * @class Bot
+ * @class SucklessBot
  */
-class Bot {
+class SucklessBot {
     /**
-     * Creates an instance of Bot.
+     * Creates an instance of SucklessBot.
      *
      * @param {string} token Your Discord bot token, if not specified, will use one in configuration instead
      * @param {boolean} debug Enable debug mode
      * @param {Discord.ClientOptions} clientOptions Client options, leave 'intents' empty, else if 'intents' are specified, they will override mods intents requirements
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     constructor(options?: {
         token?: string;
@@ -31,86 +31,86 @@ class Bot {
     }
 
     /**
-     * Bot's super secret token, DO NOT SHARE THIS !!
+     * SucklessBot's super secret token, DO NOT SHARE THIS !!
      *
      * @private
      * @type {string}
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     private token: string;
 
     /**
-     * Bot's debug mode (default off)
+     * SucklessBot's debug mode (default off)
      *
      * @private
-     * @type {boolean}
-     * @memberof Bot
+     * @type {boolean | string}
+     * @memberof SucklessBot
      */
-    public debug: boolean = false;
+    public debug: boolean | string = false;
 
     /**
-     * Bot's Client instance, for internal uses
+     * SucklessBot's Client instance, for internal uses
      *
      * @private
      * @type {Discord.Client}
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     private client: Discord.Client;
 
     /**
-     * Bot's Client options
+     * SucklessBot's Client options
      *
      * @private
      * @type {Discord.ClientOptions}
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     private clientOptions: Discord.ClientOptions;
 
     /**
-     * Bot's Command manager instace
+     * SucklessBot's Command manager instace
      *
      * @type {CommandManager}
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     public cmdMgr: CommandManager = new CommandManager();
 
     /**
-     * Bot's Logger instance
+     * SucklessBot's Logger instance
      *
      * @private
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     public logger: Logger = new Logger();
 
     /**
-     * Bot's configuration, contains token so DO NOT SHARE THIS !!
+     * SucklessBot's configuration, contains token so DO NOT SHARE THIS !!
      *
      * @public
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     public readonly config = JSON.parse(
         fs.readFileSync(`${__dirname}/../../../config.json`, "utf-8")
     );
 
     /**
-     * Bot's mods collection
+     * SucklessBot's mods collection
      *
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     public readonly mods: DSMod[] = [];
 
     /**
-     * Get the Bot's client
+     * Get the SucklessBot's client
      *
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     public readonly cli = () => this.client;
 
     /**
-     * Bot's startup phase
+     * SucklessBot's startup phase
      *
      * @private
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     private init = () => {
         this.logger.log(
@@ -177,7 +177,7 @@ class Bot {
         this.logger.log(
             `Allowed Intents: ${intents} ${
                 this.clientOptions.intents.toString() !== ""
-                    ? `(as in Bot options)`
+                    ? `(as in SucklessBot options)`
                     : `(from mods)`
             }`
         );
@@ -187,9 +187,9 @@ class Bot {
     };
 
     /**
-     * Start the Bot instance
+     * Start the SucklessBot instance
      *
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     public start() {
         this.init();
@@ -198,25 +198,26 @@ class Bot {
         this.client.on("messageCreate", this.onMessage.bind(this));
         this.client.on("messageDelete", this.onDelete.bind(this));
         this.client.on("messageUpdate", this.onUpdate.bind(this));
-        if (this.debug) this.client.on("debug", (e) => this.logger.debug(e));
+        if (this.debug === "full")
+            this.client.on("debug", (e) => this.logger.debug(e));
     }
 
     /**
-     * Triggers when Bot successfully connects to Discord
+     * Triggers when SucklessBot successfully connects to Discord
      *
      * @private
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     private onConnect = async () => {
-        this.logger.log(`Bot connected as ${this.client.user.tag}`);
+        this.logger.log(`SucklessBot connected as ${this.client.user.tag}`);
     };
 
     /**
-     * Triggers when Bot receives a message
+     * Triggers when SucklessBot receives a message
      *
      * @private
      * @param {Discord.Message} message Chat message
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     private onMessage = (message: Discord.Message) => {
         const arg = message.content.split(/ +/);
@@ -247,11 +248,11 @@ class Bot {
     };
 
     /**
-     * Triggers when Bot detects a deleted message
+     * Triggers when SucklessBot detects a deleted message
      *
      * @private
      * @param {Discord.Message} message
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     private onDelete = (message: Discord.Message) => {
         const mods: DSMod[] = [];
@@ -265,12 +266,12 @@ class Bot {
     };
 
     /**
-     * Triggers when Bot detects a deleted message
+     * Triggers when SucklessBot detects a deleted message
      *
      * @private
      * @param {Discord.Message} old message
      * @param {Discord.Message} new message
-     * @memberof Bot
+     * @memberof SucklessBot
      */
     private onUpdate = (
         oldMessage: Discord.Message,
@@ -286,4 +287,4 @@ class Bot {
     };
 }
 
-export { Bot };
+export { SucklessBot };

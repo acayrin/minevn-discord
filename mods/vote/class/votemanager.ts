@@ -1,4 +1,4 @@
-import { Bot } from "../../../core/class/bot";
+import { SucklessBot } from "../../../core/class/sucklessbot";
 import { Vote } from "./vote";
 
 /**
@@ -17,16 +17,21 @@ class VoteManager {
     private sessions: Vote[] = [];
 
     /**
-     * The Bot instance related to this manager
+     * The SucklessBot instance this manager belongs to
      *
      * @private
-     * @type {Bot}
+     * @type {SucklessBot}
      * @memberof VoteManager
      */
-    private bot: Bot = undefined;
+    private bot: SucklessBot = undefined;
 
-    // empty
-    constructor(bot?: Bot) {
+    /**
+     * Creates an instance of VoteManager.
+     *
+     * @param {SucklessBot} [bot] The SucklessBot instance this manager belongs to
+     * @memberof VoteManager
+     */
+    constructor(bot?: SucklessBot) {
         this.bot = bot;
     }
 

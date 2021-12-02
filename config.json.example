@@ -3,7 +3,8 @@
     "prefix": "mvn",
     "mute": {
         "timer": 30,
-        "duration": 5
+        "duration": 5,
+        "channel": ["channel that users can vote in"]
     },
     "snipe": {
         "limit": 20

@@ -32,8 +32,6 @@ var CommandManager = (function () {
         }
     };
     CommandManager.prototype.getMod = function (command) {
-        if (!command)
-            return null;
         return this.links.get(command);
     };
     CommandManager.prototype.getCommands = function (mod) {

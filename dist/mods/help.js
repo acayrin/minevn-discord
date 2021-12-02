@@ -1,6 +1,6 @@
 "use strict";
 var discord_js_1 = require("discord.js");
-var getHelp_1 = require("./core/getHelp");
+var gethelp_1 = require("./core/gethelp");
 module.exports = {
     name: "Help page",
     author: "acayrin",
@@ -9,5 +9,5 @@ module.exports = {
     aliases: ["h"],
     description: "Bot's help page",
     usage: "%prefix% <command/alias> [args]",
-    onMsgCreate: getHelp_1.getHelp
+    onMsgCreate: gethelp_1.getHelp
 };

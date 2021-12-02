@@ -7,21 +7,15 @@ import * as chalk from "chalk";
  */
 class Logger {
     /**
-     * Local time string
-     *
-     * @private
-     * @memberof Logger
-     */
-    private time = new Date().toLocaleString();
-
-    /**
      * Print a debug message
      *
      * @param {string} msg
      * @memberof Logger
      */
     public debug = (msg: string) => {
-        console.log(`${chalk.gray(`[${this.time} - DEBUG] ${msg}`)}`);
+        console.log(
+            `${chalk.gray(`[${new Date().toLocaleString()} - DEBUG] ${msg}`)}`
+        );
     };
 
     /**
@@ -31,7 +25,7 @@ class Logger {
      * @memberof Logger
      */
     public log = (msg: string) => {
-        console.log(`[${this.time} - INFO] ${msg}`);
+        console.log(`[${new Date().toLocaleString()} - INFO] ${msg}`);
     };
 
     /**
@@ -41,7 +35,9 @@ class Logger {
      * @memberof Logger
      */
     public warn = (msg: string) => {
-        console.log(`${chalk.yellow(`[${this.time} - WARN] ${msg}`)}`);
+        console.log(
+            `${chalk.yellow(`[${new Date().toLocaleString()} - WARN] ${msg}`)}`
+        );
     };
 
     /**
@@ -51,7 +47,9 @@ class Logger {
      * @memberof Logger
      */
     public error = (msg: string) => {
-        console.log(`${chalk.red(`[${this.time} - ERROR] ${msg}`)}`);
+        console.log(
+            `${chalk.red(`[${new Date().toLocaleString()} - ERROR] ${msg}`)}`
+        );
     };
 }
 

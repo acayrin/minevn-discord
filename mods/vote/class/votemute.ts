@@ -1,5 +1,5 @@
-import { recentMutes } from "..";
 import { getRole } from "../../../core/utils";
+import * as recentmutes from "../recentmute";
 import { Vote } from "./vote";
 
 export class VoteMute extends Vote {
@@ -11,7 +11,7 @@ export class VoteMute extends Vote {
      */
     async vote(): Promise<void> {
         this.run({
-            embed: this.embed.setTitle(
+            embed: this.embed().setTitle(
                 `Mute: ${this.target.user.tag} for ${this.bot.config.mute.duration}m`
             ),
         });
@@ -30,7 +30,7 @@ export class VoteMute extends Vote {
 
         this.msg.edit({
             embeds: [
-                this.embed
+                this.embed()
                     .setTitle(
                         `Muted: ${this.target.user.tag} [${this.bot.config.mute.duration}m]`
                     )
@@ -43,6 +43,7 @@ export class VoteMute extends Vote {
             (await this.getTarget()).roles.add(role);
         });
 
+        // remove role after timeout
         setTimeout(async () => {
             this.target.roles.remove(role).catch(async (e) => {
                 (await this.getTarget()).roles.remove(role);
@@ -50,10 +51,11 @@ export class VoteMute extends Vote {
             //this.channel.send(`Un-muted **${this.target.user.tag}**`)
 
             // recent mute
-            recentMutes.push(this.target.id);
+            // remove after 2x[mute duration]
+            recentmutes.add(this.target.id);
             setTimeout(() => {
-                recentMutes.splice(recentMutes.indexOf(this.target.id), 1);
-            }, this.bot.config.mute.duration * 2 * 1000);
+                recentmutes.remove(this.target.id);
+            }, this.bot.config.mute.duration * 2 * 60000);
 
             // debug
             if (this.bot.debug)
@@ -71,7 +73,7 @@ export class VoteMute extends Vote {
     async onLose(): Promise<any> {
         this.msg.edit({
             embeds: [
-                this.embed
+                this.embed()
                     .setTitle(`Vote ended, nobody was abused`)
                     .setDescription(
                         `amount ${this.vote_Y} 👍 : ${this.vote_N} 👎`

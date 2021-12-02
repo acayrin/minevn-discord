@@ -40,7 +40,7 @@ var Snipe = function (message, args, bot) {
                 record_U[message.channelId].length = 0;
                 record_D[message.channelId].length = 0;
                 if (bot.debug)
-                    bot.logger.debug("[Snipe] Cleared local cache");
+                    bot.logger.debug("[Snipe - ".concat(message.channelId, "] Cleared local cache"));
             }
             break;
         }
@@ -54,7 +54,7 @@ var SnipeDelete = function (message, args, bot) {
     if (record_D[message.channelId].length > bot.config.snipe.limit)
         record_D[message.channelId].shift();
     if (bot.debug)
-        bot.logger.debug("[Snipe] Deleted +".concat(message.id, " (").concat(record_D[message.channelId].length, "/").concat(bot.config.snipe.limit, ")"));
+        bot.logger.debug("[Snipe - ".concat(message.channelId, "] Deleted +").concat(message.id, " (").concat(record_D[message.channelId].length, "/").concat(bot.config.snipe.limit, ")"));
     var files = [];
     message.attachments.forEach(function (file) {
         files.push(new discord_js_1.MessageAttachment(file.attachment, file.name));
@@ -73,7 +73,7 @@ var SnipeUpdate = function (oldMsg, newMsg, bot) {
     if (record_U[oldMsg.channelId].length > bot.config.snipe.limit)
         record_U[oldMsg.channelId].shift();
     if (bot.debug)
-        bot.logger.debug("[Snipe] Updated +".concat(oldMsg.id, " (").concat(record_U[oldMsg.channelId].length, "/").concat(bot.config.snipe.limit, ")"));
+        bot.logger.debug("[Snipe - ".concat(oldMsg.channelId, "] Updated +").concat(oldMsg.id, " (").concat(record_U[oldMsg.channelId].length, "/").concat(bot.config.snipe.limit, ")"));
     var files = [];
     oldMsg.attachments.forEach(function (file) {
         files.push({ attachment: file.attachment, name: file.name });

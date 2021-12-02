@@ -1,5 +1,5 @@
 import { Client, Intents, Message, PartialMessage } from "discord.js";
-import { Bot } from "../class/bot";
+import { SucklessBot } from "../class/sucklessbot";
 
 /**
  * Discord bot Mod(dule) interface
@@ -77,7 +77,7 @@ interface DSMod {
      *
      * @memberof DSMod
      */
-    onInit?: (bot: Bot) => void;
+    onInit?: (bot: SucklessBot) => void;
 
     /**
      * Mod's callback function for messageCreate event
@@ -87,7 +87,7 @@ interface DSMod {
     onMsgCreate?: (
         msg: Message | PartialMessage,
         arg: string[],
-        bot: Bot
+        bot: SucklessBot
     ) => void;
 
     /**
@@ -98,7 +98,7 @@ interface DSMod {
     onMsgDelete?: (
         msg: Message | PartialMessage,
         arg: string[],
-        bot: Bot
+        bot: SucklessBot
     ) => void;
 
     /**
@@ -109,7 +109,7 @@ interface DSMod {
     onMsgUpdate?: (
         oldMsg: Message | PartialMessage,
         newMsg: Message | PartialMessage,
-        bot: Bot
+        bot: SucklessBot
     ) => void;
 }
 

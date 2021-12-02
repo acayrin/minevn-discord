@@ -10,7 +10,7 @@ export class VoteUnmute extends Vote {
      */
     async vote(): Promise<void> {
         this.run({
-            embed: this.embed.setTitle(`Un-mute: ${this.target.user.tag}`),
+            embed: this.embed().setTitle(`Un-mute: ${this.target.user.tag}`),
         });
     }
 
@@ -27,7 +27,7 @@ export class VoteUnmute extends Vote {
 
         this.msg.edit({
             embeds: [
-                this.embed
+                this.embed()
                     .setTitle(`Un-muted: ${this.target.user.tag}`)
                     .setDescription(
                         `reason: ${this.reason}\namount ${this.vote_Y} 👍 : ${this.vote_N} 👎`

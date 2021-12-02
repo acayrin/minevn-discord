@@ -1,14 +1,18 @@
 import * as Discord from "discord.js";
-import { Bot } from "../../core/class/bot";
+import { SucklessBot } from "../../core/class/sucklessbot";
 
 /**
  * Send help page to user
  *
  * @param {Discord.Message} message
  * @param {string[]} args
- * @param {Bot} bot
+ * @param {SucklessBot} bot
  */
-const getHelp = (message: Discord.Message, args: string[], bot: Bot) => {
+const getHelp = (
+    message: Discord.Message,
+    args: string[],
+    bot: SucklessBot
+) => {
     if (args && args[0]) {
         // get the mod associated with the command
         const mod = bot.cmdMgr.getMod(args[0]);

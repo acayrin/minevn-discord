@@ -1,8 +1,8 @@
 import { Intents, Message, MessageEmbed } from "discord.js";
 import fetch from "node-fetch";
-import { Bot } from "../core/class/bot";
+import { SucklessBot } from "../core/class/sucklessbot";
 
-const Query = (message: Message, args: string[], bot: Bot) => {
+const Query = (message: Message, args: string[], bot: SucklessBot) => {
     if (!args) return;
 
     const ip = args.length > 0 ? args.join("") : "minevn.net";

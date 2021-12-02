@@ -1,7 +1,7 @@
 "use strict";
 exports.__esModule = true;
-var bot_1 = require("./core/class/bot");
-new bot_1.Bot({
+var sucklessbot_1 = require("./core/class/sucklessbot");
+new sucklessbot_1.SucklessBot({
     debug: true,
     clientOptions: {
         intents: [],

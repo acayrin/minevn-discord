@@ -1,9 +1,9 @@
-import { Bot } from "./core/class/bot";
+import { SucklessBot } from "./core/class/sucklessbot";
 
-new Bot({
-    debug: true,
+new SucklessBot({
+    debug: true, // may set to "full" for DJS's debug as well
     clientOptions: {
-        intents: [],
+        intents: [], // leave it empty so the bot will use what the mods require
         presence: {
             activities: [
                 {

@@ -1,5 +1,5 @@
 import { Intents } from "discord.js";
-import { getHelp } from "./core/getHelp";
+import { getHelp } from "./core/gethelp";
 
 export = {
     name: "Help page",

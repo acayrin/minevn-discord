@@ -36,14 +36,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.Bot = void 0;
+exports.SucklessBot = void 0;
 var Discord = require("discord.js");
 var fs = require("fs");
 var path_1 = require("path");
 var commandmanager_1 = require("./commandmanager");
 var logger_1 = require("./logger");
-var Bot = (function () {
-    function Bot(options) {
+var SucklessBot = (function () {
+    function SucklessBot(options) {
         var _this = this;
         this.debug = false;
         this.cmdMgr = new commandmanager_1.CommandManager();
@@ -83,13 +83,13 @@ var Bot = (function () {
                 intents = _this.clientOptions.intents;
             _this.logger.log("Requested Intents: ".concat(intents));
             _this.logger.log("Allowed Intents: ".concat(intents, " ").concat(_this.clientOptions.intents.toString() !== ""
-                ? "(as in Bot options)"
+                ? "(as in SucklessBot options)"
                 : "(from mods)"));
             _this.client = new Discord.Client(Object.assign({}, _this.clientOptions, { intents: intents }));
         };
         this.onConnect = function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                this.logger.log("Bot connected as ".concat(this.client.user.tag));
+                this.logger.log("SucklessBot connected as ".concat(this.client.user.tag));
                 return [2];
             });
         }); };
@@ -139,7 +139,7 @@ var Bot = (function () {
         this.debug = options.debug;
         this.clientOptions = options.clientOptions;
     }
-    Bot.prototype.start = function () {
+    SucklessBot.prototype.start = function () {
         var _this = this;
         this.init();
         this.client.login(this.token);
@@ -147,9 +147,9 @@ var Bot = (function () {
         this.client.on("messageCreate", this.onMessage.bind(this));
         this.client.on("messageDelete", this.onDelete.bind(this));
         this.client.on("messageUpdate", this.onUpdate.bind(this));
-        if (this.debug)
+        if (this.debug === "full")
             this.client.on("debug", function (e) { return _this.logger.debug(e); });
     };
-    return Bot;
+    return SucklessBot;
 }());
-exports.Bot = Bot;
+exports.SucklessBot = SucklessBot;

@@ -9,7 +9,7 @@ import {
     User,
 } from "discord.js";
 import { voteMgr } from "..";
-import { Bot } from "../../../core/class/bot";
+import { SucklessBot } from "../../../core/class/sucklessbot";
 
 /**
  * A Vote instance, to mute anyone
@@ -50,12 +50,12 @@ class Vote {
     public msg: Message = undefined;
 
     /**
-     * This Bot instance related to this vote
+     * This SucklessBot instance related to this vote
      *
-     * @type {Bot}
+     * @type {SucklessBot}
      * @memberof Vote
      */
-    protected bot: Bot = undefined;
+    protected bot: SucklessBot = undefined;
 
     /**
      * Amount of YES votes
@@ -105,25 +105,27 @@ class Vote {
      *
      * @memberof Vote
      */
-    protected embed = new MessageEmbed()
-        .setTimestamp()
-        .setColor("#ed2261")
-        .setTitle(`Vote`)
-        .setDescription(`Voting ends in ${this.timer}s`)
-        .setFooter("i love democracy");
+    protected embed(): MessageEmbed {
+        return new MessageEmbed()
+            .setTimestamp()
+            .setColor("#ed2261")
+            .setTitle(`Vote`)
+            .setDescription(`Voting ends in ${this.timer}s`)
+            .setFooter("i love democracy");
+    }
 
     /**
      * Creates an instance of Vote.
      * @param {GuildMember} target User to mute
      * @param {(TextChannel | any)} channel Base text channel
-     * @param {Bot} bot Bot instance
+     * @param {SucklessBot} bot SucklessBot instance
      * @param {any} options vote options
      * @memberof Vote
      */
     constructor(
         target: GuildMember,
         channel: TextChannel | any,
-        bot: Bot,
+        bot: SucklessBot,
         options?: { reason?: string; timer?: number }
     ) {
         voteMgr.add(this);
@@ -196,7 +198,7 @@ class Vote {
             );
 
         this.msg = await this.channel.send({
-            embeds: [options.embed || this.embed],
+            embeds: [options.embed || this.embed()],
         });
         await this.msg.react("👍");
         await this.msg.react("👎");
@@ -269,7 +271,7 @@ class Vote {
     protected async onWin() {
         this.msg.edit({
             embeds: [
-                this.embed
+                this.embed()
                     .setTitle(`Vote ended, someone was abused`)
                     .setDescription(
                         `amount ${this.vote_Y} 👍 : ${this.vote_N} 👎`
@@ -286,7 +288,7 @@ class Vote {
     protected async onLose() {
         this.msg.edit({
             embeds: [
-                this.embed
+                this.embed()
                     .setTitle(`Vote ended, nobody was abused`)
                     .setDescription(
                         `amount ${this.vote_Y} 👍 : ${this.vote_N} 👎`

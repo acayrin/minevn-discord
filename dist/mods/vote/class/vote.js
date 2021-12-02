@@ -56,12 +56,6 @@ var Vote = (function () {
             .update(Date.now().toString(), "utf-8")
             .digest("hex")
             .slice(0, 7);
-        this.embed = new discord_js_1.MessageEmbed()
-            .setTimestamp()
-            .setColor("#ed2261")
-            .setTitle("Vote")
-            .setDescription("Voting ends in ".concat(this.timer, "s"))
-            .setFooter("i love democracy");
         __1.voteMgr.add(this);
         this.bot = bot;
         this.channel = channel;
@@ -74,6 +68,14 @@ var Vote = (function () {
                 this.timer = options.timer;
         }
     }
+    Vote.prototype.embed = function () {
+        return new discord_js_1.MessageEmbed()
+            .setTimestamp()
+            .setColor("#ed2261")
+            .setTitle("Vote")
+            .setDescription("Voting ends in ".concat(this.timer, "s"))
+            .setFooter("i love democracy");
+    };
     Vote.prototype.__onEnd = function () {
         var _this = this;
         this.onEnd()["finally"](function () { return __1.voteMgr.remove(_this); });
@@ -110,7 +112,7 @@ var Vote = (function () {
                             this.bot.logger.debug("[Vote - ".concat(this.id, "] A vote has started, target: ").concat(this.target));
                         _a = this;
                         return [4, this.channel.send({
-                                embeds: [options.embed || this.embed]
+                                embeds: [options.embed || this.embed()]
                             })];
                     case 2:
                         _a.msg = _b.sent();
@@ -183,7 +185,7 @@ var Vote = (function () {
             return __generator(this, function (_a) {
                 this.msg.edit({
                     embeds: [
-                        this.embed
+                        this.embed()
                             .setTitle("Vote ended, someone was abused")
                             .setDescription("amount ".concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E")),
                     ]
@@ -197,7 +199,7 @@ var Vote = (function () {
             return __generator(this, function (_a) {
                 this.msg.edit({
                     embeds: [
-                        this.embed
+                        this.embed()
                             .setTitle("Vote ended, nobody was abused")
                             .setDescription("amount ".concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E")),
                     ]

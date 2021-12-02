@@ -69,9 +69,7 @@ class CommandManager {
      * @return {*}  {DSMod}
      * @memberof CommandManager
      */
-    public getMod(command: string): DSMod | null {
-        if (!command) return null;
-
+    public getMod(command: string): DSMod {
         return this.links.get(command);
     }
 

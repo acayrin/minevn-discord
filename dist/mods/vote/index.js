@@ -36,23 +36,29 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.voteMgr = exports.recentMutes = exports.VUM = exports.VM = void 0;
+exports.voteMgr = exports.VUM = exports.VM = void 0;
 var utils_1 = require("../../core/utils");
 var votemanager_1 = require("./class/votemanager");
 var votemute_1 = require("./class/votemute");
 var voteunmute_1 = require("./class/voteunmute");
-var recentMutes = [];
-exports.recentMutes = recentMutes;
+var recentmutes = require("./recentmute");
 var voteMgr = new votemanager_1.VoteManager();
 exports.voteMgr = voteMgr;
 function VoteSomebody(message, args, bot, unmute) {
     return __awaiter(this, void 0, void 0, function () {
-        var lookup, reason, user, role, session, vote;
+        var channel, lookup, reason, user, role, session, vote;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     if (!args)
                         return [2];
+                    if (bot.config.mute.channel)
+                        if (!bot.config.mute.channel.includes(message.channelId)) {
+                            channel = message.guild.channels.cache
+                                .filter(function (ch) { return bot.config.mute.channel.includes(ch.id); })
+                                .first();
+                            return [2, message.reply("Buddy, ya can't vote someone outside of ".concat(channel))];
+                        }
                     lookup = args.shift();
                     reason = args.join(" ").length > 0 ? args.join(" ") : undefined;
                     user = message.mentions.members.first();
@@ -68,7 +74,7 @@ function VoteSomebody(message, args, bot, unmute) {
                     if (user.user.bot) {
                         return [2, message.channel.send("**".concat(user.user.tag, "** is a robot u sussy baka"))];
                     }
-                    if (recentMutes.find(function (rec) { return rec.includes(user.id); })) {
+                    if (recentmutes.has(user.id)) {
                         return [2, message.channel.send("User **".concat(user.user.tag, "** was recently abused, please refrain yourself"))];
                     }
                     return [4, (0, utils_1.getRole)(bot.config.mute.role || "mute", message.member.guild)];
@@ -78,7 +84,7 @@ function VoteSomebody(message, args, bot, unmute) {
                         return [2, message.channel.send("Can't find any **muted** role, stop abusing now")];
                     }
                     if (user.roles.cache.has(role.id)) {
-                        return [2, message.channel.send("User **".concat(user.user.tag, "** is already muted, give them some break will ya"))];
+                        return [2, message.channel.send("User **".concat(user.user.tag, "** is already muted, give them a break will ya"))];
                     }
                     if (user.roles.highest.comparePositionTo(role) > 0) {
                         return [2, message.channel.send("User **".concat(user.user.tag, "** is too powerful, can't abuse them"))];
@@ -91,10 +97,12 @@ function VoteSomebody(message, args, bot, unmute) {
                     }
                     vote = unmute
                         ? new voteunmute_1.VoteUnmute(user, message.channel, bot, {
-                            reason: reason || undefined
+                            reason: reason || undefined,
+                            timer: bot.config.mute.timer
                         })
                         : new votemute_1.VoteMute(user, message.channel, bot, {
-                            reason: reason || undefined
+                            reason: reason || undefined,
+                            timer: bot.config.mute.timer
                         });
                     vote.vote();
                     return [2];

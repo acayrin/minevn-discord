@@ -1,6 +1,6 @@
 import { Message, MessageAttachment, MessageEmbed } from "discord.js";
-import { Bot } from "../../core/class/bot";
-import { DSChatRecord } from "./DSChatRecord";
+import { SucklessBot } from "../../core/class/sucklessbot";
+import { DSChatRecord } from "./interface/DSChatRecord";
 
 const record_D: any = {};
 const record_U: any = {};
@@ -9,9 +9,9 @@ const record_U: any = {};
  *
  * @param {Message} message The message
  * @param {string[]} args Arguments from message
- * @param {Bot} bot The bot instance
+ * @param {SucklessBot} bot The bot instance
  */
-const Snipe = (message: Message, args: string[], bot: Bot) => {
+const Snipe = (message: Message, args: string[], bot: SucklessBot) => {
     // check
     _c(message.channelId);
 
@@ -55,7 +55,10 @@ const Snipe = (message: Message, args: string[], bot: Bot) => {
                 record_D[message.channelId].length = 0;
 
                 // debug
-                if (bot.debug) bot.logger.debug(`[Snipe] Cleared local cache`);
+                if (bot.debug)
+                    bot.logger.debug(
+                        `[Snipe - ${message.channelId}] Cleared local cache`
+                    );
             }
             break;
         }
@@ -70,9 +73,9 @@ const Snipe = (message: Message, args: string[], bot: Bot) => {
  *
  * @param {Message} message The deleted message
  * @param {*} args empty
- * @param {Bot} bot The bot instance
+ * @param {SucklessBot} bot The bot instance
  */
-const SnipeDelete = (message: Message, args: any, bot: Bot) => {
+const SnipeDelete = (message: Message, args: any, bot: SucklessBot) => {
     // check
     _c(message.channelId);
 
@@ -83,7 +86,7 @@ const SnipeDelete = (message: Message, args: any, bot: Bot) => {
     // debug
     if (bot.debug)
         bot.logger.debug(
-            `[Snipe] Deleted +${message.id} (${
+            `[Snipe - ${message.channelId}] Deleted +${message.id} (${
                 record_D[message.channelId].length
             }/${bot.config.snipe.limit})`
         );
@@ -110,9 +113,9 @@ const SnipeDelete = (message: Message, args: any, bot: Bot) => {
  * @param {Message} oldMsg The old message
  * @param {Message} newMsg The updated message
  * @param {*} args empty
- * @param {Bot} bot The bot instance
+ * @param {SucklessBot} bot The bot instance
  */
-const SnipeUpdate = (oldMsg: Message, newMsg: Message, bot: Bot) => {
+const SnipeUpdate = (oldMsg: Message, newMsg: Message, bot: SucklessBot) => {
     // check
     _c(oldMsg.channelId);
 
@@ -123,7 +126,7 @@ const SnipeUpdate = (oldMsg: Message, newMsg: Message, bot: Bot) => {
     // debug
     if (bot.debug)
         bot.logger.debug(
-            `[Snipe] Updated +${oldMsg.id} (${
+            `[Snipe - ${oldMsg.channelId}] Updated +${oldMsg.id} (${
                 record_U[oldMsg.channelId].length
             }/${bot.config.snipe.limit})`
         );
