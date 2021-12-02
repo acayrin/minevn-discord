@@ -17,8 +17,6 @@ This project was made mainly for fun, don't take it too serious for all the so-c
     -   clowns - we need happiness
     -   _ded cuz of depression_
 
-<hr>
-
 ## Requirements
 
 -   NodeJS `16.x`
@@ -40,8 +38,6 @@ Change `config.json.example` to `config.json`
 Then edit it to suit your needs
 
 Currently custom configs are not supported
-
-<hr>
 
 ## Creating a mod
 
@@ -128,8 +124,6 @@ export function SomeSucklessFunction(message: Discord.Message, args: string[], b
 ```
 
 You may find more "interest" things inside the `mods` folder
-
-<hr>
 
 ## Todos
 
