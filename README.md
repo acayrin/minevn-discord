@@ -4,7 +4,7 @@ as the title, mainly used in MineVN's Discord server
 
 ## Usage
 
-```json
+```
 npm i           // install dependencies
 npm run build   // compile the project
 npm start       // start the bot
