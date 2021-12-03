@@ -34,8 +34,10 @@ export class VoteUnmute extends Vote {
                     ),
             ],
         });
-        this.target.roles.remove(role).catch(async (e) => {
-            (await this.getTarget()).roles.remove(role);
+        this.target.roles.remove(role).catch((e) => {
+            this.channel.send(
+                `I failed to set **${this.target.user.tag}** free (err: ${e})`
+            );
         });
     }
 }

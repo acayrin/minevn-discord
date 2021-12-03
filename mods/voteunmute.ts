@@ -2,7 +2,7 @@ import { Intents } from "discord.js";
 import { VUM } from "./vote";
 
 export = {
-    name: "Vote un-mute",
+    name: "Vote unmute",
     author: "acayrin",
     intents: [
         Intents.FLAGS.GUILDS,
@@ -12,7 +12,7 @@ export = {
     ],
     command: "voteunmute",
     aliases: ["vum"],
-    description: "Vote un-mute somebody cuz democracy is kul",
+    description: "Vote unmute somebody cuz democracy is kul",
     usage: "%prefix% <command/alias> <mention>[/<user id>/<username>] [reason]",
     onMsgCreate: VUM,
 };

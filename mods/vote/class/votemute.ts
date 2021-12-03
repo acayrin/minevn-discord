@@ -2,6 +2,13 @@ import { getRole } from "../../../core/utils";
 import * as recentmutes from "../recentmute";
 import { Vote } from "./vote";
 
+/**
+ * Vote mute instance, extends from Vote
+ *
+ * @export
+ * @class VoteMute
+ * @extends {Vote}
+ */
 export class VoteMute extends Vote {
     /**
      * Override base vote run phase
@@ -39,30 +46,39 @@ export class VoteMute extends Vote {
                     ),
             ],
         });
-        this.target.roles.add(role).catch(async (e) => {
-            (await this.getTarget()).roles.add(role);
-        });
-
-        // remove role after timeout
-        setTimeout(async () => {
-            this.target.roles.remove(role).catch(async (e) => {
-                (await this.getTarget()).roles.remove(role);
-            });
-            //this.channel.send(`Un-muted **${this.target.user.tag}**`)
-
-            // recent mute
-            // remove after 2x[mute duration]
-            recentmutes.add(this.target.id);
-            setTimeout(() => {
-                recentmutes.remove(this.target.id);
-            }, this.bot.config.mute.duration * 2 * 60000);
-
-            // debug
-            if (this.bot.debug)
-                this.bot.logger.debug(
-                    `[Vote - ${this.id}] Un-muted user ${this.target.id}`
+        this.target.roles
+            .add(role)
+            .catch((e) => {
+                // user left server before the vote ends
+                return this.channel.send(
+                    `User **${this.target.user.tag}** can't be abused cuz they ran away like a wimp`
                 );
-        }, this.bot.config.mute.duration * 60000);
+            })
+            .then(() => {
+                // only when the user is still in the server
+                // remove role after timeout
+                setTimeout(async () => {
+                    this.target.roles.remove(role).catch((e) => {
+                        this.channel.send(
+                            `User **${this.target.user.tag}** can't be abused cuz they ran away like a wimp`
+                        );
+                    });
+                    //this.channel.send(`Unmuted **${this.target.user.tag}**`)
+
+                    // recent mute
+                    // remove after 2x[mute duration]
+                    recentmutes.add(this.target.id);
+                    setTimeout(() => {
+                        recentmutes.remove(this.target.id);
+                    }, this.bot.config.mute.duration * 2 * 60000);
+
+                    // debug
+                    if (this.bot.debug)
+                        this.bot.logger.debug(
+                            `[Vote - ${this.id}] Unmuted user ${this.target.id}`
+                        );
+                }, this.bot.config.mute.duration * 60000);
+            });
     }
 
     /**

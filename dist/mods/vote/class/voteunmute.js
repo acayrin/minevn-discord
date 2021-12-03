@@ -85,16 +85,9 @@ var VoteUnmute = (function (_super) {
                                     .setDescription("reason: ".concat(this.reason, "\namount ").concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E")),
                             ]
                         });
-                        this.target.roles.remove(role)["catch"](function (e) { return __awaiter(_this, void 0, void 0, function () {
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0: return [4, this.getTarget()];
-                                    case 1:
-                                        (_a.sent()).roles.remove(role);
-                                        return [2];
-                                }
-                            });
-                        }); });
+                        this.target.roles.remove(role)["catch"](function (e) {
+                            _this.channel.send("I failed to set **".concat(_this.target.user.tag, "** free (err: ").concat(e, ")"));
+                        });
                         return [2];
                 }
             });

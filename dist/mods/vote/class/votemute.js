@@ -86,38 +86,27 @@ var VoteMute = (function (_super) {
                                     .setDescription("reason: ".concat(this.reason, "\namount ").concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E")),
                             ]
                         });
-                        this.target.roles.add(role)["catch"](function (e) { return __awaiter(_this, void 0, void 0, function () {
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0: return [4, this.getTarget()];
-                                    case 1:
-                                        (_a.sent()).roles.add(role);
-                                        return [2];
-                                }
-                            });
-                        }); });
-                        setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
-                            var _this = this;
-                            return __generator(this, function (_a) {
-                                this.target.roles.remove(role)["catch"](function (e) { return __awaiter(_this, void 0, void 0, function () {
-                                    return __generator(this, function (_a) {
-                                        switch (_a.label) {
-                                            case 0: return [4, this.getTarget()];
-                                            case 1:
-                                                (_a.sent()).roles.remove(role);
-                                                return [2];
-                                        }
+                        this.target.roles
+                            .add(role)["catch"](function (e) {
+                            return _this.channel.send("User **".concat(_this.target.user.tag, "** can't be abused cuz they ran away like a wimp"));
+                        })
+                            .then(function () {
+                            setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
+                                var _this = this;
+                                return __generator(this, function (_a) {
+                                    this.target.roles.remove(role)["catch"](function (e) {
+                                        _this.channel.send("User **".concat(_this.target.user.tag, "** can't be abused cuz they ran away like a wimp"));
                                     });
-                                }); });
-                                recentmutes.add(this.target.id);
-                                setTimeout(function () {
-                                    recentmutes.remove(_this.target.id);
-                                }, this.bot.config.mute.duration * 2 * 60000);
-                                if (this.bot.debug)
-                                    this.bot.logger.debug("[Vote - ".concat(this.id, "] Un-muted user ").concat(this.target.id));
-                                return [2];
-                            });
-                        }); }, this.bot.config.mute.duration * 60000);
+                                    recentmutes.add(this.target.id);
+                                    setTimeout(function () {
+                                        recentmutes.remove(_this.target.id);
+                                    }, this.bot.config.mute.duration * 2 * 60000);
+                                    if (this.bot.debug)
+                                        this.bot.logger.debug("[Vote - ".concat(this.id, "] Un-muted user ").concat(this.target.id));
+                                    return [2];
+                                });
+                            }); }, _this.bot.config.mute.duration * 60000);
+                        });
                         return [2];
                 }
             });
