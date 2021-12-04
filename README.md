@@ -1,21 +1,21 @@
 # A Somewhat Suckless Discord Bot
 
-As the title, mainly used in MineVN's Discord server
+As the title said, mainly used in MineVN's Discord server
 
-This project was made mainly for fun, don't take it too serious for all the so-called jokes i put around this README kekw
+This project was made mainly for fun, and for the purpose of learning Typescript (~~why when i could just stick with java instead~~)
 
 ## Current features
 
 -   Vote system - vote (un)mute someone (with anti-spam, channel lock and vote cooldown)
 -   Message snipe - snipe a deleted/modified message (with files support\* and custom history lookup)
 -   Minecraft status - a simple minecraft server tracker (Hẻo đã hẻo)
+-   Random weeb shit - send random images from nekos.fun/nekos.life
 -   To be added:
     -   basic moderation features? most likely no
     -   full size minecraft server tracker?
     -   credit syste- wait wut
     -   image options??? wtf does that even mean
     -   clowns - we need happiness
-    -   _ded cuz of depression_
 
 ## Requirements
 
@@ -27,7 +27,7 @@ This project was made mainly for fun, don't take it too serious for all the so-c
 
 ```
 npm i           // install dependencies
-npm run build   // compile the project
+npm run build   // compile the project (optional)
 npm start       // start the bot
 ```
 
@@ -115,7 +115,7 @@ export = {
 };
 ```
 
-### `mods/SomeSuckLessFunction.ts`
+### `mods/SomeSucklessFunction.ts`
 
 ```ts
 export function SomeSucklessFunction(message: Discord.Message, args: string[], bot: Bot) {

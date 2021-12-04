@@ -55,7 +55,7 @@ class Vote {
      * @type {SucklessBot}
      * @memberof Vote
      */
-    protected bot: SucklessBot = undefined;
+    protected _bot: SucklessBot = undefined;
 
     /**
      * Amount of YES votes
@@ -63,7 +63,7 @@ class Vote {
      * @type {number}
      * @memberof Vote
      */
-    protected vote_Y: number = 0;
+    protected _vote_Y: number = 0;
 
     /**
      * Amount of NO votes
@@ -71,7 +71,7 @@ class Vote {
      * @type {number}
      * @memberof Vote
      */
-    protected vote_N: number = 0;
+    protected _vote_N: number = 0;
 
     /**
      * Reason for this vote
@@ -105,7 +105,7 @@ class Vote {
      *
      * @memberof Vote
      */
-    protected embed(): MessageEmbed {
+    protected _embed(): MessageEmbed {
         return new MessageEmbed()
             .setTimestamp()
             .setColor("#ed2261")
@@ -129,7 +129,7 @@ class Vote {
         options?: { reason?: string; timer?: number }
     ) {
         voteMgr.add(this);
-        this.bot = bot;
+        this._bot = bot;
         this.channel = channel;
         this.guild = channel.guild;
         this.target = target;
@@ -146,7 +146,7 @@ class Vote {
      * @memberof Vote
      */
     private __onEnd() {
-        this.onEnd().finally(() => voteMgr.remove(this));
+        this._onEnd().finally(() => voteMgr.remove(this));
     }
 
     /**
@@ -156,7 +156,7 @@ class Vote {
      * @memberof Vote
      */
     private __onCollect(react: MessageReaction) {
-        this.onCollect(react);
+        this._onCollect(react);
     }
 
     /**
@@ -166,7 +166,7 @@ class Vote {
      * @memberof Vote
      */
     private __onRemove(react: MessageReaction) {
-        this.onRemove(react);
+        this._onRemove(react);
     }
 
     /**
@@ -175,7 +175,7 @@ class Vote {
      * @return {*}  {Promise<GuildMember>} Member to be voted
      * @memberof Vote
      */
-    protected async getTarget(id?: string): Promise<GuildMember> {
+    protected async _getTarget(id?: string): Promise<GuildMember> {
         return await this.guild.members.fetch({
             user: id || this.target.id,
             cache: false,
@@ -189,16 +189,16 @@ class Vote {
      *
      * @memberof Vote
      */
-    protected async run(options?: { embed?: MessageEmbed }) {
-        if (await this.preload()) return;
+    protected async _run(options?: { embed?: MessageEmbed }) {
+        if (await this._preload()) return;
 
-        if (this.bot.debug)
-            this.bot.logger.debug(
+        if (this._bot.debug)
+            this._bot.logger.debug(
                 `[Vote - ${this.id}] A vote has started, target: ${this.target}`
             );
 
         this.msg = await this.channel.send({
-            embeds: [options.embed || this.embed()],
+            embeds: [options.embed || this._embed()],
         });
         await this.msg.react("👍");
         await this.msg.react("👎");
@@ -220,7 +220,7 @@ class Vote {
      *
      * @memberof Vote
      */
-    protected async preload(): Promise<any> {
+    protected async _preload(): Promise<any> {
         // your code here
     }
 
@@ -230,9 +230,9 @@ class Vote {
      * @param {MessageReaction} react
      * @memberof Vote
      */
-    protected async onCollect(react: MessageReaction) {
-        if ("👍".includes(react.emoji.name)) this.vote_Y++;
-        if ("👎".includes(react.emoji.name)) this.vote_N++;
+    protected async _onCollect(react: MessageReaction) {
+        if ("👍".includes(react.emoji.name)) this._vote_Y++;
+        if ("👎".includes(react.emoji.name)) this._vote_N++;
     }
 
     /**
@@ -241,9 +241,9 @@ class Vote {
      * @param {MessageReaction} react
      * @memberof Vote
      */
-    protected async onRemove(react: MessageReaction) {
-        if ("👍".includes(react.emoji.name)) this.vote_Y--;
-        if ("👎".includes(react.emoji.name)) this.vote_N--;
+    protected async _onRemove(react: MessageReaction) {
+        if ("👍".includes(react.emoji.name)) this._vote_Y--;
+        if ("👎".includes(react.emoji.name)) this._vote_N--;
     }
 
     /**
@@ -251,16 +251,16 @@ class Vote {
      *
      * @memberof Vote
      */
-    protected async onEnd() {
-        if (this.bot.debug)
-            this.bot.logger.debug(
-                `[Vote - ${this.id}] Vote ended with ${this.vote_Y}:${
-                    this.vote_N
-                } (total ${this.vote_Y + this.vote_N})`
+    protected async _onEnd() {
+        if (this._bot.debug)
+            this._bot.logger.debug(
+                `[Vote - ${this.id}] Vote ended with ${this._vote_Y}:${
+                    this._vote_N
+                } (total ${this._vote_Y + this._vote_N})`
             );
 
-        if (this.vote_Y > this.vote_N) this.onWin();
-        else this.onLose();
+        if (this._vote_Y > this._vote_N) this._onWin();
+        else this._onLose();
     }
 
     /**
@@ -268,13 +268,13 @@ class Vote {
      *
      * @memberof Vote
      */
-    protected async onWin() {
+    protected async _onWin() {
         this.msg.edit({
             embeds: [
-                this.embed()
+                this._embed()
                     .setTitle(`Vote ended, someone was abused`)
                     .setDescription(
-                        `amount ${this.vote_Y} 👍 : ${this.vote_N} 👎`
+                        `amount ${this._vote_Y} 👍 : ${this._vote_N} 👎`
                     ),
             ],
         });
@@ -285,13 +285,13 @@ class Vote {
      *
      * @memberof Vote
      */
-    protected async onLose() {
+    protected async _onLose() {
         this.msg.edit({
             embeds: [
-                this.embed()
+                this._embed()
                     .setTitle(`Vote ended, nobody was abused`)
                     .setDescription(
-                        `amount ${this.vote_Y} 👍 : ${this.vote_N} 👎`
+                        `amount ${this._vote_Y} 👍 : ${this._vote_N} 👎`
                     ),
             ],
         });

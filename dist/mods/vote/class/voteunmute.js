@@ -62,8 +62,8 @@ var VoteUnmute = (function (_super) {
     VoteUnmute.prototype.vote = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                this.run({
-                    embed: this.embed().setTitle("Un-mute: ".concat(this.target.user.tag))
+                this._run({
+                    embed: this._embed().setTitle("Un-mute: ".concat(this.target.user.tag))
                 });
                 return [2];
             });
@@ -75,14 +75,14 @@ var VoteUnmute = (function (_super) {
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, (0, utils_1.getRole)(this.bot.config.mute.role || "mute", this.channel.guild)];
+                    case 0: return [4, (0, utils_1.getRole)(this._bot.config.mute.role || "mute", this.channel.guild)];
                     case 1:
                         role = _a.sent();
                         this.msg.edit({
                             embeds: [
-                                this.embed()
+                                this._embed()
                                     .setTitle("Un-muted: ".concat(this.target.user.tag))
-                                    .setDescription("reason: ".concat(this.reason, "\namount ").concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E")),
+                                    .setDescription("reason: ".concat(this.reason, "\namount ").concat(this._vote_Y, " \uD83D\uDC4D : ").concat(this._vote_N, " \uD83D\uDC4E")),
                             ]
                         });
                         this.target.roles.remove(role)["catch"](function (e) {

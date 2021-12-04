@@ -50,8 +50,8 @@ var SucklessBot = (function () {
         this.logger = new logger_1.Logger();
         this.config = JSON.parse(fs.readFileSync("".concat(__dirname, "/../../../config.json"), "utf-8"));
         this.mods = [];
-        this.cli = function () { return _this.client; };
-        this.init = function () {
+        this.cli = function () { return _this.__client; };
+        this.__init = function () {
             _this.logger.log("Platform ".concat(process.platform, " ").concat(process.arch, " - Node ").concat(process.version.match(/^v(\d+\.\d+)/)[1]));
             var path = (0, path_1.dirname)(require.main.filename);
             var intents = [];
@@ -79,21 +79,21 @@ var SucklessBot = (function () {
                     _this.logger.debug("[STARTUP] ".concat(mod.name, " requested Intents: ").concat(mod.intents));
                 }
             });
-            if (_this.clientOptions.intents.toString() !== "")
-                intents = _this.clientOptions.intents;
+            if (_this.__clientOptions.intents.toString() !== "")
+                intents = _this.__clientOptions.intents;
             _this.logger.log("Requested Intents: ".concat(intents));
-            _this.logger.log("Allowed Intents: ".concat(intents, " ").concat(_this.clientOptions.intents.toString() !== ""
+            _this.logger.log("Allowed Intents: ".concat(intents, " ").concat(_this.__clientOptions.intents.toString() !== ""
                 ? "(as in SucklessBot options)"
                 : "(from mods)"));
-            _this.client = new Discord.Client(Object.assign({}, _this.clientOptions, { intents: intents }));
+            _this.__client = new Discord.Client(Object.assign({}, _this.__clientOptions, { intents: intents }));
         };
-        this.onConnect = function () { return __awaiter(_this, void 0, void 0, function () {
+        this.__onConnect = function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                this.logger.log("SucklessBot connected as ".concat(this.client.user.tag));
+                this.logger.log("SucklessBot connected as ".concat(this.__client.user.tag));
                 return [2];
             });
         }); };
-        this.onMessage = function (message) {
+        this.__onMessage = function (message) {
             var arg = message.content.split(/ +/);
             if (arg.length === 1 ||
                 !message.content.startsWith(_this.config.prefix))
@@ -113,7 +113,7 @@ var SucklessBot = (function () {
                 _this.logger.error("Error while executing command '".concat(message.content, "'\n").concat(error));
             }
         };
-        this.onDelete = function (message) {
+        this.__onDelete = function (message) {
             var mods = [];
             _this.mods.forEach(function (mod) {
                 if (!mods.includes(mod))
@@ -124,7 +124,7 @@ var SucklessBot = (function () {
                     mod.onMsgDelete(message, message.content.split(/ +/), _this);
             });
         };
-        this.onUpdate = function (oldMessage, newMessage) {
+        this.__onUpdate = function (oldMessage, newMessage) {
             var mods = [];
             _this.mods.forEach(function (mod) {
                 if (!mods.includes(mod))
@@ -135,20 +135,20 @@ var SucklessBot = (function () {
                     mod.onMsgUpdate(oldMessage, newMessage, _this);
             });
         };
-        this.token = options.token || this.config.token;
+        this.__token = options.token || this.config.token;
         this.debug = options.debug;
-        this.clientOptions = options.clientOptions;
+        this.__clientOptions = options.clientOptions;
     }
     SucklessBot.prototype.start = function () {
         var _this = this;
-        this.init();
-        this.client.login(this.token);
-        this.client.on("ready", this.onConnect.bind(this));
-        this.client.on("messageCreate", this.onMessage.bind(this));
-        this.client.on("messageDelete", this.onDelete.bind(this));
-        this.client.on("messageUpdate", this.onUpdate.bind(this));
+        this.__init();
+        this.__client.login(this.__token);
+        this.__client.on("ready", this.__onConnect.bind(this));
+        this.__client.on("messageCreate", this.__onMessage.bind(this));
+        this.__client.on("messageDelete", this.__onDelete.bind(this));
+        this.__client.on("messageUpdate", this.__onUpdate.bind(this));
         if (this.debug === "full")
-            this.client.on("debug", function (e) { return _this.logger.debug(e); });
+            this.__client.on("debug", function (e) { return _this.logger.debug(e); });
     };
     return SucklessBot;
 }());

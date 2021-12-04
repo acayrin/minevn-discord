@@ -2,11 +2,28 @@ import { Intents, Message, MessageEmbed } from "discord.js";
 import fetch from "node-fetch";
 import { SucklessBot } from "../core/class/sucklessbot";
 
-const Query = (message: Message, args: string[], bot: SucklessBot) => {
+const __trackers: any = {};
+
+/**
+ * Ping a minecraft server and its info
+ *
+ * @param {Message} message
+ * @param {string[]} args
+ * @param {SucklessBot} bot
+ * @return {*}
+ */
+const Query = async (
+    message: Message,
+    args: string[],
+    bot: SucklessBot
+): Promise<void> => {
     if (!args) return;
 
-    const ip = args.length > 0 ? args.join("") : "minevn.net";
-    fetch(`https://mcsrv.vercel.app/?ip=${ip}`).then((res) =>
+    // use 'minevn.net' if no ip was given | use port 25565 if no other port was given
+    const ip = args.length > 0 ? args.shift() : "minevn.net";
+    const port = args.length > 0 ? Number(args.shift()) : 25565;
+
+    fetch(`https://mcsrv.vercel.app/?ip=${ip}&port=${port}`).then((res) =>
         res
             .text()
             .then((txt) => {

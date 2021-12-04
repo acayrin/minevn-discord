@@ -35,47 +35,47 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+exports.__esModule = true;
+exports.SendImg = void 0;
 var discord_js_1 = require("discord.js");
-var node_fetch_1 = require("node-fetch");
-var __trackers = {};
-var Query = function (message, args, bot) { return __awaiter(void 0, void 0, void 0, function () {
-    var ip, port;
-    return __generator(this, function (_a) {
-        if (!args)
-            return [2];
-        ip = args.length > 0 ? args.shift() : "minevn.net";
-        port = args.length > 0 ? Number(args.shift()) : 25565;
-        (0, node_fetch_1["default"])("https://mcsrv.vercel.app/?ip=".concat(ip, "&port=").concat(port)).then(function (res) {
-            return res
-                .text()
-                .then(function (txt) {
-                var json = JSON.parse(txt);
-                message.channel.send({
-                    embeds: [
-                        new discord_js_1.MessageEmbed()
-                            .setColor("#ed2261")
-                            .setTimestamp()
-                            .setTitle("".concat(json.host.toUpperCase()))
-                            .setDescription("".concat(json.description.descriptionText.replace(/§[a-z0-9]+/g, "")))
-                            .setThumbnail("".concat(bot.cli().user.avatarURL()))
-                            .addField("Online", "".concat(json.onlinePlayers, "/").concat(json.maxPlayers))
-                            .addField("Version", "".concat(json.version)),
-                    ]
-                });
-            })["catch"](function () {
-                message.channel.send("I wasn't able to sneak up onto **".concat(args.join(), "** and steal their goodies"));
-            });
+var functions_1 = require("./functions");
+function SendImg(message, args, bot) {
+    return __awaiter(this, void 0, void 0, function () {
+        var tag, img;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!args) {
+                        return [2];
+                    }
+                    else {
+                        if (args.length === 0) {
+                        }
+                        else if (args.join().toLowerCase().match(/list/)) {
+                            return [2, message.reply("**Available tags:** ".concat(functions_1.__all.join(", ")))];
+                        }
+                        else {
+                            tag = args.join();
+                        }
+                    }
+                    return [4, (0, functions_1.__random)(tag)];
+                case 1:
+                    img = _a.sent();
+                    if (img)
+                        message.channel.send({
+                            embeds: [
+                                new discord_js_1.MessageEmbed()
+                                    .setTitle("Here ya go")
+                                    .setImage(img)
+                                    .setAuthor(message.author.tag)
+                                    .setTimestamp(),
+                            ]
+                        });
+                    else
+                        message.reply("I couldn't find any image with the tag **".concat(tag, "**"));
+                    return [2];
+            }
         });
-        return [2];
     });
-}); };
-module.exports = {
-    name: "Minecraft Server Status",
-    author: "acayrin",
-    intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES],
-    command: ["mcstatus"],
-    aliases: ["mc"],
-    description: "Ping a minecraft server",
-    usage: "%prefix% <command/alias> [ip:port]",
-    onMsgCreate: Query
-};
+}
+exports.SendImg = SendImg;

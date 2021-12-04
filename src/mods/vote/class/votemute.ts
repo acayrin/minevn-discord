@@ -17,9 +17,9 @@ export class VoteMute extends Vote {
      * @memberof VoteMute
      */
     async vote(): Promise<void> {
-        this.run({
-            embed: this.embed().setTitle(
-                `Mute: ${this.target.user.tag} for ${this.bot.config.mute.duration}m`
+        this._run({
+            embed: this._embed().setTitle(
+                `Mute: ${this.target.user.tag} for ${this._bot.config.mute.duration}m`
             ),
         });
     }
@@ -31,18 +31,18 @@ export class VoteMute extends Vote {
      */
     async onWin(): Promise<any> {
         const role = await getRole(
-            this.bot.config.mute.role || "mute",
+            this._bot.config.mute.role || "mute",
             this.channel.guild
         );
 
         this.msg.edit({
             embeds: [
-                this.embed()
+                this._embed()
                     .setTitle(
-                        `Muted: ${this.target.user.tag} [${this.bot.config.mute.duration}m]`
+                        `Muted: ${this.target.user.tag} [${this._bot.config.mute.duration}m]`
                     )
                     .setDescription(
-                        `reason: ${this.reason}\namount ${this.vote_Y} 👍 : ${this.vote_N} 👎`
+                        `reason: ${this.reason}\namount ${this._vote_Y} 👍 : ${this._vote_N} 👎`
                     ),
             ],
         });
@@ -70,14 +70,14 @@ export class VoteMute extends Vote {
                     recentmutes.add(this.target.id);
                     setTimeout(() => {
                         recentmutes.remove(this.target.id);
-                    }, this.bot.config.mute.duration * 2 * 60000);
+                    }, this._bot.config.mute.duration * 2 * 60000);
 
                     // debug
-                    if (this.bot.debug)
-                        this.bot.logger.debug(
+                    if (this._bot.debug)
+                        this._bot.logger.debug(
                             `[Vote - ${this.id}] Unmuted user ${this.target.id}`
                         );
-                }, this.bot.config.mute.duration * 60000);
+                }, this._bot.config.mute.duration * 60000);
             });
     }
 
@@ -89,10 +89,10 @@ export class VoteMute extends Vote {
     async onLose(): Promise<any> {
         this.msg.edit({
             embeds: [
-                this.embed()
+                this._embed()
                     .setTitle(`Vote ended, nobody was abused`)
                     .setDescription(
-                        `amount ${this.vote_Y} 👍 : ${this.vote_N} 👎`
+                        `amount ${this._vote_Y} 👍 : ${this._vote_N} 👎`
                     ),
             ],
         });

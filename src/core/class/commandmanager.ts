@@ -14,7 +14,10 @@ class CommandManager {
      * @type {Collection<string, DSMod>}
      * @memberof CommandManager
      */
-    private links: Collection<string, DSMod> = new Collection<string, DSMod>();
+    private __links: Collection<string, DSMod> = new Collection<
+        string,
+        DSMod
+    >();
 
     /**
      * Store commands from all mods
@@ -42,22 +45,22 @@ class CommandManager {
         // get commands
         if (Array.isArray(mod.command)) {
             mod.command.forEach((cmd) => {
-                this.links.set(cmd, mod);
+                this.__links.set(cmd, mod);
                 this.commands.push(cmd);
             });
         } else {
-            this.links.set(mod.command, mod);
+            this.__links.set(mod.command, mod);
             this.commands.push(mod.command);
         }
 
         // get aliases
         if (Array.isArray(mod.aliases)) {
             mod.aliases.forEach((cmd) => {
-                this.links.set(cmd, mod);
+                this.__links.set(cmd, mod);
                 this.aliases.push(cmd);
             });
         } else {
-            this.links.set(mod.aliases, mod);
+            this.__links.set(mod.aliases, mod);
             this.aliases.push(mod.aliases);
         }
     }
@@ -70,7 +73,7 @@ class CommandManager {
      * @memberof CommandManager
      */
     public getMod(command: string): DSMod {
-        return this.links.get(command);
+        return this.__links.get(command);
     }
 
     /**

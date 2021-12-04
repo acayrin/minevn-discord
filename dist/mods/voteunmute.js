@@ -2,7 +2,7 @@
 var discord_js_1 = require("discord.js");
 var vote_1 = require("./vote");
 module.exports = {
-    name: "Vote un-mute",
+    name: "Vote unmute",
     author: "acayrin",
     intents: [
         discord_js_1.Intents.FLAGS.GUILDS,
@@ -12,7 +12,7 @@ module.exports = {
     ],
     command: "voteunmute",
     aliases: ["vum"],
-    description: "Vote un-mute somebody cuz democracy is kul",
+    description: "Vote unmute somebody cuz democracy is kul",
     usage: "%prefix% <command/alias> <mention>[/<user id>/<username>] [reason]",
     onMsgCreate: vote_1.VUM
 };

@@ -1,24 +1,24 @@
 {
-  "name": "minevn-discord",
-  "version": "1.0.0",
-  "description": "",
-  "engines": {
-    "node": "16.x"
-  },
-  "main": "index.js",
-  "type": "commonjs",
-  "scripts": {
-    "build": "rm -rf dist && ./node_modules/typescript/bin/tsc --outDir dist",
-    "start": "cp config.json ./dist/ && node dist/index.js"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "chalk": "4.1.2",
-    "discord.js": "13.3.1",
-    "node-fetch": "2.6.6"
-  },
-  "devDependencies": {
-    "typescript": "^4.5.2"
-  }
+    "name": "minevn-discord",
+    "version": "1.0.0",
+    "description": "",
+    "engines": {
+        "node": "16.x"
+    },
+    "main": "index.js",
+    "type": "commonjs",
+    "scripts": {
+        "build": "rm -rf dist && ./node_modules/typescript/bin/tsc --outDir dist",
+        "start": "cp config.json ./dist/ && node dist/index.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "chalk": "4.1.2",
+        "discord.js": "13.3.1",
+        "node-fetch": "2.6.6"
+    },
+    "devDependencies": {
+        "typescript": "^4.5.2"
+    }
 }

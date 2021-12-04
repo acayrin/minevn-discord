@@ -46,7 +46,7 @@ var voteMgr = new votemanager_1.VoteManager();
 exports.voteMgr = voteMgr;
 function VoteSomebody(message, args, bot, unmute) {
     return __awaiter(this, void 0, void 0, function () {
-        var channel, lookup, reason, user, role, session, vote;
+        var channel, lookup, reason, user, role, session;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -83,6 +83,12 @@ function VoteSomebody(message, args, bot, unmute) {
                     if (!role) {
                         return [2, message.channel.send("Can't find any **muted** role, stop abusing now")];
                     }
+                    if (unmute) {
+                        return [2, new voteunmute_1.VoteUnmute(user, message.channel, bot, {
+                                reason: reason || undefined,
+                                timer: bot.config.mute.timer
+                            }).vote()];
+                    }
                     if (user.roles.cache.has(role.id)) {
                         return [2, message.channel.send("User **".concat(user.user.tag, "** is already muted, give them a break will ya"))];
                     }
@@ -95,16 +101,10 @@ function VoteSomebody(message, args, bot, unmute) {
                     if (session) {
                         return [2, session.msg.reply("There is an ongoing vote for **".concat(user.user.tag, "** so stopping now"))];
                     }
-                    vote = unmute
-                        ? new voteunmute_1.VoteUnmute(user, message.channel, bot, {
-                            reason: reason || undefined,
-                            timer: bot.config.mute.timer
-                        })
-                        : new votemute_1.VoteMute(user, message.channel, bot, {
-                            reason: reason || undefined,
-                            timer: bot.config.mute.timer
-                        });
-                    vote.vote();
+                    new votemute_1.VoteMute(user, message.channel, bot, {
+                        reason: reason || undefined,
+                        timer: bot.config.mute.timer
+                    }).vote();
                     return [2];
             }
         });

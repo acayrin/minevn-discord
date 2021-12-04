@@ -63,8 +63,8 @@ var VoteMute = (function (_super) {
     VoteMute.prototype.vote = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                this.run({
-                    embed: this.embed().setTitle("Mute: ".concat(this.target.user.tag, " for ").concat(this.bot.config.mute.duration, "m"))
+                this._run({
+                    embed: this._embed().setTitle("Mute: ".concat(this.target.user.tag, " for ").concat(this._bot.config.mute.duration, "m"))
                 });
                 return [2];
             });
@@ -76,14 +76,14 @@ var VoteMute = (function (_super) {
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, (0, utils_1.getRole)(this.bot.config.mute.role || "mute", this.channel.guild)];
+                    case 0: return [4, (0, utils_1.getRole)(this._bot.config.mute.role || "mute", this.channel.guild)];
                     case 1:
                         role = _a.sent();
                         this.msg.edit({
                             embeds: [
-                                this.embed()
-                                    .setTitle("Muted: ".concat(this.target.user.tag, " [").concat(this.bot.config.mute.duration, "m]"))
-                                    .setDescription("reason: ".concat(this.reason, "\namount ").concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E")),
+                                this._embed()
+                                    .setTitle("Muted: ".concat(this.target.user.tag, " [").concat(this._bot.config.mute.duration, "m]"))
+                                    .setDescription("reason: ".concat(this.reason, "\namount ").concat(this._vote_Y, " \uD83D\uDC4D : ").concat(this._vote_N, " \uD83D\uDC4E")),
                             ]
                         });
                         this.target.roles
@@ -100,12 +100,12 @@ var VoteMute = (function (_super) {
                                     recentmutes.add(this.target.id);
                                     setTimeout(function () {
                                         recentmutes.remove(_this.target.id);
-                                    }, this.bot.config.mute.duration * 2 * 60000);
-                                    if (this.bot.debug)
-                                        this.bot.logger.debug("[Vote - ".concat(this.id, "] Un-muted user ").concat(this.target.id));
+                                    }, this._bot.config.mute.duration * 2 * 60000);
+                                    if (this._bot.debug)
+                                        this._bot.logger.debug("[Vote - ".concat(this.id, "] Unmuted user ").concat(this.target.id));
                                     return [2];
                                 });
-                            }); }, _this.bot.config.mute.duration * 60000);
+                            }); }, _this._bot.config.mute.duration * 60000);
                         });
                         return [2];
                 }
@@ -117,9 +117,9 @@ var VoteMute = (function (_super) {
             return __generator(this, function (_a) {
                 this.msg.edit({
                     embeds: [
-                        this.embed()
+                        this._embed()
                             .setTitle("Vote ended, nobody was abused")
-                            .setDescription("amount ".concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E")),
+                            .setDescription("amount ".concat(this._vote_Y, " \uD83D\uDC4D : ").concat(this._vote_N, " \uD83D\uDC4E")),
                     ]
                 });
                 return [2];

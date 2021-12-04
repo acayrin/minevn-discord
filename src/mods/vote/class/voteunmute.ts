@@ -9,8 +9,8 @@ export class VoteUnmute extends Vote {
      * @memberof VoteMute
      */
     async vote(): Promise<void> {
-        this.run({
-            embed: this.embed().setTitle(`Un-mute: ${this.target.user.tag}`),
+        this._run({
+            embed: this._embed().setTitle(`Un-mute: ${this.target.user.tag}`),
         });
     }
 
@@ -21,16 +21,16 @@ export class VoteUnmute extends Vote {
      */
     async onWin(): Promise<any> {
         const role = await getRole(
-            this.bot.config.mute.role || "mute",
+            this._bot.config.mute.role || "mute",
             this.channel.guild
         );
 
         this.msg.edit({
             embeds: [
-                this.embed()
+                this._embed()
                     .setTitle(`Un-muted: ${this.target.user.tag}`)
                     .setDescription(
-                        `reason: ${this.reason}\namount ${this.vote_Y} 👍 : ${this.vote_N} 👎`
+                        `reason: ${this.reason}\namount ${this._vote_Y} 👍 : ${this._vote_N} 👎`
                     ),
             ],
         });

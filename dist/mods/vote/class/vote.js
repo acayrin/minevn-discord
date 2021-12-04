@@ -46,9 +46,9 @@ var Vote = (function () {
         this.channel = undefined;
         this.guild = undefined;
         this.msg = undefined;
-        this.bot = undefined;
-        this.vote_Y = 0;
-        this.vote_N = 0;
+        this._bot = undefined;
+        this._vote_Y = 0;
+        this._vote_N = 0;
         this.reason = "mob vote";
         this.timer = 30;
         this.id = crypto
@@ -57,7 +57,7 @@ var Vote = (function () {
             .digest("hex")
             .slice(0, 7);
         __1.voteMgr.add(this);
-        this.bot = bot;
+        this._bot = bot;
         this.channel = channel;
         this.guild = channel.guild;
         this.target = target;
@@ -68,7 +68,7 @@ var Vote = (function () {
                 this.timer = options.timer;
         }
     }
-    Vote.prototype.embed = function () {
+    Vote.prototype._embed = function () {
         return new discord_js_1.MessageEmbed()
             .setTimestamp()
             .setColor("#ed2261")
@@ -78,15 +78,15 @@ var Vote = (function () {
     };
     Vote.prototype.__onEnd = function () {
         var _this = this;
-        this.onEnd()["finally"](function () { return __1.voteMgr.remove(_this); });
+        this._onEnd()["finally"](function () { return __1.voteMgr.remove(_this); });
     };
     Vote.prototype.__onCollect = function (react) {
-        this.onCollect(react);
+        this._onCollect(react);
     };
     Vote.prototype.__onRemove = function (react) {
-        this.onRemove(react);
+        this._onRemove(react);
     };
-    Vote.prototype.getTarget = function (id) {
+    Vote.prototype._getTarget = function (id) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -99,20 +99,20 @@ var Vote = (function () {
             });
         });
     };
-    Vote.prototype.run = function (options) {
+    Vote.prototype._run = function (options) {
         return __awaiter(this, void 0, void 0, function () {
             var _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
-                    case 0: return [4, this.preload()];
+                    case 0: return [4, this._preload()];
                     case 1:
                         if (_b.sent())
                             return [2];
-                        if (this.bot.debug)
-                            this.bot.logger.debug("[Vote - ".concat(this.id, "] A vote has started, target: ").concat(this.target));
+                        if (this._bot.debug)
+                            this._bot.logger.debug("[Vote - ".concat(this.id, "] A vote has started, target: ").concat(this.target));
                         _a = this;
                         return [4, this.channel.send({
-                                embeds: [options.embed || this.embed()]
+                                embeds: [options.embed || this._embed()]
                             })];
                     case 2:
                         _a.msg = _b.sent();
@@ -138,70 +138,70 @@ var Vote = (function () {
             });
         });
     };
-    Vote.prototype.preload = function () {
+    Vote.prototype._preload = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2];
             });
         });
     };
-    Vote.prototype.onCollect = function (react) {
+    Vote.prototype._onCollect = function (react) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 if ("👍".includes(react.emoji.name))
-                    this.vote_Y++;
+                    this._vote_Y++;
                 if ("👎".includes(react.emoji.name))
-                    this.vote_N++;
+                    this._vote_N++;
                 return [2];
             });
         });
     };
-    Vote.prototype.onRemove = function (react) {
+    Vote.prototype._onRemove = function (react) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 if ("👍".includes(react.emoji.name))
-                    this.vote_Y--;
+                    this._vote_Y--;
                 if ("👎".includes(react.emoji.name))
-                    this.vote_N--;
+                    this._vote_N--;
                 return [2];
             });
         });
     };
-    Vote.prototype.onEnd = function () {
+    Vote.prototype._onEnd = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                if (this.bot.debug)
-                    this.bot.logger.debug("[Vote - ".concat(this.id, "] Vote ended with ").concat(this.vote_Y, ":").concat(this.vote_N, " (total ").concat(this.vote_Y + this.vote_N, ")"));
-                if (this.vote_Y > this.vote_N)
-                    this.onWin();
+                if (this._bot.debug)
+                    this._bot.logger.debug("[Vote - ".concat(this.id, "] Vote ended with ").concat(this._vote_Y, ":").concat(this._vote_N, " (total ").concat(this._vote_Y + this._vote_N, ")"));
+                if (this._vote_Y > this._vote_N)
+                    this._onWin();
                 else
-                    this.onLose();
+                    this._onLose();
                 return [2];
             });
         });
     };
-    Vote.prototype.onWin = function () {
+    Vote.prototype._onWin = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 this.msg.edit({
                     embeds: [
-                        this.embed()
+                        this._embed()
                             .setTitle("Vote ended, someone was abused")
-                            .setDescription("amount ".concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E")),
+                            .setDescription("amount ".concat(this._vote_Y, " \uD83D\uDC4D : ").concat(this._vote_N, " \uD83D\uDC4E")),
                     ]
                 });
                 return [2];
             });
         });
     };
-    Vote.prototype.onLose = function () {
+    Vote.prototype._onLose = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 this.msg.edit({
                     embeds: [
-                        this.embed()
+                        this._embed()
                             .setTitle("Vote ended, nobody was abused")
-                            .setDescription("amount ".concat(this.vote_Y, " \uD83D\uDC4D : ").concat(this.vote_N, " \uD83D\uDC4E")),
+                            .setDescription("amount ".concat(this._vote_Y, " \uD83D\uDC4D : ").concat(this._vote_N, " \uD83D\uDC4E")),
                     ]
                 });
                 return [2];

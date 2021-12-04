@@ -25,9 +25,9 @@ class SucklessBot {
         debug?: boolean;
         clientOptions?: Discord.ClientOptions;
     }) {
-        this.token = options.token || this.config.token;
+        this.__token = options.token || this.config.token;
         this.debug = options.debug;
-        this.clientOptions = options.clientOptions;
+        this.__clientOptions = options.clientOptions;
     }
 
     /**
@@ -37,7 +37,7 @@ class SucklessBot {
      * @type {string}
      * @memberof SucklessBot
      */
-    private token: string;
+    private __token: string;
 
     /**
      * SucklessBot's debug mode (default off)
@@ -55,7 +55,7 @@ class SucklessBot {
      * @type {Discord.Client}
      * @memberof SucklessBot
      */
-    private client: Discord.Client;
+    private __client: Discord.Client;
 
     /**
      * SucklessBot's Client options
@@ -64,7 +64,7 @@ class SucklessBot {
      * @type {Discord.ClientOptions}
      * @memberof SucklessBot
      */
-    private clientOptions: Discord.ClientOptions;
+    private __clientOptions: Discord.ClientOptions;
 
     /**
      * SucklessBot's Command manager instace
@@ -104,7 +104,7 @@ class SucklessBot {
      *
      * @memberof SucklessBot
      */
-    public readonly cli = () => this.client;
+    public readonly cli = () => this.__client;
 
     /**
      * SucklessBot's startup phase
@@ -112,7 +112,7 @@ class SucklessBot {
      * @private
      * @memberof SucklessBot
      */
-    private init = () => {
+    private __init = () => {
         this.logger.log(
             `Platform ${process.platform} ${process.arch} - Node ${
                 process.version.match(/^v(\d+\.\d+)/)[1]
@@ -170,19 +170,19 @@ class SucklessBot {
         });
 
         // if bot is configured with intents, use those instead
-        if (this.clientOptions.intents.toString() !== "")
-            intents = this.clientOptions.intents;
+        if (this.__clientOptions.intents.toString() !== "")
+            intents = this.__clientOptions.intents;
 
         this.logger.log(`Requested Intents: ${intents}`);
         this.logger.log(
             `Allowed Intents: ${intents} ${
-                this.clientOptions.intents.toString() !== ""
+                this.__clientOptions.intents.toString() !== ""
                     ? `(as in SucklessBot options)`
                     : `(from mods)`
             }`
         );
-        this.client = new Discord.Client(
-            Object.assign({}, this.clientOptions, { intents: intents })
+        this.__client = new Discord.Client(
+            Object.assign({}, this.__clientOptions, { intents: intents })
         );
     };
 
@@ -192,14 +192,14 @@ class SucklessBot {
      * @memberof SucklessBot
      */
     public start() {
-        this.init();
-        this.client.login(this.token);
-        this.client.on("ready", this.onConnect.bind(this));
-        this.client.on("messageCreate", this.onMessage.bind(this));
-        this.client.on("messageDelete", this.onDelete.bind(this));
-        this.client.on("messageUpdate", this.onUpdate.bind(this));
+        this.__init();
+        this.__client.login(this.__token);
+        this.__client.on("ready", this.__onConnect.bind(this));
+        this.__client.on("messageCreate", this.__onMessage.bind(this));
+        this.__client.on("messageDelete", this.__onDelete.bind(this));
+        this.__client.on("messageUpdate", this.__onUpdate.bind(this));
         if (this.debug === "full")
-            this.client.on("debug", (e) => this.logger.debug(e));
+            this.__client.on("debug", (e) => this.logger.debug(e));
     }
 
     /**
@@ -208,8 +208,8 @@ class SucklessBot {
      * @private
      * @memberof SucklessBot
      */
-    private onConnect = async () => {
-        this.logger.log(`SucklessBot connected as ${this.client.user.tag}`);
+    private __onConnect = async () => {
+        this.logger.log(`SucklessBot connected as ${this.__client.user.tag}`);
     };
 
     /**
@@ -219,7 +219,7 @@ class SucklessBot {
      * @param {Discord.Message} message Chat message
      * @memberof SucklessBot
      */
-    private onMessage = (message: Discord.Message) => {
+    private __onMessage = (message: Discord.Message) => {
         const arg = message.content.split(/ +/);
         if (
             arg.length === 1 || // not enough arguments
@@ -254,7 +254,7 @@ class SucklessBot {
      * @param {Discord.Message} message
      * @memberof SucklessBot
      */
-    private onDelete = (message: Discord.Message) => {
+    private __onDelete = (message: Discord.Message) => {
         const mods: DSMod[] = [];
         this.mods.forEach((mod) => {
             if (!mods.includes(mod)) mods.push(mod);
@@ -273,7 +273,7 @@ class SucklessBot {
      * @param {Discord.Message} new message
      * @memberof SucklessBot
      */
-    private onUpdate = (
+    private __onUpdate = (
         oldMessage: Discord.Message,
         newMessage: Discord.Message
     ) => {

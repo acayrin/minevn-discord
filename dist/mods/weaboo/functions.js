@@ -35,47 +35,47 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var discord_js_1 = require("discord.js");
+exports.__esModule = true;
+exports.__random = exports.__all = void 0;
 var node_fetch_1 = require("node-fetch");
-var __trackers = {};
-var Query = function (message, args, bot) { return __awaiter(void 0, void 0, void 0, function () {
-    var ip, port;
-    return __generator(this, function (_a) {
-        if (!args)
-            return [2];
-        ip = args.length > 0 ? args.shift() : "minevn.net";
-        port = args.length > 0 ? Number(args.shift()) : 25565;
-        (0, node_fetch_1["default"])("https://mcsrv.vercel.app/?ip=".concat(ip, "&port=").concat(port)).then(function (res) {
-            return res
-                .text()
-                .then(function (txt) {
-                var json = JSON.parse(txt);
-                message.channel.send({
-                    embeds: [
-                        new discord_js_1.MessageEmbed()
-                            .setColor("#ed2261")
-                            .setTimestamp()
-                            .setTitle("".concat(json.host.toUpperCase()))
-                            .setDescription("".concat(json.description.descriptionText.replace(/§[a-z0-9]+/g, "")))
-                            .setThumbnail("".concat(bot.cli().user.avatarURL()))
-                            .addField("Online", "".concat(json.onlinePlayers, "/").concat(json.maxPlayers))
-                            .addField("Version", "".concat(json.version)),
-                    ]
-                });
-            })["catch"](function () {
-                message.channel.send("I wasn't able to sneak up onto **".concat(args.join(), "** and steal their goodies"));
-            });
-        });
-        return [2];
+var endpoints_1 = require("./endpoints");
+exports.__all = [];
+Object.keys(endpoints_1.__tags).forEach(function (key) {
+    return endpoints_1.__tags[key].forEach(function (tag) {
+        if (!exports.__all.includes(tag))
+            exports.__all.push(tag);
+    });
+});
+var __random = function (what) { return __awaiter(void 0, void 0, void 0, function () {
+    var from, url, tag, img, _a, _b, e_1;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
+            case 0:
+                from = [];
+                if (what) {
+                    Object.keys(endpoints_1.__tags).forEach(function (url) {
+                        if (endpoints_1.__tags[url].includes(what))
+                            from.push(url);
+                    });
+                }
+                url = what
+                    ? from[Math.floor(Math.random() * from.length)]
+                    : Object.keys(endpoints_1.__tags)[Math.floor(Math.random() * Object.keys(endpoints_1.__tags).length)];
+                tag = what || endpoints_1.__tags[url][Math.floor(Math.random() * endpoints_1.__tags[url].length)];
+                _c.label = 1;
+            case 1:
+                _c.trys.push([1, 4, , 5]);
+                _b = (_a = JSON).parse;
+                return [4, (0, node_fetch_1["default"])("".concat(url).concat(tag))];
+            case 2: return [4, (_c.sent()).text()];
+            case 3:
+                img = _b.apply(_a, [_c.sent()]);
+                return [2, img["url"] || img["image"]];
+            case 4:
+                e_1 = _c.sent();
+                return [2, undefined];
+            case 5: return [2];
+        }
     });
 }); };
-module.exports = {
-    name: "Minecraft Server Status",
-    author: "acayrin",
-    intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES],
-    command: ["mcstatus"],
-    aliases: ["mc"],
-    description: "Ping a minecraft server",
-    usage: "%prefix% <command/alias> [ip:port]",
-    onMsgCreate: Query
-};
+exports.__random = __random;

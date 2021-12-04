@@ -77,6 +77,14 @@ async function VoteSomebody(
         );
     }
 
+    // vote unmute
+    if (unmute) {
+        return new VoteUnmute(user, message.channel, bot, {
+            reason: reason || undefined,
+            timer: bot.config.mute.timer,
+        }).vote();
+    }
+
     // check if user is already muted
     if (user.roles.cache.has(role.id)) {
         return message.channel.send(
@@ -101,17 +109,11 @@ async function VoteSomebody(
         );
     }
 
-    // create vote
-    const vote = unmute
-        ? new VoteUnmute(user, message.channel, bot, {
-              reason: reason || undefined,
-              timer: bot.config.mute.timer,
-          })
-        : new VoteMute(user, message.channel, bot, {
-              reason: reason || undefined,
-              timer: bot.config.mute.timer,
-          });
-    vote.vote();
+    // vote mute
+    new VoteMute(user, message.channel, bot, {
+        reason: reason || undefined,
+        timer: bot.config.mute.timer,
+    }).vote();
 }
 
 /**

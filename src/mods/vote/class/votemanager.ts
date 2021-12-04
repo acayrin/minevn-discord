@@ -14,7 +14,7 @@ class VoteManager {
      * @type {Vote[]}
      * @memberof VoteManager
      */
-    private sessions: Vote[] = [];
+    private __sessions: Vote[] = [];
 
     /**
      * The SucklessBot instance this manager belongs to
@@ -23,7 +23,7 @@ class VoteManager {
      * @type {SucklessBot}
      * @memberof VoteManager
      */
-    private bot: SucklessBot = undefined;
+    private __bot: SucklessBot = undefined;
 
     /**
      * Creates an instance of VoteManager.
@@ -32,7 +32,7 @@ class VoteManager {
      * @memberof VoteManager
      */
     constructor(bot?: SucklessBot) {
-        this.bot = bot;
+        this.__bot = bot;
     }
 
     /**
@@ -42,11 +42,11 @@ class VoteManager {
      * @memberof VoteManager
      */
     public add(session: Vote): void {
-        this.sessions.push(session);
+        this.__sessions.push(session);
 
         // debug
-        if (this.bot && this.bot.debug)
-            this.bot.logger.debug(
+        if (this.__bot && this.__bot.debug)
+            this.__bot.logger.debug(
                 `[VoteManager] Added Vote #${session.id} to the list`
             );
     }
@@ -58,11 +58,11 @@ class VoteManager {
      * @memberof VoteManager
      */
     public remove(session: Vote): void {
-        this.sessions.splice(this.sessions.indexOf(session), 1);
+        this.__sessions.splice(this.__sessions.indexOf(session), 1);
 
         // debug
-        if (this.bot && this.bot.debug)
-            this.bot.logger.debug(
+        if (this.__bot && this.__bot.debug)
+            this.__bot.logger.debug(
                 `[VoteManager] Removed Vote #${session.id} from the list`
             );
     }
@@ -76,9 +76,9 @@ class VoteManager {
      */
     public getSession(id?: string): Vote[] {
         if (id) {
-            return [this.sessions.find((session) => session.id.includes(id))];
+            return [this.__sessions.find((session) => session.id.includes(id))];
         }
-        return this.sessions;
+        return this.__sessions;
     }
 }
 
