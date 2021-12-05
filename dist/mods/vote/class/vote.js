@@ -200,7 +200,7 @@ var Vote = (function () {
                 this.msg.edit({
                     embeds: [
                         this._embed()
-                            .setTitle("Vote ended, nobody was abused")
+                            .setTitle("Vote ended, nothing happened, you saw nothing")
                             .setDescription("amount ".concat(this._vote_Y, " \uD83D\uDC4D : ").concat(this._vote_N, " \uD83D\uDC4E")),
                     ]
                 });

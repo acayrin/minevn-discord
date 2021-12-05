@@ -82,10 +82,16 @@ async function VoteSomebody(
 
 	// vote unmute
 	if (unmute) {
-		return new VoteUnmute(user, message.channel, bot, {
-			reason: reason || undefined,
-			timer: bot.config.mute.timer,
-		}).vote();
+		if (user.roles.cache.has(role.id)) {
+			return new VoteUnmute(user, message.channel, bot, {
+				reason: reason || undefined,
+				timer: bot.config.mute.timer,
+			}).vote();
+		} else {
+			return message.channel.send(
+				`User **${user.user.tag}** is not muted so ignoring`
+			);
+		}
 	}
 
 	// if user is recent muted

@@ -289,7 +289,7 @@ class Vote {
 		this.msg.edit({
 			embeds: [
 				this._embed()
-					.setTitle(`Vote ended, nobody was abused`)
+					.setTitle(`Vote ended, nothing happened, you saw nothing`)
 					.setDescription(
 						`amount ${this._vote_Y} 👍 : ${this._vote_N} 👎`
 					),

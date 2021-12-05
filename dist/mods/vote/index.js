@@ -87,10 +87,15 @@ function VoteSomebody(message, args, bot, unmute) {
                         return [2, message.channel.send("Can't find any **muted** role, stop abusing now")];
                     }
                     if (unmute) {
-                        return [2, new voteunmute_1.VoteUnmute(user, message.channel, bot, {
-                                reason: reason || undefined,
-                                timer: bot.config.mute.timer
-                            }).vote()];
+                        if (user.roles.cache.has(role.id)) {
+                            return [2, new voteunmute_1.VoteUnmute(user, message.channel, bot, {
+                                    reason: reason || undefined,
+                                    timer: bot.config.mute.timer
+                                }).vote()];
+                        }
+                        else {
+                            return [2, message.channel.send("User **".concat(user.user.tag, "** is not muted so ignoring"))];
+                        }
                     }
                     if (recentmutes.has(user.id)) {
                         return [2, message.channel.send("User **".concat(user.user.tag, "** was recently abused, please refrain yourself"))];
