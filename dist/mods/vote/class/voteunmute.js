@@ -69,7 +69,7 @@ var VoteUnmute = (function (_super) {
             });
         });
     };
-    VoteUnmute.prototype.onWin = function () {
+    VoteUnmute.prototype._onWin = function () {
         return __awaiter(this, void 0, void 0, function () {
             var role;
             var _this = this;

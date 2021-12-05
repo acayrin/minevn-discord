@@ -46,7 +46,7 @@ var voteMgr = new votemanager_1.VoteManager();
 exports.voteMgr = voteMgr;
 function VoteSomebody(message, args, bot, unmute) {
     return __awaiter(this, void 0, void 0, function () {
-        var channel, lookup, reason, user, role, session;
+        var channel, lookup, reason, user, session, role;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -74,8 +74,11 @@ function VoteSomebody(message, args, bot, unmute) {
                     if (user.user.bot) {
                         return [2, message.channel.send("**".concat(user.user.tag, "** is a robot u sussy baka"))];
                     }
-                    if (recentmutes.has(user.id)) {
-                        return [2, message.channel.send("User **".concat(user.user.tag, "** was recently abused, please refrain yourself"))];
+                    session = voteMgr
+                        .getSession()
+                        .find(function (session) { return session.target.id.includes(user.id); });
+                    if (session) {
+                        return [2, session.msg.reply("There is an ongoing vote for **".concat(user.user.tag, "** so stopping now"))];
                     }
                     return [4, (0, utils_1.getRole)(bot.config.mute.role || "mute", message.member.guild)];
                 case 3:
@@ -89,17 +92,14 @@ function VoteSomebody(message, args, bot, unmute) {
                                 timer: bot.config.mute.timer
                             }).vote()];
                     }
+                    if (recentmutes.has(user.id)) {
+                        return [2, message.channel.send("User **".concat(user.user.tag, "** was recently abused, please refrain yourself"))];
+                    }
                     if (user.roles.cache.has(role.id)) {
                         return [2, message.channel.send("User **".concat(user.user.tag, "** is already muted, give them a break will ya"))];
                     }
                     if (user.roles.highest.comparePositionTo(role) > 0) {
                         return [2, message.channel.send("User **".concat(user.user.tag, "** is too powerful, can't abuse them"))];
-                    }
-                    session = voteMgr
-                        .getSession()
-                        .find(function (session) { return session.target.id.includes(user.id); });
-                    if (session) {
-                        return [2, session.msg.reply("There is an ongoing vote for **".concat(user.user.tag, "** so stopping now"))];
                     }
                     new votemute_1.VoteMute(user, message.channel, bot, {
                         reason: reason || undefined,

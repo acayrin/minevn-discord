@@ -70,7 +70,7 @@ var VoteMute = (function (_super) {
             });
         });
     };
-    VoteMute.prototype.onWin = function () {
+    VoteMute.prototype._onWin = function () {
         return __awaiter(this, void 0, void 0, function () {
             var role;
             var _this = this;
@@ -91,38 +91,33 @@ var VoteMute = (function (_super) {
                             return _this.channel.send("User **".concat(_this.target.user.tag, "** can't be abused cuz they ran away like a wimp"));
                         })
                             .then(function () {
+                            recentmutes.add(_this.target.id);
+                            setTimeout(function () {
+                                recentmutes.remove(_this.target.id);
+                            }, _this._bot.config.mute.duration * 3 * 60000);
                             setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
                                 var _this = this;
                                 return __generator(this, function (_a) {
-                                    this.target.roles.remove(role)["catch"](function (e) {
-                                        _this.channel.send("User **".concat(_this.target.user.tag, "** can't be abused cuz they ran away like a wimp"));
-                                    });
-                                    recentmutes.add(this.target.id);
-                                    setTimeout(function () {
-                                        recentmutes.remove(_this.target.id);
-                                    }, this._bot.config.mute.duration * 2 * 60000);
-                                    if (this._bot.debug)
-                                        this._bot.logger.debug("[Vote - ".concat(this.id, "] Unmuted user ").concat(this.target.id));
+                                    if (this.target.roles.cache.has(role.id)) {
+                                        this.target.roles
+                                            .remove(role)
+                                            .then(function () {
+                                            if (_this._bot.debug)
+                                                _this._bot.logger.debug("[Vote - ".concat(_this.id, "] Unmuted user ").concat(_this.target.id));
+                                        })["catch"](function (e) {
+                                            _this._bot.logger.debug("[Vote - ".concat(_this.id, "] Can't remove muted role from user ").concat(_this.target.id, ", error ").concat(e));
+                                        });
+                                    }
+                                    else {
+                                        if (this._bot.debug)
+                                            this._bot.logger.debug("[Vote - ".concat(this.id, "] User ").concat(this.target.id, " got their muted role removed, ignoring"));
+                                    }
                                     return [2];
                                 });
                             }); }, _this._bot.config.mute.duration * 60000);
                         });
                         return [2];
                 }
-            });
-        });
-    };
-    VoteMute.prototype.onLose = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                this.msg.edit({
-                    embeds: [
-                        this._embed()
-                            .setTitle("Vote ended, nobody was abused")
-                            .setDescription("amount ".concat(this._vote_Y, " \uD83D\uDC4D : ").concat(this._vote_N, " \uD83D\uDC4E")),
-                    ]
-                });
-                return [2];
             });
         });
     };

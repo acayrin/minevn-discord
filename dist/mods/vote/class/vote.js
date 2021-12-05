@@ -109,7 +109,7 @@ var Vote = (function () {
                         if (_b.sent())
                             return [2];
                         if (this._bot.debug)
-                            this._bot.logger.debug("[Vote - ".concat(this.id, "] A vote has started, target: ").concat(this.target));
+                            this._bot.logger.debug("[Vote - ".concat(this.id, "] A vote has started, target: ").concat(this.target.id));
                         _a = this;
                         return [4, this.channel.send({
                                 embeds: [options.embed || this._embed()]
