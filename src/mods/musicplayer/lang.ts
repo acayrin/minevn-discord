@@ -23,7 +23,7 @@ export enum MusicPlayerLang {
 
 	PLAYER_NOW_FORMAT = "```%track_name% (%track_requester%)\n%track_bar% [%track_now%/%track_duration%]```",
 
-	PLAYER_LIST_HEADER = "```Current queue (%page_current%/%page_all%)",
+	PLAYER_LIST_HEADER = "```Current queue (%page_current%/%page_all%)\n",
 	PLAYER_LIST_EACH = "[%index%] %track_name%\n └─ %track_requester% - %track_duration%",
 	PLAYER_LIST_FOOTER = "\nTo switch between pages, use 'yt list [page]' ```",
 

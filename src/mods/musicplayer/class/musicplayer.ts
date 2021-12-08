@@ -132,10 +132,7 @@ export class MusicPlayer {
 				);
 		});
 		this.__player.on("stateChange", (oldState, newState) => {
-			if (
-				oldState.status === Voice.AudioPlayerStatus.Playing &&
-				newState.status === Voice.AudioPlayerStatus.Idle
-			) {
+			if (oldState.status !== Voice.AudioPlayerStatus.Idle && newState.status === Voice.AudioPlayerStatus.Idle) {
 				const bf = this.__queue.shift();
 				const af = this.__queue.at(0);
 				this.current = null;

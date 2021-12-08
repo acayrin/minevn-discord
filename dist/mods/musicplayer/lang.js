@@ -20,7 +20,7 @@ var MusicPlayerLang;
     MusicPlayerLang["PLAYER_TRACK_REMOVED"] = "Removed **%track%** from the queue";
     MusicPlayerLang["PLAYER_PLAYLIST_ADDED"] = "Added **%tracks%** tracks to the queue";
     MusicPlayerLang["PLAYER_NOW_FORMAT"] = "```%track_name% (%track_requester%)\n%track_bar% [%track_now%/%track_duration%]```";
-    MusicPlayerLang["PLAYER_LIST_HEADER"] = "```Current queue (%page_current%/%page_all%)";
+    MusicPlayerLang["PLAYER_LIST_HEADER"] = "```Current queue (%page_current%/%page_all%)\n";
     MusicPlayerLang["PLAYER_LIST_EACH"] = "[%index%] %track_name%\n \u2514\u2500 %track_requester% - %track_duration%";
     MusicPlayerLang["PLAYER_LIST_FOOTER"] = "\nTo switch between pages, use 'yt list [page]' ```";
     MusicPlayerLang["PLAYER_SEARCH_TIMEOUT"] = "Well you didn't choose anything";

@@ -181,8 +181,7 @@ var MusicPlayer = (function () {
             });
         }); });
         this.__player.on("stateChange", function (oldState, newState) {
-            if (oldState.status === Voice.AudioPlayerStatus.Playing &&
-                newState.status === Voice.AudioPlayerStatus.Idle) {
+            if (oldState.status !== Voice.AudioPlayerStatus.Idle && newState.status === Voice.AudioPlayerStatus.Idle) {
                 var bf = _this.__queue.shift();
                 var af_1 = _this.__queue.at(0);
                 _this.current = null;
