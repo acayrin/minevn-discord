@@ -47,6 +47,7 @@ export class MusicPlayer {
 		this.__guild = tchannel.guild;
 		this.__manager = manager;
 		this.__player = Voice.createAudioPlayer();
+		this.__bot = bot;
 
 		/**
 		 *

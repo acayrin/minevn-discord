@@ -95,7 +95,7 @@ function VoteSomebody(message, args, bot, unmute) {
                     }
                     session = voteMgr.getSession().find(function (session) { return session.target.id.includes(user.id); });
                     if (session) {
-                        return [2, session.msg.reply("There is an ongoing vote for **".concat(user.user.tag, "** so stopping now"))];
+                        return [2, (session.msg || message).reply("There is an ongoing vote for **".concat(user.user.tag, "** so stopping now"))];
                     }
                     return [4, (0, utils_1.getRole)(bot.config.mute.role || "mute", message.member.guild)];
                 case 3:

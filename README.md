@@ -10,6 +10,7 @@ This project was made mainly for fun, and for the purpose of learning Typescript
 -   Message snipe - snipe a deleted/modified message (with files support\* and custom history lookup)
 -   Minecraft status - a simple minecraft server tracker (Hẻo đã hẻo)
 -   Random weeb shit - send random images from nekos.fun/nekos.life
+-   Music player - a simple, kinda broken youtube audio player (keep getting hit with rate-limit)
 -   To be added:
     -   basic moderation features? most likely no
     -   full size minecraft server tracker?
@@ -99,19 +100,19 @@ Whether the mod will be disabled
 
 ```ts
 export = {
-    name: "Some suckless mod",
-    author: "acayrin",
-    intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MEMBERS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-    ],
-    command: "suck",
-    aliases: ["sk"],
-    description: "This is a mod used for demonstration only",
-    usage: "%prefix% <command/alias> <mention>[/<user id>/<username>] [args]",
-    onMsgCreate: SomeSucklessFunction,
+	name: "Some suckless mod",
+	author: "acayrin",
+	intents: [
+		Intents.FLAGS.GUILDS,
+		Intents.FLAGS.GUILD_MEMBERS,
+		Intents.FLAGS.GUILD_MESSAGES,
+		Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+	],
+	command: "suck",
+	aliases: ["sk"],
+	description: "This is a mod used for demonstration only",
+	usage: "%prefix% <command/alias> <mention>[/<user id>/<username>] [args]",
+	onMsgCreate: SomeSucklessFunction,
 };
 ```
 

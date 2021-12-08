@@ -49,7 +49,7 @@ async function VoteSomebody(message: Message, args: string[], bot: SucklessBot, 
 	// check if a vote is ongoing
 	const session = voteMgr.getSession().find((session) => session.target.id.includes(user.id));
 	if (session) {
-		return session.msg.reply(`There is an ongoing vote for **${user.user.tag}** so stopping now`);
+		return (session.msg || message).reply(`There is an ongoing vote for **${user.user.tag}** so stopping now`);
 	}
 
 	// try to get muted role

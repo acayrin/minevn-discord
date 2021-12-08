@@ -86,6 +86,7 @@ var MusicPlayer = (function () {
         this.__guild = tchannel.guild;
         this.__manager = manager;
         this.__player = Voice.createAudioPlayer();
+        this.__bot = bot;
         this.__connection = Voice.joinVoiceChannel({
             channelId: this.__vchannel.id,
             guildId: this.__guild.id,
