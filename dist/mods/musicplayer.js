@@ -7,7 +7,7 @@ module.exports = {
     intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES, discord_js_1.Intents.FLAGS.GUILD_VOICE_STATES],
     command: ["player", "youtube"],
     aliases: "yt",
-    usage: "Use ``%prefix% yt`` for full usage guide",
+    usage: "Use ``%prefix%yt`` for full usage guide",
     author: "acayrin",
     onMsgCreate: musicplayer_1.CreatePlayer
 };

@@ -44,6 +44,6 @@ module.exports = {
     command: "kiwi",
     author: "kiwi",
     intents: [Discord.Intents.FLAGS.GUILDS],
-    usage: "%prefix% kiwi",
+    usage: "%prefix%kiwi",
     onMsgCreate: run
 };

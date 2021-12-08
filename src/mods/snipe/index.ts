@@ -21,8 +21,7 @@ export const Snipe = (message: Discord.Message, args: string[], bot: SucklessBot
 	// if message is not a command
 	if (!args) return;
 
-	const arg = message.content.split(/ +/);
-	arg.shift();
+	const arg = message.content.replace(bot.config.prefix, "").trim().split(/ +/);
 	const cmd = arg.shift().toLocaleLowerCase();
 	const num = -1 - Math.abs(Number(arg.shift()));
 

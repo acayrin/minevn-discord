@@ -8,7 +8,7 @@ module.exports = {
     command: ["snipe", "editsnipe", "clear"],
     aliases: ["s", "es"],
     description: "Snipe somebody and make their day miserable",
-    usage: "%prefix% <command/alias> [step]",
+    usage: "%prefix%<command/alias> [step]",
     onMsgCreate: snipe_1.Snipe,
     onMsgDelete: snipe_1.SnipeDelete,
     onMsgUpdate: snipe_1.SnipeUpdate

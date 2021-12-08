@@ -69,8 +69,7 @@ var Snipe = function (message, args, bot) {
     record_U[_b = message.channelId] || (record_U[_b] = []);
     if (!args)
         return;
-    var arg = message.content.split(/ +/);
-    arg.shift();
+    var arg = message.content.replace(bot.config.prefix, "").trim().split(/ +/);
     var cmd = arg.shift().toLocaleLowerCase();
     var num = -1 - Math.abs(Number(arg.shift()));
     switch (cmd) {

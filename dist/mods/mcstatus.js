@@ -79,6 +79,6 @@ module.exports = {
     command: ["mcstatus"],
     aliases: ["mc"],
     description: "Ping a minecraft server",
-    usage: "%prefix% <command/alias> [ip:port]",
+    usage: "%prefix%<command/alias> [ip:port]",
     onMsgCreate: Query
 };
