@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -41,7 +60,7 @@ var utils_1 = require("../../core/utils");
 var votemanager_1 = require("./class/votemanager");
 var votemute_1 = require("./class/votemute");
 var voteunmute_1 = require("./class/voteunmute");
-var recentmutes = require("./recentmute");
+var recentmutes = __importStar(require("./recentmute"));
 var voteMgr = new votemanager_1.VoteManager();
 exports.voteMgr = voteMgr;
 function VoteSomebody(message, args, bot, unmute) {
@@ -74,9 +93,7 @@ function VoteSomebody(message, args, bot, unmute) {
                     if (user.user.bot) {
                         return [2, message.channel.send("**".concat(user.user.tag, "** is a robot u sussy baka"))];
                     }
-                    session = voteMgr
-                        .getSession()
-                        .find(function (session) { return session.target.id.includes(user.id); });
+                    session = voteMgr.getSession().find(function (session) { return session.target.id.includes(user.id); });
                     if (session) {
                         return [2, session.msg.reply("There is an ongoing vote for **".concat(user.user.tag, "** so stopping now"))];
                     }

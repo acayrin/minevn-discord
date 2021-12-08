@@ -1,29 +1,21 @@
 import * as crypto from "crypto";
-import {
-	Guild,
-	GuildMember,
-	Message,
-	MessageEmbed,
-	MessageReaction,
-	TextChannel,
-	User,
-} from "discord.js";
+import * as Discord from "discord.js";
 import { voteMgr } from "..";
-import { SucklessBot } from "../../../core/class/sucklessbot";
+import { SucklessBot } from "../../../core/sucklessbot";
 
 /**
  * A Vote instance, to mute anyone
  *
  * @class Vote
  */
-class Vote {
+export class Vote {
 	/**
 	 * The target user ID
 	 *
 	 * @type {GuildMember}
 	 * @memberof Vote
 	 */
-	public target: GuildMember = undefined;
+	public target: Discord.GuildMember = undefined;
 
 	/**
 	 * The text channel that the vote is held
@@ -31,7 +23,7 @@ class Vote {
 	 * @type {TextChannel}
 	 * @memberof Vote
 	 */
-	public channel: TextChannel = undefined;
+	public channel: Discord.TextChannel = undefined;
 
 	/**
 	 * The guild that the vote is in
@@ -39,7 +31,7 @@ class Vote {
 	 * @type {Guild}
 	 * @memberof Vote
 	 */
-	public guild: Guild = undefined;
+	public guild: Discord.Guild = undefined;
 
 	/**
 	 * The message that triggered the vote
@@ -47,11 +39,12 @@ class Vote {
 	 * @type {Message}
 	 * @memberof Vote
 	 */
-	public msg: Message = undefined;
+	public msg: Discord.Message = undefined;
 
 	/**
 	 * This SucklessBot instance related to this vote
 	 *
+	 * @protected
 	 * @type {SucklessBot}
 	 * @memberof Vote
 	 */
@@ -60,6 +53,7 @@ class Vote {
 	/**
 	 * Amount of YES votes
 	 *
+	 * @protected
 	 * @type {number}
 	 * @memberof Vote
 	 */
@@ -68,6 +62,7 @@ class Vote {
 	/**
 	 * Amount of NO votes
 	 *
+	 * @protected
 	 * @type {number}
 	 * @memberof Vote
 	 */
@@ -92,21 +87,20 @@ class Vote {
 	/**
 	 * The ID of this vote
 	 *
+	 * @type {string}
+	 * @returns {string} id string
 	 * @memberof Vote
 	 */
-	public id = crypto
-		.createHash("md5")
-		.update(Date.now().toString(), "utf-8")
-		.digest("hex")
-		.slice(0, 7);
+	public id: string = crypto.createHash("md5").update(Date.now().toString(), "utf-8").digest("hex").slice(0, 7);
 
 	/**
 	 * The message embed for this vote
 	 *
+	 * @returns {Discord.MessageEmbed}
 	 * @memberof Vote
 	 */
-	protected _embed(): MessageEmbed {
-		return new MessageEmbed()
+	protected _embed(): Discord.MessageEmbed {
+		return new Discord.MessageEmbed()
 			.setTimestamp()
 			.setColor("#ed2261")
 			.setTitle(`Vote`)
@@ -116,6 +110,7 @@ class Vote {
 
 	/**
 	 * Creates an instance of Vote.
+	 *
 	 * @param {GuildMember} target User to mute
 	 * @param {(TextChannel | any)} channel Base text channel
 	 * @param {SucklessBot} bot SucklessBot instance
@@ -123,8 +118,8 @@ class Vote {
 	 * @memberof Vote
 	 */
 	constructor(
-		target: GuildMember,
-		channel: TextChannel | any,
+		target: Discord.GuildMember,
+		channel: Discord.TextChannel | any,
 		bot: SucklessBot,
 		options?: { reason?: string; timer?: number }
 	) {
@@ -143,9 +138,10 @@ class Vote {
 	 * Remove this vote session from the vote manager when it ends (Local)
 	 *
 	 * @private
+	 * @return {*} void
 	 * @memberof Vote
 	 */
-	private __onEnd() {
+	private __onEnd(): void {
 		this._onEnd().finally(() => voteMgr.remove(this));
 	}
 
@@ -153,9 +149,10 @@ class Vote {
 	 * Triggers when a user casts their vote (Local)
 	 *
 	 * @private
+	 * @return {*} void
 	 * @memberof Vote
 	 */
-	private __onCollect(react: MessageReaction) {
+	private __onCollect(react: Discord.MessageReaction): void {
 		this._onCollect(react);
 	}
 
@@ -163,9 +160,10 @@ class Vote {
 	 * Triggers when a user removes their vote (Local)
 	 *
 	 * @private
+	 * @return {*} void
 	 * @memberof Vote
 	 */
-	private __onRemove(react: MessageReaction) {
+	private __onRemove(react: Discord.MessageReaction): void {
 		this._onRemove(react);
 	}
 
@@ -175,7 +173,7 @@ class Vote {
 	 * @return {*}  {Promise<GuildMember>} Member to be voted
 	 * @memberof Vote
 	 */
-	protected async _getTarget(id?: string): Promise<GuildMember> {
+	protected async _getTarget(id?: string): Promise<Discord.GuildMember> {
 		return await this.guild.members.fetch({
 			user: id || this.target.id,
 			cache: false,
@@ -187,15 +185,18 @@ class Vote {
 	/**
 	 * Start the vote
 	 *
+	 * @protected
+	 * @param {{
+	 * 		embed?: Discord.MessageEmbed;
+	 * 	}} [options] options to the vote, mainly message embed
+	 * @return {*}  {Promise<void>}
 	 * @memberof Vote
 	 */
-	protected async _run(options?: { embed?: MessageEmbed }) {
+	protected async _run(options?: { embed?: Discord.MessageEmbed }): Promise<void> {
 		if (await this._preload()) return;
 
 		if (this._bot.debug)
-			this._bot.logger.debug(
-				`[Vote - ${this.id}] A vote has started, target: ${this.target.id}`
-			);
+			this._bot.logger.debug(`[Vote - ${this.id}] A vote has started, target: ${this.target.id}`);
 
 		this.msg = await this.channel.send({
 			embeds: [options.embed || this._embed()],
@@ -205,8 +206,7 @@ class Vote {
 
 		this.msg
 			.createReactionCollector({
-				filter: (r: MessageReaction, u: User) =>
-					["👍", "👎"].includes(r.emoji.name) && !u.bot,
+				filter: (r: Discord.MessageReaction, u: Discord.User) => ["👍", "👎"].includes(r.emoji.name) && !u.bot,
 				time: this.timer * 1000,
 				dispose: true,
 			})
@@ -218,6 +218,8 @@ class Vote {
 	/**
 	 * Triggers before the vote starts
 	 *
+	 * @protected
+	 * @return {*}  {Promise<any>}
 	 * @memberof Vote
 	 */
 	protected async _preload(): Promise<any> {
@@ -227,10 +229,12 @@ class Vote {
 	/**
 	 * Triggers when a user casts their vote
 	 *
-	 * @param {MessageReaction} react
+	 * @protected
+	 * @param {Discord.MessageReaction} react user's reaction
+	 * @return {*}  {Promise<void>}
 	 * @memberof Vote
 	 */
-	protected async _onCollect(react: MessageReaction) {
+	protected async _onCollect(react: Discord.MessageReaction): Promise<void> {
 		if ("👍".includes(react.emoji.name)) this._vote_Y++;
 		if ("👎".includes(react.emoji.name)) this._vote_N++;
 	}
@@ -238,10 +242,12 @@ class Vote {
 	/**
 	 * Triggers when a user retracts their vote
 	 *
-	 * @param {MessageReaction} react
+	 * @protected
+	 * @param {Discord.MessageReaction} react user's reaction
+	 * @return {*}  {Promise<void>}
 	 * @memberof Vote
 	 */
-	protected async _onRemove(react: MessageReaction) {
+	protected async _onRemove(react: Discord.MessageReaction): Promise<void> {
 		if ("👍".includes(react.emoji.name)) this._vote_Y--;
 		if ("👎".includes(react.emoji.name)) this._vote_N--;
 	}
@@ -249,14 +255,16 @@ class Vote {
 	/**
 	 * Triggers when the vote ends
 	 *
+	 * @protected
+	 * @return {*}  {Promise<void>}
 	 * @memberof Vote
 	 */
-	protected async _onEnd() {
+	protected async _onEnd(): Promise<void> {
 		if (this._bot.debug)
 			this._bot.logger.debug(
-				`[Vote - ${this.id}] Vote ended with ${this._vote_Y}:${
-					this._vote_N
-				} (total ${this._vote_Y + this._vote_N})`
+				`[Vote - ${this.id}] Vote ended with ${this._vote_Y}:${this._vote_N} (total ${
+					this._vote_Y + this._vote_N
+				})`
 			);
 
 		if (this._vote_Y > this._vote_N) this._onWin();
@@ -266,16 +274,16 @@ class Vote {
 	/**
 	 * Triggers when the vote ended as win (Yes > No)
 	 *
+	 * @protected
+	 * @return {*}  {Promise<void>}
 	 * @memberof Vote
 	 */
-	protected async _onWin() {
+	protected async _onWin(): Promise<void> {
 		this.msg.edit({
 			embeds: [
 				this._embed()
 					.setTitle(`Vote ended, someone was abused`)
-					.setDescription(
-						`amount ${this._vote_Y} 👍 : ${this._vote_N} 👎`
-					),
+					.setDescription(`amount ${this._vote_Y} 👍 : ${this._vote_N} 👎`),
 			],
 		});
 	}
@@ -283,19 +291,17 @@ class Vote {
 	/**
 	 * Triggers when the vote ended as lose (No > Yes)
 	 *
+	 * @protected
+	 * @return {*}  {Promise<void>}
 	 * @memberof Vote
 	 */
-	protected async _onLose() {
+	protected async _onLose(): Promise<void> {
 		this.msg.edit({
 			embeds: [
 				this._embed()
 					.setTitle(`Vote ended, nothing happened, you saw nothing`)
-					.setDescription(
-						`amount ${this._vote_Y} 👍 : ${this._vote_N} 👎`
-					),
+					.setDescription(`amount ${this._vote_Y} 👍 : ${this._vote_N} 👎`),
 			],
 		});
 	}
 }
-
-export { Vote };

@@ -1,5 +1,5 @@
-import { Message, MessageEmbed } from "discord.js";
-import { SucklessBot } from "../../core/class/sucklessbot";
+import * as Discord from "discord.js";
+import { SucklessBot } from "../../core/sucklessbot";
 import { __all, __random } from "./functions";
 
 /**
@@ -10,39 +10,28 @@ import { __all, __random } from "./functions";
  * @param {SucklessBot} bot
  * @return {*}
  */
-export async function SendImg(
-    message: Message,
-    args: string[],
-    bot: SucklessBot
-): Promise<any> {
-    let tag: string;
+export async function SendImg(message: Discord.Message, args: string[], bot: SucklessBot): Promise<any> {
+	const tag = args && args.length > 0 ? args.join() : undefined;
 
-    if (!args) {
-        return;
-    } else {
-        // if no args was given, get a random pic
-        if (args.length === 0) {
-            // empty
-        } else if (args.join().toLowerCase().match(/list/)) {
-            // if list was given, send available tags
-            return message.reply(`**Available tags:** ${__all.join(", ")}`);
-        } else {
-            // use user's given tag
-            tag = args.join();
-        }
-    }
+	if (!args) {
+		return;
+	} else if (tag?.toLowerCase().match(/list/)) {
+		// if list was given, send available tags
+		return message.reply(`**Available tags:** ${__all.join(", ")}`);
+	}
 
-    // get a random image
-    const img = await __random(tag);
-    if (img)
-        message.channel.send({
-            embeds: [
-                new MessageEmbed()
-                    .setTitle(`Here ya go`)
-                    .setImage(img)
-                    .setAuthor(message.author.tag)
-                    .setTimestamp(),
-            ],
-        });
-    else message.reply(`I couldn't find any image with the tag **${tag}**`);
+	// get a random image
+	__random(tag).then((img) =>
+		img
+			? message.channel.send({
+					embeds: [
+						new Discord.MessageEmbed()
+							.setTitle(`Here ya go`)
+							.setImage(img)
+							.setAuthor(message.author.tag)
+							.setTimestamp(),
+					],
+			  })
+			: message.reply(`I couldn't find any image with the tag **${tag}**`)
+	);
 }

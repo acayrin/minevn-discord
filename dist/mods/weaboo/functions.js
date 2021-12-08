@@ -35,9 +35,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
 exports.__random = exports.__all = void 0;
-var node_fetch_1 = require("node-fetch");
+var node_fetch_1 = __importDefault(require("node-fetch"));
 var endpoints_1 = require("./endpoints");
 exports.__all = [];
 Object.keys(endpoints_1.__tags).forEach(function (key) {
@@ -52,16 +55,15 @@ var __random = function (what) { return __awaiter(void 0, void 0, void 0, functi
         switch (_c.label) {
             case 0:
                 from = [];
-                if (what) {
+                if (what)
                     Object.keys(endpoints_1.__tags).forEach(function (url) {
                         if (endpoints_1.__tags[url].includes(what))
                             from.push(url);
                     });
-                }
                 url = what
                     ? from[Math.floor(Math.random() * from.length)]
                     : Object.keys(endpoints_1.__tags)[Math.floor(Math.random() * Object.keys(endpoints_1.__tags).length)];
-                tag = what || endpoints_1.__tags[url][Math.floor(Math.random() * endpoints_1.__tags[url].length)];
+                tag = what !== null && what !== void 0 ? what : endpoints_1.__tags[url][Math.floor(Math.random() * endpoints_1.__tags[url].length)];
                 _c.label = 1;
             case 1:
                 _c.trys.push([1, 4, , 5]);

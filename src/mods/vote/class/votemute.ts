@@ -18,9 +18,7 @@ export class VoteMute extends Vote {
 	 */
 	async vote(): Promise<void> {
 		this._run({
-			embed: this._embed().setTitle(
-				`Mute: ${this.target.user.tag} for ${this._bot.config.mute.duration}m`
-			),
+			embed: this._embed().setTitle(`Mute: ${this.target.user.tag} for ${this._bot.config.mute.duration}m`),
 		});
 	}
 
@@ -30,20 +28,13 @@ export class VoteMute extends Vote {
 	 * @memberof Vote
 	 */
 	protected async _onWin(): Promise<any> {
-		const role = await getRole(
-			this._bot.config.mute.role || "mute",
-			this.channel.guild
-		);
+		const role = await getRole(this._bot.config.mute.role || "mute", this.channel.guild);
 
 		this.msg.edit({
 			embeds: [
 				this._embed()
-					.setTitle(
-						`Muted: ${this.target.user.tag} [${this._bot.config.mute.duration}m]`
-					)
-					.setDescription(
-						`reason: ${this.reason}\namount ${this._vote_Y} 👍 : ${this._vote_N} 👎`
-					),
+					.setTitle(`Muted: ${this.target.user.tag} [${this._bot.config.mute.duration}m]`)
+					.setDescription(`reason: ${this.reason}\namount ${this._vote_Y} 👍 : ${this._vote_N} 👎`),
 			],
 		});
 		this.target.roles
@@ -71,9 +62,7 @@ export class VoteMute extends Vote {
 							.then(() => {
 								// debug
 								if (this._bot.debug)
-									this._bot.logger.debug(
-										`[Vote - ${this.id}] Unmuted user ${this.target.id}`
-									);
+									this._bot.logger.debug(`[Vote - ${this.id}] Unmuted user ${this.target.id}`);
 							})
 							.catch((e) => {
 								this._bot.logger.debug(

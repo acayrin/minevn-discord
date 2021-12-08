@@ -7,7 +7,7 @@ const recentmutes: string[] = [];
  * @param {string} user
  */
 function add(user: string) {
-    recentmutes.push(user);
+	recentmutes.push(user);
 }
 
 /**
@@ -16,7 +16,7 @@ function add(user: string) {
  * @param {string} user
  */
 function remove(user: string) {
-    recentmutes.splice(recentmutes.indexOf(user), 1);
+	recentmutes.splice(recentmutes.indexOf(user), 1);
 }
 
 /**
@@ -26,7 +26,7 @@ function remove(user: string) {
  * @return {*}
  */
 function has(user: string): boolean {
-    return recentmutes.find((mute) => mute.includes(user)) ? true : false;
+	return recentmutes.find((mute) => mute.includes(user)) ? true : false;
 }
 
 export { add, remove, has };

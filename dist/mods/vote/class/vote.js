@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -37,8 +56,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.Vote = void 0;
-var crypto = require("crypto");
-var discord_js_1 = require("discord.js");
+var crypto = __importStar(require("crypto"));
+var Discord = __importStar(require("discord.js"));
 var __1 = require("..");
 var Vote = (function () {
     function Vote(target, channel, bot, options) {
@@ -51,11 +70,7 @@ var Vote = (function () {
         this._vote_N = 0;
         this.reason = "mob vote";
         this.timer = 30;
-        this.id = crypto
-            .createHash("md5")
-            .update(Date.now().toString(), "utf-8")
-            .digest("hex")
-            .slice(0, 7);
+        this.id = crypto.createHash("md5").update(Date.now().toString(), "utf-8").digest("hex").slice(0, 7);
         __1.voteMgr.add(this);
         this._bot = bot;
         this.channel = channel;
@@ -69,7 +84,7 @@ var Vote = (function () {
         }
     }
     Vote.prototype._embed = function () {
-        return new discord_js_1.MessageEmbed()
+        return new Discord.MessageEmbed()
             .setTimestamp()
             .setColor("#ed2261")
             .setTitle("Vote")
@@ -124,9 +139,7 @@ var Vote = (function () {
                         _b.sent();
                         this.msg
                             .createReactionCollector({
-                            filter: function (r, u) {
-                                return ["👍", "👎"].includes(r.emoji.name) && !u.bot;
-                            },
+                            filter: function (r, u) { return ["👍", "👎"].includes(r.emoji.name) && !u.bot; },
                             time: this.timer * 1000,
                             dispose: true
                         })

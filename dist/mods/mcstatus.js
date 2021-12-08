@@ -35,16 +35,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var discord_js_1 = require("discord.js");
-var node_fetch_1 = require("node-fetch");
-var __trackers = {};
+var node_fetch_1 = __importDefault(require("node-fetch"));
 var Query = function (message, args, bot) { return __awaiter(void 0, void 0, void 0, function () {
     var ip, port;
-    return __generator(this, function (_a) {
+    var _a, _b;
+    return __generator(this, function (_c) {
         if (!args)
             return [2];
-        ip = args.length > 0 ? args.shift() : "minevn.net";
-        port = args.length > 0 ? Number(args.shift()) : 25565;
+        ip = (_a = args.shift()) !== null && _a !== void 0 ? _a : "minevn.net";
+        port = (_b = args.shift()) !== null && _b !== void 0 ? _b : 25565;
         (0, node_fetch_1["default"])("https://mcsrv.vercel.app/?ip=".concat(ip, "&port=").concat(port)).then(function (res) {
             return res
                 .text()
@@ -63,7 +66,7 @@ var Query = function (message, args, bot) { return __awaiter(void 0, void 0, voi
                     ]
                 });
             })["catch"](function () {
-                message.channel.send("I wasn't able to sneak up onto **".concat(args.join(), "** and steal their goodies"));
+                message.channel.send("I wasn't able to sneak up onto **".concat(ip, ":").concat(port, "** and steal their goodies"));
             });
         });
         return [2];

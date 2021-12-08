@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -37,44 +56,33 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.SendImg = void 0;
-var discord_js_1 = require("discord.js");
+var Discord = __importStar(require("discord.js"));
 var functions_1 = require("./functions");
 function SendImg(message, args, bot) {
     return __awaiter(this, void 0, void 0, function () {
-        var tag, img;
+        var tag;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (!args) {
-                        return [2];
-                    }
-                    else {
-                        if (args.length === 0) {
-                        }
-                        else if (args.join().toLowerCase().match(/list/)) {
-                            return [2, message.reply("**Available tags:** ".concat(functions_1.__all.join(", ")))];
-                        }
-                        else {
-                            tag = args.join();
-                        }
-                    }
-                    return [4, (0, functions_1.__random)(tag)];
-                case 1:
-                    img = _a.sent();
-                    if (img)
-                        message.channel.send({
-                            embeds: [
-                                new discord_js_1.MessageEmbed()
-                                    .setTitle("Here ya go")
-                                    .setImage(img)
-                                    .setAuthor(message.author.tag)
-                                    .setTimestamp(),
-                            ]
-                        });
-                    else
-                        message.reply("I couldn't find any image with the tag **".concat(tag, "**"));
-                    return [2];
+            tag = args && args.length > 0 ? args.join() : undefined;
+            if (!args) {
+                return [2];
             }
+            else if (tag === null || tag === void 0 ? void 0 : tag.toLowerCase().match(/list/)) {
+                return [2, message.reply("**Available tags:** ".concat(functions_1.__all.join(", ")))];
+            }
+            (0, functions_1.__random)(tag).then(function (img) {
+                return img
+                    ? message.channel.send({
+                        embeds: [
+                            new Discord.MessageEmbed()
+                                .setTitle("Here ya go")
+                                .setImage(img)
+                                .setAuthor(message.author.tag)
+                                .setTimestamp(),
+                        ]
+                    })
+                    : message.reply("I couldn't find any image with the tag **".concat(tag, "**"));
+            });
+            return [2];
         });
     });
 }

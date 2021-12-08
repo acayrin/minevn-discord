@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -37,23 +56,23 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.SucklessBot = void 0;
-var Discord = require("discord.js");
-var fs = require("fs");
+var Discord = __importStar(require("discord.js"));
+var fs = __importStar(require("fs"));
 var path_1 = require("path");
-var commandmanager_1 = require("./commandmanager");
-var logger_1 = require("./logger");
+var commandmanager_1 = require("./manager/commandmanager");
+var logger_1 = require("./utils/logger");
+var path = (0, path_1.dirname)(require.main.filename);
 var SucklessBot = (function () {
     function SucklessBot(options) {
         var _this = this;
         this.debug = false;
         this.cmdMgr = new commandmanager_1.CommandManager();
         this.logger = new logger_1.Logger();
-        this.config = JSON.parse(fs.readFileSync("".concat(__dirname, "/../../../config.json"), "utf-8"));
+        this.config = JSON.parse(fs.readFileSync("".concat(path, "/config.json"), "utf-8"));
         this.mods = [];
         this.cli = function () { return _this.__client; };
         this.__init = function () {
             _this.logger.log("Platform ".concat(process.platform, " ").concat(process.arch, " - Node ").concat(process.version.match(/^v(\d+\.\d+)/)[1]));
-            var path = (0, path_1.dirname)(require.main.filename);
             var intents = [];
             fs.readdirSync("".concat(path, "/mods")).forEach(function (item) {
                 if (!item.endsWith(".js"))
@@ -82,9 +101,7 @@ var SucklessBot = (function () {
             if (_this.__clientOptions.intents.toString() !== "")
                 intents = _this.__clientOptions.intents;
             _this.logger.log("Requested Intents: ".concat(intents));
-            _this.logger.log("Allowed Intents: ".concat(intents, " ").concat(_this.__clientOptions.intents.toString() !== ""
-                ? "(as in SucklessBot options)"
-                : "(from mods)"));
+            _this.logger.log("Allowed Intents: ".concat(intents, " ").concat(_this.__clientOptions.intents.toString() !== "" ? "(as in SucklessBot options)" : "(from mods)"));
             _this.__client = new Discord.Client(Object.assign({}, _this.__clientOptions, { intents: intents }));
         };
         this.__onConnect = function () { return __awaiter(_this, void 0, void 0, function () {
@@ -94,18 +111,13 @@ var SucklessBot = (function () {
             });
         }); };
         this.__onMessage = function (message) {
-            var arg = message.content.split(/ +/);
-            if (arg.length === 1 ||
-                !message.content.startsWith(_this.config.prefix))
-                return _this.mods.forEach(function (mod) {
-                    return mod.onMsgCreate(message, undefined, _this);
-                });
-            arg.shift();
+            if (!message.content.startsWith(_this.config.prefix))
+                return _this.mods.forEach(function (mod) { return mod.onMsgCreate(message, undefined, _this); });
+            var msg = message.content.replace(_this.config.prefix, "").trim();
+            var arg = msg.split(/ +/);
             var cmd = arg.shift().toLocaleLowerCase();
             if (!_this.cmdMgr.getMod(cmd))
-                return _this.mods.forEach(function (mod) {
-                    return mod.onMsgCreate(message, undefined, _this);
-                });
+                return _this.mods.forEach(function (mod) { return mod.onMsgCreate(message, undefined, _this); });
             try {
                 _this.cmdMgr.getMod(cmd).onMsgCreate(message, arg, _this);
             }

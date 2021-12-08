@@ -8,6 +8,6 @@ export = {
 	command: "help",
 	aliases: ["h"],
 	description: "Bot's help page",
-	usage: "%prefix% <command/alias> [args]",
+	usage: "%prefix%<command/alias> [args]",
 	onMsgCreate: getHelp,
 };

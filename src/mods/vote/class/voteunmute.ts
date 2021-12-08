@@ -10,7 +10,7 @@ export class VoteUnmute extends Vote {
 	 */
 	async vote(): Promise<void> {
 		this._run({
-			embed: this._embed().setTitle(`Un-mute: ${this.target.user.tag}`),
+			embed: this._embed().setTitle(`Unmute: ${this.target.user.tag}`),
 		});
 	}
 
@@ -20,24 +20,17 @@ export class VoteUnmute extends Vote {
 	 * @memberof VoteUnmute
 	 */
 	protected async _onWin(): Promise<any> {
-		const role = await getRole(
-			this._bot.config.mute.role || "mute",
-			this.channel.guild
-		);
+		const role = await getRole(this._bot.config.mute.role || "mute", this.channel.guild);
 
 		this.msg.edit({
 			embeds: [
 				this._embed()
-					.setTitle(`Un-muted: ${this.target.user.tag}`)
-					.setDescription(
-						`reason: ${this.reason}\namount ${this._vote_Y} 👍 : ${this._vote_N} 👎`
-					),
+					.setTitle(`Unmuted: ${this.target.user.tag}`)
+					.setDescription(`reason: ${this.reason}\namount ${this._vote_Y} 👍 : ${this._vote_N} 👎`),
 			],
 		});
 		this.target.roles.remove(role).catch((e) => {
-			this.channel.send(
-				`I failed to set **${this.target.user.tag}** free (err: ${e})`
-			);
+			this.channel.send(`I failed to set **${this.target.user.tag}** free (err: ${e})`);
 		});
 	}
 }

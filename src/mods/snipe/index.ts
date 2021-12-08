@@ -1,9 +1,11 @@
-import { Message, MessageAttachment, MessageEmbed } from "discord.js";
-import { SucklessBot } from "../../core/class/sucklessbot";
+import * as Discord from "discord.js";
+import fetch from "node-fetch";
+import { SucklessBot } from "../../core/sucklessbot";
 import { DSChatRecord } from "./interface/DSChatRecord";
 
 const record_D: any = {};
 const record_U: any = {};
+
 /**
  * Triggers when a message is sent
  *
@@ -11,61 +13,59 @@ const record_U: any = {};
  * @param {string[]} args Arguments from message
  * @param {SucklessBot} bot The bot instance
  */
-const Snipe = (message: Message, args: string[], bot: SucklessBot) => {
-    // check
-    _c(message.channelId);
+export const Snipe = (message: Discord.Message, args: string[], bot: SucklessBot) => {
+	// check
+	record_D[message.channelId] ||= [];
+	record_U[message.channelId] ||= [];
 
-    // if message is not a command
-    if (!args) return;
+	// if message is not a command
+	if (!args) return;
 
-    const arg = message.content.split(/ +/);
-    arg.shift();
-    const cmd = arg.shift().toLocaleLowerCase();
-    const num = -1 - Math.abs(Number(arg.shift()));
+	const arg = message.content.split(/ +/);
+	arg.shift();
+	const cmd = arg.shift().toLocaleLowerCase();
+	const num = -1 - Math.abs(Number(arg.shift()));
 
-    switch (cmd) {
-        // normal snipe
-        case "s":
-        case "snipe": {
-            if (record_D[message.channelId].length < 1) return;
+	switch (cmd) {
+		// normal snipe
+		case "s":
+		case "snipe": {
+			if (record_D[message.channelId].length < 1) return;
 
-            const rep = record_D[message.channelId].at(num || -1);
-            message.reply({
-                embeds: [_e(rep)],
-                files: rep.files || null,
-            });
-            break;
-        }
-        // edit snipe
-        case "es":
-        case "editsnipe": {
-            if (record_U[message.channelId].length < 1) return;
+			const rep = record_D[message.channelId].at(num || -1);
+			message.reply({
+				embeds: [_e(rep)],
+				files: rep.files || null,
+			});
+			break;
+		}
+		// edit snipe
+		case "es":
+		case "editsnipe": {
+			if (record_U[message.channelId].length < 1) return;
 
-            const rep = record_U[message.channelId].at(num || -1);
-            message.reply({
-                embeds: [_e(rep)],
-                files: rep.files || null,
-            });
-            break;
-        }
-        // clear everything
-        case "clear": {
-            if (message.member.permissions.has("MANAGE_MESSAGES")) {
-                record_U[message.channelId].length = 0;
-                record_D[message.channelId].length = 0;
+			const rep = record_U[message.channelId].at(num || -1);
+			message.reply({
+				embeds: [_e(rep)],
+				files: rep.files || null,
+			});
+			break;
+		}
+		// clear everything
+		case "clear": {
+			if (message.member.permissions.has("MANAGE_MESSAGES")) {
+				record_U[message.channelId].length = 0;
+				record_D[message.channelId].length = 0;
 
-                // debug
-                if (bot.debug)
-                    bot.logger.debug(
-                        `[Snipe - ${message.channelId}] Cleared local cache`
-                    );
-            }
-            break;
-        }
-        default: {
-            // how tf did you get here
-        }
-    }
+				// debug
+				if (bot.debug) bot.logger.debug(`[Snipe - ${message.channelId}] Cleared local cache`);
+			}
+			break;
+		}
+		default: {
+			// how tf did you get here
+		}
+	}
 };
 
 /**
@@ -75,36 +75,37 @@ const Snipe = (message: Message, args: string[], bot: SucklessBot) => {
  * @param {*} args empty
  * @param {SucklessBot} bot The bot instance
  */
-const SnipeDelete = (message: Message, args: any, bot: SucklessBot) => {
-    // check
-    _c(message.channelId);
+export const SnipeDelete = (message: Discord.Message, args: any, bot: SucklessBot) => {
+	// check
+	record_D[message.channelId] ||= [];
+	record_U[message.channelId] ||= [];
 
-    // shift oldest record
-    if (record_D[message.channelId].length > bot.config.snipe.limit)
-        record_D[message.channelId].shift();
+	// shift oldest record
+	if (record_D[message.channelId].length > bot.config.snipe.limit) record_D[message.channelId].shift();
 
-    // debug
-    if (bot.debug)
-        bot.logger.debug(
-            `[Snipe - ${message.channelId}] Deleted +${message.id} (${
-                record_D[message.channelId].length
-            }/${bot.config.snipe.limit})`
-        );
+	// debug
+	if (bot.debug)
+		bot.logger.debug(
+			`[Snipe - ${message.channelId}] Deleted +${message.id} (${record_D[message.channelId].length}/${
+				bot.config.snipe.limit
+			})`
+		);
 
-    // get attachments
-    const files: MessageAttachment[] = [];
-    message.attachments.forEach((file) => {
-        files.push(new MessageAttachment(file.attachment, file.name));
-    });
+	// get attachments
+	const files: { attachment: any; name: string }[] = [];
+	message.attachments.forEach(async (file) => {
+		const buffer = await (await fetch(file.attachment.toString())).buffer();
+		files.push({ attachment: buffer, name: file.name });
+	});
 
-    // add record
-    return record_D[message.channelId].push({
-        id: message.id,
-        content: message.content,
-        files: files,
-        owner: message.author.tag,
-        avatar: message.author.avatarURL(),
-    });
+	// add record
+	return record_D[message.channelId].push({
+		id: message.id,
+		content: message.content,
+		files: files,
+		owner: message.author.tag,
+		avatar: message.author.avatarURL(),
+	});
 };
 
 /**
@@ -115,46 +116,37 @@ const SnipeDelete = (message: Message, args: any, bot: SucklessBot) => {
  * @param {*} args empty
  * @param {SucklessBot} bot The bot instance
  */
-const SnipeUpdate = (oldMsg: Message, newMsg: Message, bot: SucklessBot) => {
-    // check
-    _c(oldMsg.channelId);
+export const SnipeUpdate = (oldMsg: Discord.Message, newMsg: Discord.Message, bot: SucklessBot) => {
+	// check
+	record_D[oldMsg.channelId] ||= [];
+	record_U[oldMsg.channelId] ||= [];
 
-    // shift oldest record
-    if (record_U[oldMsg.channelId].length > bot.config.snipe.limit)
-        record_U[oldMsg.channelId].shift();
+	// shift oldest record
+	if (record_U[oldMsg.channelId].length > bot.config.snipe.limit) record_U[oldMsg.channelId].shift();
 
-    // debug
-    if (bot.debug)
-        bot.logger.debug(
-            `[Snipe - ${oldMsg.channelId}] Updated +${oldMsg.id} (${
-                record_U[oldMsg.channelId].length
-            }/${bot.config.snipe.limit})`
-        );
+	// debug
+	if (bot.debug)
+		bot.logger.debug(
+			`[Snipe - ${oldMsg.channelId}] Updated +${oldMsg.id} (${record_U[oldMsg.channelId].length}/${
+				bot.config.snipe.limit
+			})`
+		);
 
-    // get attachments
-    const files: { attachment: any; name: string }[] = [];
-    oldMsg.attachments.forEach((file) => {
-        files.push({ attachment: file.attachment, name: file.name });
-    });
+	// get attachments
+	const files: { attachment: any; name: string }[] = [];
+	oldMsg.attachments.forEach(async (file) => {
+		const buffer = await (await fetch(file.attachment.toString())).buffer();
+		files.push({ attachment: buffer, name: file.name });
+	});
 
-    // add record
-    return record_U[oldMsg.channelId].push({
-        id: oldMsg.id,
-        content: oldMsg.content,
-        files: files,
-        owner: oldMsg.author.tag,
-        avatar: oldMsg.author.avatarURL(),
-    });
-};
-
-/**
- * Creates channel record if doesnt exist
- *
- * @param {string} ch channel id
- */
-const _c = (ch: string) => {
-    if (!record_D[ch]) record_D[ch] = [];
-    if (!record_U[ch]) record_U[ch] = [];
+	// add record
+	return record_U[oldMsg.channelId].push({
+		id: oldMsg.id,
+		content: oldMsg.content,
+		files: files,
+		owner: oldMsg.author.tag,
+		avatar: oldMsg.author.avatarURL(),
+	});
 };
 
 /**
@@ -163,12 +155,10 @@ const _c = (ch: string) => {
  * @param {DSChatRecord} a Chat record
  * @return {MessageEmbed} Discord embed
  */
-const _e = (a: DSChatRecord): MessageEmbed => {
-    return new MessageEmbed()
-        .setColor("#ed2261")
-        .setAuthor(a.owner, a.avatar)
-        .setDescription(a.content)
-        .setTimestamp();
+const _e = (a: DSChatRecord): Discord.MessageEmbed => {
+	return new Discord.MessageEmbed()
+		.setColor("#ed2261")
+		.setAuthor(a.owner, a.avatar)
+		.setDescription(a.content)
+		.setTimestamp();
 };
-
-export { Snipe, SnipeDelete, SnipeUpdate };

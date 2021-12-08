@@ -8,17 +8,28 @@
 	"main": "index.js",
 	"type": "commonjs",
 	"scripts": {
-		"build": "rm -rf dist && ./node_modules/typescript/bin/tsc --outDir dist",
+		"build": "rm -rf dist && ./node_modules/typescript/bin/tsc",
 		"start": "cp config.json ./dist/ && node dist/index.js"
 	},
-	"author": "",
+	"author": "acayrin <iacayrin@gmail.com>",
 	"license": "ISC",
 	"dependencies": {
-		"chalk": "4.1.2",
+		"@discordjs/voice": "^0.7.5",
+		"bufferutil": "^4.0.5",
+		"colors-cli": "^1.0.28",
 		"discord.js": "13.3.1",
-		"node-fetch": "2.6.6"
+		"ffmpeg-static": "^4.4.0",
+		"libsodium-wrappers": "^0.7.9",
+		"node-fetch": "2.6.6",
+		"opusscript": "^0.0.8",
+		"utf-8-validate": "^5.0.7",
+		"ytdl-core": "^4.9.1",
+		"ytpl": "^2.2.3",
+		"ytsr": "^3.5.3",
+		"zlib-sync": "^0.1.7"
 	},
 	"devDependencies": {
 		"typescript": "^4.5.2"
-	}
+	},
+	"repository": "https://github.com/acayrin/minevn-discord.git"
 }

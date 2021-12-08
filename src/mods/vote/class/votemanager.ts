@@ -1,4 +1,5 @@
-import { SucklessBot } from "../../../core/class/sucklessbot";
+import { BaseManager } from "../../../core/manager/basemanager";
+import { SucklessBot } from "../../../core/sucklessbot";
 import { Vote } from "./vote";
 
 /**
@@ -6,7 +7,7 @@ import { Vote } from "./vote";
  *
  * @class VoteManager
  */
-class VoteManager {
+export class VoteManager extends BaseManager {
 	/**
 	 * Vote sessions for this manager
 	 *
@@ -17,54 +18,41 @@ class VoteManager {
 	private __sessions: Vote[] = [];
 
 	/**
-	 * The SucklessBot instance this manager belongs to
-	 *
-	 * @private
-	 * @type {SucklessBot}
-	 * @memberof VoteManager
-	 */
-	private __bot: SucklessBot = undefined;
-
-	/**
 	 * Creates an instance of VoteManager.
 	 *
 	 * @param {SucklessBot} [bot] The SucklessBot instance this manager belongs to
 	 * @memberof VoteManager
 	 */
 	constructor(bot?: SucklessBot) {
-		this.__bot = bot;
+		super(bot);
 	}
 
 	/**
 	 * Add a vote session to this manager
 	 *
 	 * @param {Vote} session
+	 * @returns {*}
 	 * @memberof VoteManager
 	 */
 	public add(session: Vote): void {
 		this.__sessions.push(session);
 
 		// debug
-		if (this.__bot && this.__bot.debug)
-			this.__bot.logger.debug(
-				`[VoteManager] Added Vote #${session.id} to the list`
-			);
+		if (this.__bot?.debug) this.__bot.logger.debug(`[VoteManager] Added Vote #${session.id} to the list`);
 	}
 
 	/**
 	 * Remove a vote session from this manager
 	 *
 	 * @param {Vote} session
+	 * @returns {*}
 	 * @memberof VoteManager
 	 */
 	public remove(session: Vote): void {
 		this.__sessions.splice(this.__sessions.indexOf(session), 1);
 
 		// debug
-		if (this.__bot && this.__bot.debug)
-			this.__bot.logger.debug(
-				`[VoteManager] Removed Vote #${session.id} from the list`
-			);
+		if (this.__bot?.debug) this.__bot.logger.debug(`[VoteManager] Removed Vote #${session.id} from the list`);
 	}
 
 	/**
@@ -75,11 +63,6 @@ class VoteManager {
 	 * @memberof VoteManager
 	 */
 	public getSession(id?: string): Vote[] {
-		if (id) {
-			return [this.__sessions.find((session) => session.id.includes(id))];
-		}
-		return this.__sessions;
+		return id ? [this.__sessions.find((session) => session.id.includes(id))] : this.__sessions;
 	}
 }
-
-export { VoteManager };

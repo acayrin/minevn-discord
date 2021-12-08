@@ -63,7 +63,7 @@ var VoteUnmute = (function (_super) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 this._run({
-                    embed: this._embed().setTitle("Un-mute: ".concat(this.target.user.tag))
+                    embed: this._embed().setTitle("Unmute: ".concat(this.target.user.tag))
                 });
                 return [2];
             });
@@ -81,7 +81,7 @@ var VoteUnmute = (function (_super) {
                         this.msg.edit({
                             embeds: [
                                 this._embed()
-                                    .setTitle("Un-muted: ".concat(this.target.user.tag))
+                                    .setTitle("Unmuted: ".concat(this.target.user.tag))
                                     .setDescription("reason: ".concat(this.reason, "\namount ").concat(this._vote_Y, " \uD83D\uDC4D : ").concat(this._vote_N, " \uD83D\uDC4E")),
                             ]
                         });
