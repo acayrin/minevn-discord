@@ -9,7 +9,7 @@ rm node-$VERSION-linux-x64.tar.xz
 echo '
 const express = require("express");
 const app = express()
-app.get('/', (_: any, res:any) => res.send("Ping pong"))
+app.get("/", (_: any, res:any) => res.send("Ping pong"))
 app.listen(3000)' >> src/index.ts
 
 echo 'language = "nodejs"
