@@ -1,28 +1,115 @@
 import * as Voice from "@discordjs/voice";
-import * as crypto from "crypto";
 import * as Discord from "discord.js";
+import { SucklessBot } from "../../../core/sucklessbot";
+import { id } from "../../../core/utils/generateid";
+import { MusicPlayerLang } from "../lang";
 import { MusicManager } from "./musicmanager";
 import { MusicTrack } from "./musictrack";
 import ytdl = require("ytdl-core");
-import { MusicPlayerLang } from "../lang";
-import { SucklessBot } from "../../../core/sucklessbot";
 
+/**
+ * Music player instance
+ *
+ * @export
+ * @class MusicPlayer
+ */
 export class MusicPlayer {
-	public readonly id: string = crypto
-		.createHash("md5")
-		.update(Date.now().toString(), "utf-8")
-		.digest("hex")
-		.slice(0, 7);
+	/**
+	 * Player's unique ID
+	 *
+	 * @type {string}
+	 * @memberof MusicPlayer
+	 */
+	public readonly id: string = id();
+
+	/**
+	 * Player's current audio resource
+	 *
+	 * @type {Voice.AudioResource<MusicTrack>}
+	 * @memberof MusicPlayer
+	 */
 	public current: Voice.AudioResource<MusicTrack>;
 
+	/**
+	 * Current player's queue
+	 *
+	 * @private
+	 * @type {MusicTrack[]}
+	 * @memberof MusicPlayer
+	 */
 	private __queue: MusicTrack[] = [];
+
+	/**
+	 * The guild which this player is in
+	 *
+	 * @private
+	 * @type {Discord.Guild}
+	 * @memberof MusicPlayer
+	 */
 	private __guild: Discord.Guild;
+
+	/**
+	 * The player's text channel, for responses
+	 *
+	 * @private
+	 * @type {Discord.TextChannel}
+	 * @memberof MusicPlayer
+	 */
 	private __tchannel: Discord.TextChannel;
+
+	/**
+	 * The player's voice channel
+	 *
+	 * @private
+	 * @type {(Discord.VoiceChannel | Discord.StageChannel)}
+	 * @memberof MusicPlayer
+	 */
 	private __vchannel: Discord.VoiceChannel | Discord.StageChannel;
+
+	/**
+	 * The player's voice connection
+	 *
+	 * @private
+	 * @type {Voice.VoiceConnection}
+	 * @memberof MusicPlayer
+	 */
 	private __connection: Voice.VoiceConnection;
+
+	/**
+	 * The player's audio player instance
+	 *
+	 * @private
+	 * @type {Voice.AudioPlayer}
+	 * @memberof MusicPlayer
+	 */
 	private __player: Voice.AudioPlayer;
+
+	/**
+	 * The manager which this player is in
+	 *
+	 * @private
+	 * @type {MusicManager}
+	 * @memberof MusicPlayer
+	 */
 	private __manager: MusicManager;
+
+	/**
+	 * The Bot instance which owns this player
+	 *
+	 * @private
+	 * @type {SucklessBot}
+	 * @memberof MusicPlayer
+	 */
 	private __bot: SucklessBot;
+
+	/**
+	 * Current playback duration in miliseconds
+	 *
+	 * @private
+	 * @type {number}
+	 * @memberof MusicPlayer
+	 */
+	private __playduration: number = 0;
 
 	/**
 	 * Creates an instance of MusicPlayer.
@@ -50,25 +137,17 @@ export class MusicPlayer {
 		this.__bot = bot;
 
 		/**
-		 *
 		 * Join and create the voice connection
-		 *
 		 */
-		this.__connection = Voice.joinVoiceChannel({
-			channelId: this.__vchannel.id,
-			guildId: this.__guild.id,
-			adapterCreator: this.__vchannel.guild.voiceAdapterCreator,
-		});
-		this.__connection.subscribe(this.__player);
+		this.__connect();
 
 		/**
-		 *
 		 * Handle when the voice state changes
-		 *
 		 */
+		this.__connection.on("debug", (m) => {
+			this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] ${m}`);
+		});
 		this.__connection.on("stateChange", async (_, newState: Voice.VoiceConnectionState) => {
-			if (this.__bot.debug)
-				this.__connection.on("debug", (m) => this.__bot.logger.debug(`[MusicPlayer - ${this.id}] ${m}`));
 			if (newState.status === Voice.VoiceConnectionStatus.Disconnected) {
 				if (
 					newState.reason === Voice.VoiceConnectionDisconnectReason.WebSocketClose &&
@@ -78,17 +157,21 @@ export class MusicPlayer {
 						await Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Connecting, 20e3);
 					} catch (e) {
 						this.__connection.destroy();
-						if (this.__bot.debug)
-							this.__bot.logger.debug(`[MusicPlayer - ${this.id}] CONN - Encountered error: ${e}`);
+
+						this.__bot?.emit(
+							"debug",
+							`[MusicPlayer - ${this.id}] CONN - Encountered error while reconnecting: ${e}`
+						);
 					}
 				} else if (this.__connection.rejoinAttempts < 5) {
-					if (this.__bot.debug)
-						this.__bot.logger.debug(
-							`[MusicPlayer - ${this.id}] CONN - Reconnecting attempt ${this.__connection.rejoinAttempts}`
-						);
+					this.__bot?.emit(
+						"debug",
+						`[MusicPlayer - ${this.id}] CONN - Reconnecting attempt ${this.__connection.rejoinAttempts}`
+					);
 					await new Promise((r) => setTimeout(r, (this.__connection.rejoinAttempts + 1) * 3e3).unref());
 					this.__connection.rejoin();
 				} else {
+					this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] CONN - Disconnected after 5 attempts`);
 					this.__connection.destroy();
 				}
 			} else if (
@@ -98,8 +181,7 @@ export class MusicPlayer {
 				try {
 					await Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Ready, 20e3);
 				} catch (e) {
-					if (this.__bot.debug)
-						this.__bot.logger.debug(`[MusicPlayer - ${this.id}] CONN - Encountered error: ${e}`);
+					this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] CONN - Encountered error: ${e}`);
 					if (this.__connection.state.status !== Voice.VoiceConnectionStatus.Destroyed) {
 						this.__connection.destroy();
 					}
@@ -110,31 +192,44 @@ export class MusicPlayer {
 		});
 
 		/**
-		 *
 		 * Handle when the player state changes
-		 *
 		 */
-		this.__player.on("error", async (e) => {
+		// errors
+		this.__player.on("error", (e) => {
+			// store current playback duration
+			this.__playduration = this.current.playbackDuration;
+
+			// age restricted
 			if (e.message.includes("410")) {
 				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_AGE_RESTRICTED);
+				// no opus audio found
+			} else if (e.message.includes("EBML")) {
+				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_NO_OPUS);
+				// rate limited
 			} else if (e.message.includes("403")) {
 				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_RATE_LIMITED);
 				this.__queue.unshift(this.current.metadata);
-			} else if (e.message.includes("EBML")) {
-				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_NO_OPUS);
+				// unknown
 			} else {
 				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
 				this.__queue.unshift(this.current.metadata);
 			}
-			if (this.__bot.debug)
-				this.__bot.logger.debug(
-					`[MusicPlayer - ${this.id}] PLAYER - Track: ${this.current.metadata.url} - Encountered error: ${e}`
-				);
+
+			// debug
+			this.__bot?.emit(
+				"debug",
+				`[MusicPlayer - ${this.id}] PLAYER - Track: ${this.current.metadata.url} - Encountered error: ${e}`
+			);
 		});
+
+		// state changes
 		this.__player.on("stateChange", (oldState, newState) => {
 			if (oldState.status !== Voice.AudioPlayerStatus.Idle && newState.status === Voice.AudioPlayerStatus.Idle) {
+				// get tracks info
 				const bf = this.__queue.shift();
 				const af = this.__queue.at(0);
+
+				// delete current track
 				this.current = null;
 				this.__tchannel
 					.send(
@@ -152,12 +247,40 @@ export class MusicPlayer {
 										af.author.user.tag
 									)
 								)
-								.then(() => setTimeout(() => this.play(), 2e3));
+								.then(() =>
+									setTimeout(() => {
+										// if 2 tracks are different, reset playback duration
+										if (af.url !== bf.url) this.__playduration = 0;
+										this.play();
+									}, 2e3)
+								);
+						else this.__tchannel.send(MusicPlayerLang.PLAYER_QUEUE_ENDED);
 					});
 			}
 		});
-		if (this.__bot.debug)
-			this.__player.on("debug", (m) => this.__bot.logger.debug(`[MusicPlayer - ${this.id}] ${m}`));
+
+		// debug
+		this.__player.on("debug", (m) => {
+			this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] ${m}`);
+		});
+	}
+
+	/**
+	 * Connect to voice channel
+	 *
+	 * @private
+	 * @memberof MusicPlayer
+	 */
+	private __connect(): void {
+		// create a voice connection
+		this.__connection = Voice.joinVoiceChannel({
+			channelId: this.__vchannel.id,
+			guildId: this.__guild.id,
+			adapterCreator: this.__vchannel.guild.voiceAdapterCreator,
+		});
+
+		// subscribe player to connection
+		this.__connection.subscribe(this.__player);
 	}
 
 	/**
@@ -167,6 +290,14 @@ export class MusicPlayer {
 	 * @memberof MusicPlayer
 	 */
 	public getGuild = (): Discord.Guild => this.__guild;
+
+	/**
+	 * Get all tracks in current player
+	 *
+	 * @return {*}  {MusicTrack[]}
+	 * @memberof MusicPlayer
+	 */
+	public getQueue = (): MusicTrack[] => this.__queue;
 
 	/**
 	 * Add a track to current player
@@ -197,35 +328,34 @@ export class MusicPlayer {
 	}
 
 	/**
-	 * Get all tracks in current player
-	 *
-	 * @return {*}  {MusicTrack[]}
-	 * @memberof MusicPlayer
-	 */
-	public getQueue = (): MusicTrack[] => this.__queue;
-
-	/**
 	 * Start/Play the player
 	 *
 	 * @return {*}  {Promise<MusicPlayer>}
 	 * @memberof MusicPlayer
 	 */
 	public async play(): Promise<MusicPlayer> {
+		// cancel if queue is empty
 		if (this.__queue.length === 0) return;
+
 		try {
 			this.__player.play(
+				// create an audio resource
 				(this.current ||= Voice.createAudioResource(
 					ytdl(this.__queue.at(0).url, {
 						filter: "audioonly",
 						quality: "highestaudio",
-						highWaterMark: 1 << 32,
+						highWaterMark: 1 << 24,
+						begin: this.__playduration,
 					}).on("error", (e) => {
+						// if YTDL caught an error, retry
 						this.__tchannel.send(MusicPlayerLang.ERR_PLAYER_UNKNOWN.replace(/%error%+/g, e.message));
 						this.play();
-						if (this.__bot.debug)
-							this.__bot.logger.debug(
-								`[MusicPlayer - ${this.id}] PLAY - Track: ${this.current.metadata.url} - Encountered error: ${e}`
-							);
+
+						// debug
+						this.__bot?.emit(
+							"debug",
+							`[MusicPlayer - ${this.id}] PLAY - Track: ${this.current.metadata.url} - Encountered error: ${e}`
+						);
 					}),
 					{
 						inputType: Voice.StreamType.WebmOpus,
@@ -234,12 +364,15 @@ export class MusicPlayer {
 				))
 			);
 		} catch (e) {
+			// if something caught an error, retry
 			this.__tchannel.send(MusicPlayerLang.ERR_PLAYER_UNKNOWN.replace(/%error%+/g, e.message));
 			this.play();
-			if (this.__bot.debug)
-				this.__bot.logger.debug(
-					`[MusicPlayer - ${this.id}] PLAY - Track: ${this.current.metadata.url} - Encountered error: ${e}`
-				);
+
+			// debug
+			this.__bot?.emit(
+				"debug",
+				`[MusicPlayer - ${this.id}] PLAY - Track: ${this.current.metadata.url} - Encountered error: ${e}`
+			);
 		}
 		return this;
 	}
@@ -250,6 +383,7 @@ export class MusicPlayer {
 	 * @memberof MusicPlayer
 	 */
 	public skip(): void {
+		// only trigger if queue is longer than 1
 		if (this.__queue.length > 1) {
 			this.current = null;
 			this.__player.stop();

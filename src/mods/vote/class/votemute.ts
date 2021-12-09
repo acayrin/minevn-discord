@@ -61,19 +61,19 @@ export class VoteMute extends Vote {
 							.remove(role)
 							.then(() => {
 								// debug
-								if (this._bot.debug)
-									this._bot.logger.debug(`[Vote - ${this.id}] Unmuted user ${this.target.id}`);
+								this._bot.emit("debug", `[Vote - ${this.id}] Unmuted user ${this.target.id}`);
 							})
 							.catch((e) => {
-								this._bot.logger.debug(
+								this._bot.emit(
+									"debug",
 									`[Vote - ${this.id}] Can't remove muted role from user ${this.target.id}, error ${e}`
 								);
 							});
 					} else {
-						if (this._bot.debug)
-							this._bot.logger.debug(
-								`[Vote - ${this.id}] User ${this.target.id} got their muted role removed, ignoring`
-							);
+						this._bot.emit(
+							"debug",
+							`[Vote - ${this.id}] User ${this.target.id} got their muted role removed, ignoring`
+						);
 					}
 				}, this._bot.config.mute.duration * 60000);
 			});

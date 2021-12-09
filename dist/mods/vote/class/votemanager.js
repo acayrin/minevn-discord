@@ -27,14 +27,12 @@ var VoteManager = (function (_super) {
     VoteManager.prototype.add = function (session) {
         var _a;
         this.__sessions.push(session);
-        if ((_a = this.__bot) === null || _a === void 0 ? void 0 : _a.debug)
-            this.__bot.logger.debug("[VoteManager] Added Vote #".concat(session.id, " to the list"));
+        (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[VoteManager] Added Vote #".concat(session.id, " to the list"));
     };
     VoteManager.prototype.remove = function (session) {
         var _a;
         this.__sessions.splice(this.__sessions.indexOf(session), 1);
-        if ((_a = this.__bot) === null || _a === void 0 ? void 0 : _a.debug)
-            this.__bot.logger.debug("[VoteManager] Removed Vote #".concat(session.id, " from the list"));
+        (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[VoteManager] Removed Vote #".concat(session.id, " from the list"));
     };
     VoteManager.prototype.getSession = function (id) {
         return id ? [this.__sessions.find(function (session) { return session.id.includes(id); })] : this.__sessions;

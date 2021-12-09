@@ -251,7 +251,7 @@ function CreatePlayer(message, args, bot) {
                         i1 = page * 10 > queue.length ? queue.length : page * 10;
                         i2 = (page - 1) * 10;
                         for (i = i2; i < i1; i++)
-                            msg.push(lang_1.MusicPlayerLang.PLAYER_SEARCH_EACH.replace(/%index%+/g, i.toString())
+                            msg.push(lang_1.MusicPlayerLang.PLAYER_LIST_EACH.replace(/%index%+/g, i.toString())
                                 .replace(/%track_name%+/g, queue[i].name)
                                 .replace(/%track_channel%+/g, queue[i].channel)
                                 .replace(/%track_requester%+/g, queue[i].author.user.tag)

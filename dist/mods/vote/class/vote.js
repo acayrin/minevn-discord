@@ -56,9 +56,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.Vote = void 0;
-var crypto = __importStar(require("crypto"));
 var Discord = __importStar(require("discord.js"));
 var __1 = require("..");
+var generateid_1 = require("../../../core/utils/generateid");
 var Vote = (function () {
     function Vote(target, channel, bot, options) {
         this.target = undefined;
@@ -70,7 +70,7 @@ var Vote = (function () {
         this._vote_N = 0;
         this.reason = "mob vote";
         this.timer = 30;
-        this.id = crypto.createHash("md5").update(Date.now().toString(), "utf-8").digest("hex").slice(0, 7);
+        this.id = (0, generateid_1.id)();
         __1.voteMgr.add(this);
         this._bot = bot;
         this.channel = channel;
@@ -123,8 +123,7 @@ var Vote = (function () {
                     case 1:
                         if (_b.sent())
                             return [2];
-                        if (this._bot.debug)
-                            this._bot.logger.debug("[Vote - ".concat(this.id, "] A vote has started, target: ").concat(this.target.id));
+                        this._bot.emit("debug", "[Vote - ".concat(this.id, "] A vote has started, target: ").concat(this.target.id));
                         _a = this;
                         return [4, this.channel.send({
                                 embeds: [options.embed || this._embed()]
@@ -183,8 +182,7 @@ var Vote = (function () {
     Vote.prototype._onEnd = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                if (this._bot.debug)
-                    this._bot.logger.debug("[Vote - ".concat(this.id, "] Vote ended with ").concat(this._vote_Y, ":").concat(this._vote_N, " (total ").concat(this._vote_Y + this._vote_N, ")"));
+                this._bot.emit("debug", "[Vote - ".concat(this.id, "] Vote ended with ").concat(this._vote_Y, ":").concat(this._vote_N, " (total ").concat(this._vote_Y + this._vote_N, ")"));
                 if (this._vote_Y > this._vote_N)
                     this._onWin();
                 else

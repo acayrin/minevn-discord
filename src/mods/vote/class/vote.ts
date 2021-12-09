@@ -1,7 +1,7 @@
-import * as crypto from "crypto";
 import * as Discord from "discord.js";
 import { voteMgr } from "..";
 import { SucklessBot } from "../../../core/sucklessbot";
+import { id } from "../../../core/utils/generateid";
 
 /**
  * A Vote instance, to mute anyone
@@ -91,7 +91,7 @@ export class Vote {
 	 * @returns {string} id string
 	 * @memberof Vote
 	 */
-	public id: string = crypto.createHash("md5").update(Date.now().toString(), "utf-8").digest("hex").slice(0, 7);
+	public id: string = id();
 
 	/**
 	 * The message embed for this vote
@@ -195,8 +195,7 @@ export class Vote {
 	protected async _run(options?: { embed?: Discord.MessageEmbed }): Promise<void> {
 		if (await this._preload()) return;
 
-		if (this._bot.debug)
-			this._bot.logger.debug(`[Vote - ${this.id}] A vote has started, target: ${this.target.id}`);
+		this._bot.emit("debug", `[Vote - ${this.id}] A vote has started, target: ${this.target.id}`);
 
 		this.msg = await this.channel.send({
 			embeds: [options.embed || this._embed()],
@@ -260,12 +259,10 @@ export class Vote {
 	 * @memberof Vote
 	 */
 	protected async _onEnd(): Promise<void> {
-		if (this._bot.debug)
-			this._bot.logger.debug(
-				`[Vote - ${this.id}] Vote ended with ${this._vote_Y}:${this._vote_N} (total ${
-					this._vote_Y + this._vote_N
-				})`
-			);
+		this._bot.emit(
+			"debug",
+			`[Vote - ${this.id}] Vote ended with ${this._vote_Y}:${this._vote_N} (total ${this._vote_Y + this._vote_N})`
+		);
 
 		if (this._vote_Y > this._vote_N) this._onWin();
 		else this._onLose();

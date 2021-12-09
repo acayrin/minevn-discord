@@ -27,14 +27,12 @@ var MusicManager = (function (_super) {
     MusicManager.prototype.add = function (session) {
         var _a;
         this.__sessions.push(session);
-        if ((_a = this.__bot) === null || _a === void 0 ? void 0 : _a.debug)
-            this.__bot.logger.debug("[MusicManager] Added MusicPlayer #".concat(session.id, " to the list"));
+        (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicManager] Added MusicPlayer #".concat(session.id, " to the list"));
     };
     MusicManager.prototype.remove = function (session) {
         var _a;
         this.__sessions.splice(this.__sessions.indexOf(session), 1);
-        if ((_a = this.__bot) === null || _a === void 0 ? void 0 : _a.debug)
-            this.__bot.logger.debug("[MusicManager] Removed MusicPlayer #".concat(session.id, " from the list"));
+        (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicManager] Removed MusicPlayer #".concat(session.id, " from the list"));
     };
     MusicManager.prototype.getSession = function (id) {
         return id ? [this.__sessions.find(function (session) { return session.id.includes(id); })] : this.__sessions;

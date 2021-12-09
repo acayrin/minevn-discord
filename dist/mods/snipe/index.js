@@ -115,8 +115,7 @@ var SnipeDelete = function (message, args, bot) {
     record_U[_b = message.channelId] || (record_U[_b] = []);
     if (record_D[message.channelId].length > bot.config.snipe.limit)
         record_D[message.channelId].shift();
-    if (bot.debug)
-        bot.logger.debug("[Snipe - ".concat(message.channelId, "] Deleted +").concat(message.id, " (").concat(record_D[message.channelId].length, "/").concat(bot.config.snipe.limit, ")"));
+    bot === null || bot === void 0 ? void 0 : bot.emit("debug", "[Snipe - ".concat(message.channelId, "] Deleted +").concat(message.id, " (").concat(record_D[message.channelId].length, "/").concat(bot.config.snipe.limit, ")"));
     var files = [];
     message.attachments.forEach(function (file) { return __awaiter(void 0, void 0, void 0, function () {
         var buffer;
@@ -146,8 +145,7 @@ var SnipeUpdate = function (oldMsg, newMsg, bot) {
     record_U[_b = oldMsg.channelId] || (record_U[_b] = []);
     if (record_U[oldMsg.channelId].length > bot.config.snipe.limit)
         record_U[oldMsg.channelId].shift();
-    if (bot.debug)
-        bot.logger.debug("[Snipe - ".concat(oldMsg.channelId, "] Updated +").concat(oldMsg.id, " (").concat(record_U[oldMsg.channelId].length, "/").concat(bot.config.snipe.limit, ")"));
+    bot.emit("debug", "[Snipe - ".concat(oldMsg.channelId, "] Updated +").concat(oldMsg.id, " (").concat(record_U[oldMsg.channelId].length, "/").concat(bot.config.snipe.limit, ")"));
     var files = [];
     oldMsg.attachments.forEach(function (file) { return __awaiter(void 0, void 0, void 0, function () {
         var buffer;

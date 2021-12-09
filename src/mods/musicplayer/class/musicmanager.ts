@@ -22,7 +22,7 @@ export class MusicManager extends BaseManager {
 		this.__sessions.push(session);
 
 		// debug
-		if (this.__bot?.debug) this.__bot.logger.debug(`[MusicManager] Added MusicPlayer #${session.id} to the list`);
+		this.__bot?.emit("debug", `[MusicManager] Added MusicPlayer #${session.id} to the list`);
 	}
 
 	/**
@@ -35,8 +35,7 @@ export class MusicManager extends BaseManager {
 		this.__sessions.splice(this.__sessions.indexOf(session), 1);
 
 		// debug
-		if (this.__bot?.debug)
-			this.__bot.logger.debug(`[MusicManager] Removed MusicPlayer #${session.id} from the list`);
+		this.__bot?.emit("debug", `[MusicManager] Removed MusicPlayer #${session.id} from the list`);
 	}
 
 	/**

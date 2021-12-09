@@ -7,7 +7,7 @@ import { VoteUnmute } from "./class/voteunmute";
 import * as recentmutes from "./recentmute";
 
 // vote manager
-const voteMgr: VoteManager = new VoteManager();
+export const voteMgr: VoteManager = new VoteManager();
 
 /**
  * Vote (un)mute someone cuz i love democracy
@@ -101,7 +101,7 @@ async function VoteSomebody(message: Message, args: string[], bot: SucklessBot, 
  * @param {string[]} args
  * @param {SucklessBot} bot
  */
-function VM(message: Message, args: string[], bot: SucklessBot) {
+export function VM(message: Message, args: string[], bot: SucklessBot) {
 	VoteSomebody(message, args, bot);
 }
 
@@ -112,8 +112,6 @@ function VM(message: Message, args: string[], bot: SucklessBot) {
  * @param {string[]} args
  * @param {SucklessBot} bot
  */
-function VUM(message: Message, args: string[], bot: SucklessBot) {
+export function VUM(message: Message, args: string[], bot: SucklessBot) {
 	VoteSomebody(message, args, bot, true);
 }
-
-export { VM, VUM, voteMgr };

@@ -14,6 +14,7 @@ export enum MusicPlayerLang {
 	PLAYER_RESUMED = "Resumed the audio player",
 	PLAYER_PAUSED = "Paused the audio player",
 	PLAYER_FINISHED = "Finished playing **%track_name%** (%track_requester%)",
+	PLAYER_QUEUE_ENDED = "Finished playing all tracks",
 	PLAYER_STARTED = "Started playing **%track_name%** (%track_requester%)",
 
 	PLAYER_TRACK_ADDED = "Added **%track%** to the queue",
@@ -21,7 +22,7 @@ export enum MusicPlayerLang {
 
 	PLAYER_PLAYLIST_ADDED = "Added **%tracks%** tracks to the queue",
 
-	PLAYER_NOW_FORMAT = "```%track_name% (%track_requester%)\n%track_bar% [%track_now%/%track_duration%]```",
+	PLAYER_NOW_FORMAT = "```%track_name% (%track_requester%)\n[🎶] [%track_bar%] [%track_now%/%track_duration%]```",
 
 	PLAYER_LIST_HEADER = "```Current queue (%page_current%/%page_all%)\n",
 	PLAYER_LIST_EACH = "[%index%] %track_name%\n └─ %track_requester% - %track_duration%",

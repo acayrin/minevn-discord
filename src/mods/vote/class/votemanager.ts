@@ -38,7 +38,7 @@ export class VoteManager extends BaseManager {
 		this.__sessions.push(session);
 
 		// debug
-		if (this.__bot?.debug) this.__bot.logger.debug(`[VoteManager] Added Vote #${session.id} to the list`);
+		this.__bot?.emit("debug", `[VoteManager] Added Vote #${session.id} to the list`);
 	}
 
 	/**
@@ -52,7 +52,7 @@ export class VoteManager extends BaseManager {
 		this.__sessions.splice(this.__sessions.indexOf(session), 1);
 
 		// debug
-		if (this.__bot?.debug) this.__bot.logger.debug(`[VoteManager] Removed Vote #${session.id} from the list`);
+		this.__bot?.emit("debug", `[VoteManager] Removed Vote #${session.id} from the list`);
 	}
 
 	/**

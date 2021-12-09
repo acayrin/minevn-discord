@@ -55,14 +55,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.voteMgr = exports.VUM = exports.VM = void 0;
+exports.VUM = exports.VM = exports.voteMgr = void 0;
 var utils_1 = require("../../core/utils");
 var votemanager_1 = require("./class/votemanager");
 var votemute_1 = require("./class/votemute");
 var voteunmute_1 = require("./class/voteunmute");
 var recentmutes = __importStar(require("./recentmute"));
-var voteMgr = new votemanager_1.VoteManager();
-exports.voteMgr = voteMgr;
+exports.voteMgr = new votemanager_1.VoteManager();
 function VoteSomebody(message, args, bot, unmute) {
     return __awaiter(this, void 0, void 0, function () {
         var channel, lookup, reason, user, session, role;
@@ -93,7 +92,7 @@ function VoteSomebody(message, args, bot, unmute) {
                     if (user.user.bot) {
                         return [2, message.channel.send("**".concat(user.user.tag, "** is a robot u sussy baka"))];
                     }
-                    session = voteMgr.getSession().find(function (session) { return session.target.id.includes(user.id); });
+                    session = exports.voteMgr.getSession().find(function (session) { return session.target.id.includes(user.id); });
                     if (session) {
                         return [2, (session.msg || message).reply("There is an ongoing vote for **".concat(user.user.tag, "** so stopping now"))];
                     }

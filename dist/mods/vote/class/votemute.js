@@ -121,15 +121,13 @@ var VoteMute = (function (_super) {
                                         this.target.roles
                                             .remove(role)
                                             .then(function () {
-                                            if (_this._bot.debug)
-                                                _this._bot.logger.debug("[Vote - ".concat(_this.id, "] Unmuted user ").concat(_this.target.id));
+                                            _this._bot.emit("debug", "[Vote - ".concat(_this.id, "] Unmuted user ").concat(_this.target.id));
                                         })["catch"](function (e) {
-                                            _this._bot.logger.debug("[Vote - ".concat(_this.id, "] Can't remove muted role from user ").concat(_this.target.id, ", error ").concat(e));
+                                            _this._bot.emit("debug", "[Vote - ".concat(_this.id, "] Can't remove muted role from user ").concat(_this.target.id, ", error ").concat(e));
                                         });
                                     }
                                     else {
-                                        if (this._bot.debug)
-                                            this._bot.logger.debug("[Vote - ".concat(this.id, "] User ").concat(this.target.id, " got their muted role removed, ignoring"));
+                                        this._bot.emit("debug", "[Vote - ".concat(this.id, "] User ").concat(this.target.id, " got their muted role removed, ignoring"));
                                     }
                                     return [2];
                                 });

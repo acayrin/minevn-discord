@@ -6,7 +6,7 @@ const recentmutes: string[] = [];
  *
  * @param {string} user
  */
-function add(user: string) {
+export function add(user: string) {
 	recentmutes.push(user);
 }
 
@@ -15,7 +15,7 @@ function add(user: string) {
  *
  * @param {string} user
  */
-function remove(user: string) {
+export function remove(user: string) {
 	recentmutes.splice(recentmutes.indexOf(user), 1);
 }
 
@@ -25,8 +25,6 @@ function remove(user: string) {
  * @param {string} user
  * @return {*}
  */
-function has(user: string): boolean {
+export function has(user: string): boolean {
 	return recentmutes.find((mute) => mute.includes(user)) ? true : false;
 }
-
-export { add, remove, has };

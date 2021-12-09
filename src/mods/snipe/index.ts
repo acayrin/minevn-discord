@@ -83,12 +83,12 @@ export const SnipeDelete = (message: Discord.Message, args: any, bot: SucklessBo
 	if (record_D[message.channelId].length > bot.config.snipe.limit) record_D[message.channelId].shift();
 
 	// debug
-	if (bot.debug)
-		bot.logger.debug(
-			`[Snipe - ${message.channelId}] Deleted +${message.id} (${record_D[message.channelId].length}/${
-				bot.config.snipe.limit
-			})`
-		);
+	bot?.emit(
+		"debug",
+		`[Snipe - ${message.channelId}] Deleted +${message.id} (${record_D[message.channelId].length}/${
+			bot.config.snipe.limit
+		})`
+	);
 
 	// get attachments
 	const files: { attachment: any; name: string }[] = [];
@@ -124,12 +124,12 @@ export const SnipeUpdate = (oldMsg: Discord.Message, newMsg: Discord.Message, bo
 	if (record_U[oldMsg.channelId].length > bot.config.snipe.limit) record_U[oldMsg.channelId].shift();
 
 	// debug
-	if (bot.debug)
-		bot.logger.debug(
-			`[Snipe - ${oldMsg.channelId}] Updated +${oldMsg.id} (${record_U[oldMsg.channelId].length}/${
-				bot.config.snipe.limit
-			})`
-		);
+	bot.emit(
+		"debug",
+		`[Snipe - ${oldMsg.channelId}] Updated +${oldMsg.id} (${record_U[oldMsg.channelId].length}/${
+			bot.config.snipe.limit
+		})`
+	);
 
 	// get attachments
 	const files: { attachment: any; name: string }[] = [];

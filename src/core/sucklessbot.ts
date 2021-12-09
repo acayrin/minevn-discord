@@ -1,8 +1,9 @@
 import * as Discord from "discord.js";
+import { EventEmitter } from "events";
 import * as fs from "fs";
 import { dirname } from "path";
-import { CommandManager } from "./manager/commandmanager";
 import { DSMod } from "./interface/DSMod";
+import { CommandManager } from "./manager/commandmanager";
 import { Logger } from "./utils/logger";
 const path = dirname(require.main.filename);
 
@@ -12,19 +13,25 @@ const path = dirname(require.main.filename);
  * @export
  * @class SucklessBot
  */
-export class SucklessBot {
+export class SucklessBot extends EventEmitter {
 	/**
 	 * Creates an instance of SucklessBot.
 	 *
 	 * @param {string} token Your Discord bot token, if not specified, will use one in configuration instead
+	 * @paran {string} config Path to your configuration file
 	 * @param {boolean} debug Enable debug mode
 	 * @param {Discord.ClientOptions} clientOptions Client options, leave 'intents' empty, else if 'intents' are specified, they will override mods intents requirements
 	 * @memberof SucklessBot
 	 */
-	constructor(options?: { token?: string; debug?: boolean; clientOptions?: Discord.ClientOptions }) {
-		this.__token = options.token || this.config.token;
+	constructor(options?: { token?: string; config?: string; debug?: boolean; clientOptions?: Discord.ClientOptions }) {
+		super();
 		this.debug = options.debug;
-		this.__clientOptions = options.clientOptions;
+		this.__token = options.token || this.config.token;
+		if (options.clientOptions) this.__clientOptions = options.clientOptions;
+		if (options.config) this.config = JSON.parse(fs.readFileSync(options.config, "utf8"));
+
+		// debugging
+		this.on("debug", (m: string) => (this.debug ? this.logger.debug(m) : undefined));
 	}
 
 	/**
@@ -140,15 +147,10 @@ export class SucklessBot {
 			if (mod.onInit) mod.onInit(this);
 
 			// logger
-			this.logger.log(`Loaded mod: ${mod.name} (${item})`);
-
-			// debug
-			if (this.debug) {
-				if (mod.aliases)
-					this.logger.debug(`[STARTUP] ${mod.name} registered Aliases: ${mod.aliases.toString()}`);
-				this.logger.debug(`[STARTUP] ${mod.name} registered Commands: ${mod.command.toString()}`);
-				this.logger.debug(`[STARTUP] ${mod.name} requested Intents: ${mod.intents}`);
-			}
+			this.logger.log(`[LOADER] Loaded mod: ${mod.name} (${item})`);
+			if (mod.aliases) this.logger.log(`  ${mod.name} registered Aliases: ${mod.aliases.toString()}`);
+			this.logger.log(`  ${mod.name} registered Commands: ${mod.command.toString()}`);
+			this.logger.log(`  ${mod.name} requested Intents: ${mod.intents}`);
 		});
 
 		// if bot is configured with intents, use those instead

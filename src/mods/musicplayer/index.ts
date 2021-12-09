@@ -192,7 +192,7 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 			const i2 = (page - 1) * 10;
 			for (let i = i2; i < i1; i++)
 				msg.push(
-					MusicPlayerLang.PLAYER_SEARCH_EACH.replace(/%index%+/g, i.toString())
+					MusicPlayerLang.PLAYER_LIST_EACH.replace(/%index%+/g, i.toString())
 						.replace(/%track_name%+/g, queue[i].name)
 						.replace(/%track_channel%+/g, queue[i].channel)
 						.replace(/%track_requester%+/g, queue[i].author.user.tag)

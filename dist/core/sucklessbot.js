@@ -1,4 +1,19 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -57,21 +72,23 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.SucklessBot = void 0;
 var Discord = __importStar(require("discord.js"));
+var events_1 = require("events");
 var fs = __importStar(require("fs"));
 var path_1 = require("path");
 var commandmanager_1 = require("./manager/commandmanager");
 var logger_1 = require("./utils/logger");
 var path = (0, path_1.dirname)(require.main.filename);
-var SucklessBot = (function () {
+var SucklessBot = (function (_super) {
+    __extends(SucklessBot, _super);
     function SucklessBot(options) {
-        var _this = this;
-        this.debug = false;
-        this.cmdMgr = new commandmanager_1.CommandManager();
-        this.logger = new logger_1.Logger();
-        this.config = JSON.parse(fs.readFileSync("".concat(path, "/config.json"), "utf-8"));
-        this.mods = [];
-        this.cli = function () { return _this.__client; };
-        this.__init = function () {
+        var _this = _super.call(this) || this;
+        _this.debug = false;
+        _this.cmdMgr = new commandmanager_1.CommandManager();
+        _this.logger = new logger_1.Logger();
+        _this.config = JSON.parse(fs.readFileSync("".concat(path, "/config.json"), "utf-8"));
+        _this.mods = [];
+        _this.cli = function () { return _this.__client; };
+        _this.__init = function () {
             _this.logger.log("Platform ".concat(process.platform, " ").concat(process.arch, " - Node ").concat(process.version.match(/^v(\d+\.\d+)/)[1]));
             var intents = [];
             fs.readdirSync("".concat(path, "/mods")).forEach(function (item) {
@@ -90,13 +107,11 @@ var SucklessBot = (function () {
                 _this.mods.push(mod);
                 if (mod.onInit)
                     mod.onInit(_this);
-                _this.logger.log("Loaded mod: ".concat(mod.name, " (").concat(item, ")"));
-                if (_this.debug) {
-                    if (mod.aliases)
-                        _this.logger.debug("[STARTUP] ".concat(mod.name, " registered Aliases: ").concat(mod.aliases.toString()));
-                    _this.logger.debug("[STARTUP] ".concat(mod.name, " registered Commands: ").concat(mod.command.toString()));
-                    _this.logger.debug("[STARTUP] ".concat(mod.name, " requested Intents: ").concat(mod.intents));
-                }
+                _this.logger.log("[LOADER] Loaded mod: ".concat(mod.name, " (").concat(item, ")"));
+                if (mod.aliases)
+                    _this.logger.log("  ".concat(mod.name, " registered Aliases: ").concat(mod.aliases.toString()));
+                _this.logger.log("  ".concat(mod.name, " registered Commands: ").concat(mod.command.toString()));
+                _this.logger.log("  ".concat(mod.name, " requested Intents: ").concat(mod.intents));
             });
             if (_this.__clientOptions.intents.toString() !== "")
                 intents = _this.__clientOptions.intents;
@@ -104,13 +119,13 @@ var SucklessBot = (function () {
             _this.logger.log("Allowed Intents: ".concat(intents, " ").concat(_this.__clientOptions.intents.toString() !== "" ? "(as in SucklessBot options)" : "(from mods)"));
             _this.__client = new Discord.Client(Object.assign({}, _this.__clientOptions, { intents: intents }));
         };
-        this.__onConnect = function () { return __awaiter(_this, void 0, void 0, function () {
+        _this.__onConnect = function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 this.logger.log("SucklessBot connected as ".concat(this.__client.user.tag));
                 return [2];
             });
         }); };
-        this.__onMessage = function (message) {
+        _this.__onMessage = function (message) {
             if (!message.content.startsWith(_this.config.prefix))
                 return _this.mods.forEach(function (mod) { return mod.onMsgCreate(message, undefined, _this); });
             var msg = message.content.replace(_this.config.prefix, "").trim();
@@ -125,7 +140,7 @@ var SucklessBot = (function () {
                 _this.logger.error("Error while executing command '".concat(message.content, "'\n").concat(error));
             }
         };
-        this.__onDelete = function (message) {
+        _this.__onDelete = function (message) {
             var mods = [];
             _this.mods.forEach(function (mod) {
                 if (!mods.includes(mod))
@@ -136,7 +151,7 @@ var SucklessBot = (function () {
                     mod.onMsgDelete(message, message.content.split(/ +/), _this);
             });
         };
-        this.__onUpdate = function (oldMessage, newMessage) {
+        _this.__onUpdate = function (oldMessage, newMessage) {
             var mods = [];
             _this.mods.forEach(function (mod) {
                 if (!mods.includes(mod))
@@ -147,9 +162,14 @@ var SucklessBot = (function () {
                     mod.onMsgUpdate(oldMessage, newMessage, _this);
             });
         };
-        this.__token = options.token || this.config.token;
-        this.debug = options.debug;
-        this.__clientOptions = options.clientOptions;
+        _this.debug = options.debug;
+        _this.__token = options.token || _this.config.token;
+        if (options.clientOptions)
+            _this.__clientOptions = options.clientOptions;
+        if (options.config)
+            _this.config = JSON.parse(fs.readFileSync(options.config, "utf8"));
+        _this.on("debug", function (m) { return (_this.debug ? _this.logger.debug(m) : undefined); });
+        return _this;
     }
     SucklessBot.prototype.start = function () {
         var _this = this;
@@ -163,5 +183,5 @@ var SucklessBot = (function () {
             this.__client.on("debug", function (e) { return _this.logger.debug(e); });
     };
     return SucklessBot;
-}());
+}(events_1.EventEmitter));
 exports.SucklessBot = SucklessBot;
