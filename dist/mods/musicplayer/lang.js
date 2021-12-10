@@ -58,7 +58,7 @@ var help = function (bot) {
     return new Discord.MessageEmbed()
         .setTitle("Music player")
         .setDescription("A simple music player since Susan decided to killed off most of available bots\n" +
-        "Note: **THE BOT CAN ONLY BE DISCONNECTED BY ``yt dc`` SUBCOMMAND\n" +
+        "Note: **THE BOT CAN ONLY BE DISCONNECTED BY ``yt dc`` SUBCOMMAND**\n" +
         "Subcommands below")
         .setColor("#ed2261")
         .setThumbnail(bot.cli().user.avatarURL())
