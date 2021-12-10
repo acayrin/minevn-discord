@@ -1,6 +1,6 @@
 {
     "token": "your discord token here",
-    "prefix": "mvn",
+    "prefix": ">s",
     "mute": {
         "timer": 30,
         "duration": 5,

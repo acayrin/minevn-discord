@@ -19,6 +19,7 @@ var MusicPlayerLang;
     MusicPlayerLang["PLAYER_STARTED"] = "Started playing **%track_name%** (%track_requester%)";
     MusicPlayerLang["PLAYER_TRACK_ADDED"] = "Added **%track%** to the queue";
     MusicPlayerLang["PLAYER_TRACK_REMOVED"] = "Removed **%track%** from the queue";
+    MusicPlayerLang["PLAYER_TRACK_RESUMED"] = "Resuming **%track_name%** at **%track_duration%**";
     MusicPlayerLang["PLAYER_PLAYLIST_ADDED"] = "Added **%tracks%** tracks to the queue";
     MusicPlayerLang["PLAYER_NOW_FORMAT"] = "```%track_name% (%track_requester%)\n[\uD83C\uDFB6] [%track_bar%] [%track_now%/%track_duration%]```";
     MusicPlayerLang["PLAYER_LIST_HEADER"] = "```Current queue (%page_current%/%page_all%)\n";

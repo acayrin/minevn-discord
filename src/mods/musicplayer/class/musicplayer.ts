@@ -249,13 +249,13 @@ export class MusicPlayer {
 						await this.__tchannel.send(
 							MusicPlayerLang.PLAYER_FINISHED.replace(/%track_name%+/g, bf.name).replace(
 								/%track_requester%+/g,
-								bf.author.user.tag
+								bf.requester.user.tag
 							)
 						);
 						await this.__tchannel.send(
 							MusicPlayerLang.PLAYER_STARTED.replace(/%track_name%+/g, af.name).replace(
 								/%track_requester%+/g,
-								af.author.user.tag
+								af.requester.user.tag
 							)
 						);
 					}
@@ -341,9 +341,6 @@ export class MusicPlayer {
 	 * @memberof MusicPlayer
 	 */
 	public play(): MusicPlayer {
-		// cancel if queue is empty
-		if (this.__queue.length === 0) return;
-
 		this.__player.play(
 			// create an audio resource
 			(this.current ||= Voice.createAudioResource(

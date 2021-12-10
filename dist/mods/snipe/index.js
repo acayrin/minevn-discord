@@ -135,7 +135,8 @@ var SnipeDelete = function (message, args, bot) {
         content: message.content,
         files: files,
         owner: message.author.tag,
-        avatar: message.author.avatarURL()
+        avatar: message.author.avatarURL(),
+        timestamp: message.createdTimestamp
     });
 };
 exports.SnipeDelete = SnipeDelete;
@@ -165,7 +166,8 @@ var SnipeUpdate = function (oldMsg, newMsg, bot) {
         content: oldMsg.content,
         files: files,
         owner: oldMsg.author.tag,
-        avatar: oldMsg.author.avatarURL()
+        avatar: oldMsg.author.avatarURL(),
+        timestamp: oldMsg.createdTimestamp
     });
 };
 exports.SnipeUpdate = SnipeUpdate;
@@ -174,5 +176,5 @@ var _e = function (a) {
         .setColor("#ed2261")
         .setAuthor(a.owner, a.avatar)
         .setDescription(a.content)
-        .setTimestamp();
+        .setTimestamp(a.timestamp);
 };

@@ -2,6 +2,13 @@ import { BaseManager } from "../../../core/manager/basemanager";
 import { SucklessBot } from "../../../core/sucklessbot";
 import { MusicPlayer } from "./musicplayer";
 
+/**
+ * Music manager instance
+ *
+ * @export
+ * @class MusicManager
+ * @extends {BaseManager}
+ */
 export class MusicManager extends BaseManager {
 	/**
 	 * MusicPlayer sessions for this manager

@@ -62,6 +62,7 @@ var generateid_1 = require("../../../core/utils/generateid");
 var lang_1 = require("../lang");
 var musictrack_1 = require("./musictrack");
 var ytdl = require("ytdl-core");
+var functions_1 = require("../functions");
 var MusicPlayer = (function () {
     function MusicPlayer(tchannel, vchannel, manager, bot) {
         var _this = this;
@@ -169,35 +170,45 @@ var MusicPlayer = (function () {
                 _this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
                 _this.__queue.unshift(_this.current.metadata);
             }
-            (_a = _this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(_this.id, "] PLAYER - Track: ").concat(_this.current.metadata.url, " - Encountered error: ").concat(e));
+            (_a = _this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(_this.id, "] PLAYER - Track: ").concat(_this.current.metadata.url, " (at ").concat((0, functions_1.timeFormat)(Math.floor(_this.__playduration / 1000)), ") - Encountered error: ").concat(e));
         });
-        this.__player.on("stateChange", function (oldState, newState) {
-            if (oldState.status !== Voice.AudioPlayerStatus.Idle && newState.status === Voice.AudioPlayerStatus.Idle) {
-                var bf_1 = _this.__queue.shift();
-                var af_1 = _this.__queue.at(0);
-                _this.current = null;
-                _this.__tchannel
-                    .send(lang_1.MusicPlayerLang.PLAYER_FINISHED.replace(/%track_name%+/g, bf_1.name).replace(/%track_requester%+/g, bf_1.author.user.tag))
-                    .then(function () {
-                    if (af_1)
-                        _this.__tchannel
-                            .send(lang_1.MusicPlayerLang.PLAYER_STARTED.replace(/%track_name%+/g, af_1.name).replace(/%track_requester%+/g, af_1.author.user.tag))
-                            .then(function () {
-                            return setTimeout(function () {
-                                if (af_1.url !== bf_1.url)
-                                    _this.__playduration = 0;
-                                _this.play();
-                            }, 2e3);
-                        });
-                    else
-                        _this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_QUEUE_ENDED);
-                });
-            }
-        });
-        this.__player.on("debug", function (m) {
-            var _a;
-            (_a = _this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(_this.id, "] ").concat(m));
-        });
+        this.__player.on("stateChange", function (oldState, newState) { return __awaiter(_this, void 0, void 0, function () {
+            var bf, af;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!(oldState.status !== Voice.AudioPlayerStatus.Idle && newState.status === Voice.AudioPlayerStatus.Idle)) return [3, 7];
+                        bf = this.__queue.shift();
+                        af = this.__queue.at(0);
+                        this.current = null;
+                        if (!af) return [3, 6];
+                        if (!af.url.includes(bf.url)) return [3, 2];
+                        return [4, this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_TRACK_RESUMED.replace(/%track_name%+/g, bf.name).replace(/%track_duration%+/g, (0, functions_1.timeFormat)(Math.floor(this.__playduration / 1000))))];
+                    case 1:
+                        _a.sent();
+                        return [3, 5];
+                    case 2:
+                        this.__playduration = 0;
+                        return [4, this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_FINISHED.replace(/%track_name%+/g, bf.name).replace(/%track_requester%+/g, bf.requester.user.tag))];
+                    case 3:
+                        _a.sent();
+                        return [4, this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_STARTED.replace(/%track_name%+/g, af.name).replace(/%track_requester%+/g, af.requester.user.tag))];
+                    case 4:
+                        _a.sent();
+                        _a.label = 5;
+                    case 5:
+                        setTimeout(function () {
+                            _this.play();
+                        }, 2e3);
+                        return [3, 7];
+                    case 6:
+                        this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_QUEUE_ENDED);
+                        _a.label = 7;
+                    case 7: return [2];
+                }
+            });
+        }); });
     }
     MusicPlayer.prototype.__connect = function () {
         this.__connection = Voice.joinVoiceChannel({
@@ -218,36 +229,16 @@ var MusicPlayer = (function () {
         return this.__queue.splice(this.__queue.indexOf(search), 1).shift();
     };
     MusicPlayer.prototype.play = function () {
-        var _a;
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            return __generator(this, function (_b) {
-                if (this.__queue.length === 0)
-                    return [2];
-                try {
-                    this.__player.play((this.current || (this.current = Voice.createAudioResource(ytdl(this.__queue.at(0).url, {
-                        filter: "audioonly",
-                        quality: "highestaudio",
-                        highWaterMark: 1 << 24,
-                        begin: this.__playduration
-                    }).on("error", function (e) {
-                        var _a;
-                        _this.__tchannel.send(lang_1.MusicPlayerLang.ERR_PLAYER_UNKNOWN.replace(/%error%+/g, e.message));
-                        _this.play();
-                        (_a = _this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(_this.id, "] PLAY - Track: ").concat(_this.current.metadata.url, " - Encountered error: ").concat(e));
-                    }), {
-                        inputType: Voice.StreamType.WebmOpus,
-                        metadata: this.__queue.at(0)
-                    }))));
-                }
-                catch (e) {
-                    this.__tchannel.send(lang_1.MusicPlayerLang.ERR_PLAYER_UNKNOWN.replace(/%error%+/g, e.message));
-                    this.play();
-                    (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] PLAY - Track: ").concat(this.current.metadata.url, " - Encountered error: ").concat(e));
-                }
-                return [2, this];
-            });
-        });
+        this.__player.play((this.current || (this.current = Voice.createAudioResource(ytdl(this.__queue.at(0).url, {
+            filter: "audioonly",
+            quality: "highestaudio",
+            highWaterMark: 1 << 24,
+            begin: this.__playduration
+        }), {
+            inputType: Voice.StreamType.WebmOpus,
+            metadata: this.__queue.at(0)
+        }))));
+        return this;
     };
     MusicPlayer.prototype.skip = function () {
         if (this.__queue.length > 1) {

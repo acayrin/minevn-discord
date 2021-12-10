@@ -7,10 +7,10 @@ This project was made mainly for fun, and for the purpose of learning Typescript
 ## Current features
 
 -   Vote system - vote (un)mute someone (with anti-spam, channel lock and vote cooldown)
--   Message snipe - snipe a deleted/modified message (with files support\* and custom history lookup)
+-   Message snipe - snipe a deleted/modified message (with full file support and custom history lookup)
 -   Minecraft status - a simple minecraft server tracker (Hẻo đã hẻo)
 -   Random weeb shit - send random images from nekos.fun/nekos.life
--   Music player - a simple, kinda broken youtube audio player (keep getting hit with rate-limit)
+-   Music player - a simple, suckass youtube audio player but it works out of the box (keep getting hit with rate-limits tho)
 -   To be added:
     -   basic moderation features? most likely no
     -   full size minecraft server tracker?
@@ -27,9 +27,9 @@ This project was made mainly for fun, and for the purpose of learning Typescript
 ## Installation and Usage
 
 ```
-npm i           // install dependencies
-npm run build   // compile the project (optional)
-npm start       // start the bot
+yarn            // install dependencies [or npm i]
+yarn build      // compile the project (optional) [or npm run build]
+yarn start      // start the bot [or npm start]
 ```
 
 ## Configuration

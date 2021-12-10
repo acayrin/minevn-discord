@@ -1,8 +1,6 @@
 import * as Discord from "discord.js";
 import { SucklessBot } from "../../core/sucklessbot";
-import { MusicManager } from "./class/musicmanager";
-import { MusicPlayer } from "./class/musicplayer";
-import { MusicTrack } from "./class/musictrack";
+import { MusicManager, MusicPlayer, MusicTrack } from "./class/";
 import * as func from "./functions";
 import { MusicPlayerLang } from "./lang";
 
@@ -127,7 +125,7 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 				);
 			message.reply(
 				MusicPlayerLang.PLAYER_NOW_FORMAT.replace(/%track_name%+/g, now.metadata.name)
-					.replace(/%track_requester%+/g, now.metadata.author.user.tag)
+					.replace(/%track_requester%+/g, now.metadata.requester.user.tag)
 					.replace(/%track_bar%+/g, progress.join(""))
 					.replace(/%track_now%+/g, func.timeFormat(now.playbackDuration / 1000))
 					.replace(/%track_duration%+/g, func.timeFormat(now.metadata.duration))
@@ -149,7 +147,7 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 				msg.push(
 					MusicPlayerLang.PLAYER_REMOVE_EACH.replace(/%track_name%+/g, track.name).replace(
 						/%track_requester%+/g,
-						track.author.user.tag
+						track.requester.user.tag
 					)
 				);
 			});
@@ -195,7 +193,7 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 					MusicPlayerLang.PLAYER_LIST_EACH.replace(/%index%+/g, i.toString())
 						.replace(/%track_name%+/g, queue[i].name)
 						.replace(/%track_channel%+/g, queue[i].channel)
-						.replace(/%track_requester%+/g, queue[i].author.user.tag)
+						.replace(/%track_requester%+/g, queue[i].requester.user.tag)
 						.replace(/%track_duration%+/g, func.timeFormat(queue[i].duration))
 				);
 			msg.push(MusicPlayerLang.PLAYER_LIST_FOOTER);

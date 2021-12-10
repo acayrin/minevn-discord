@@ -1,9 +1,7 @@
 import { Message } from "discord.js";
 import { SucklessBot } from "../../core/sucklessbot";
 import { getRole, getUser } from "../../core/utils";
-import { VoteManager } from "./class/votemanager";
-import { VoteMute } from "./class/votemute";
-import { VoteUnmute } from "./class/voteunmute";
+import { VoteManager, VoteMute, VoteUnmute } from "./class/";
 import * as recentmutes from "./recentmute";
 
 // vote manager

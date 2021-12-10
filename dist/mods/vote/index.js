@@ -57,11 +57,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.VUM = exports.VM = exports.voteMgr = void 0;
 var utils_1 = require("../../core/utils");
-var votemanager_1 = require("./class/votemanager");
-var votemute_1 = require("./class/votemute");
-var voteunmute_1 = require("./class/voteunmute");
+var class_1 = require("./class/");
 var recentmutes = __importStar(require("./recentmute"));
-exports.voteMgr = new votemanager_1.VoteManager();
+exports.voteMgr = new class_1.VoteManager();
 function VoteSomebody(message, args, bot, unmute) {
     return __awaiter(this, void 0, void 0, function () {
         var channel, lookup, reason, user, session, role;
@@ -104,7 +102,7 @@ function VoteSomebody(message, args, bot, unmute) {
                     }
                     if (unmute) {
                         if (user.roles.cache.has(role.id)) {
-                            return [2, new voteunmute_1.VoteUnmute(user, message.channel, bot, {
+                            return [2, new class_1.VoteUnmute(user, message.channel, bot, {
                                     reason: reason || undefined,
                                     timer: bot.config.mute.timer
                                 }).vote()];
@@ -122,7 +120,7 @@ function VoteSomebody(message, args, bot, unmute) {
                     if (user.roles.highest.comparePositionTo(role) > 0) {
                         return [2, message.channel.send("User **".concat(user.user.tag, "** is too powerful, can't abuse them"))];
                     }
-                    new votemute_1.VoteMute(user, message.channel, bot, {
+                    new class_1.VoteMute(user, message.channel, bot, {
                         reason: reason || undefined,
                         timer: bot.config.mute.timer
                     }).vote();

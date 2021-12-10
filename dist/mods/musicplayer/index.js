@@ -57,8 +57,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.CreatePlayer = void 0;
 var Discord = __importStar(require("discord.js"));
-var musicmanager_1 = require("./class/musicmanager");
-var musicplayer_1 = require("./class/musicplayer");
+var class_1 = require("./class/");
 var func = __importStar(require("./functions"));
 var lang_1 = require("./lang");
 var musicMgr;
@@ -72,14 +71,14 @@ function CreatePlayer(message, args, bot) {
                     if (!args)
                         return [2];
                     check = function () {
-                        musicMgr || (musicMgr = new musicmanager_1.MusicManager(bot));
+                        musicMgr || (musicMgr = new class_1.MusicManager(bot));
                         var voice = message.member.voice.channel;
                         if (!voice) {
                             message.reply(lang_1.MusicPlayerLang.ERR_PLAYER_NO_VOICE);
                             return null;
                         }
                         var player = musicMgr.getSession().find(function (player) { return player.getGuild().id.includes(message.guildId); }) ||
-                            new musicplayer_1.MusicPlayer(message.channel, voice, musicMgr, bot);
+                            new class_1.MusicPlayer(message.channel, voice, musicMgr, bot);
                         if (!musicMgr.getSession().includes(player))
                             musicMgr.add(player);
                         return player;
@@ -203,7 +202,7 @@ function CreatePlayer(message, args, bot) {
                         for (i = 0; i < 50; i++)
                             progress.push(Math.floor((now.playbackDuration / 1000 / now.metadata.duration) * 50) === i ? "🤡" : "─");
                         message.reply(lang_1.MusicPlayerLang.PLAYER_NOW_FORMAT.replace(/%track_name%+/g, now.metadata.name)
-                            .replace(/%track_requester%+/g, now.metadata.author.user.tag)
+                            .replace(/%track_requester%+/g, now.metadata.requester.user.tag)
                             .replace(/%track_bar%+/g, progress.join(""))
                             .replace(/%track_now%+/g, func.timeFormat(now.playbackDuration / 1000))
                             .replace(/%track_duration%+/g, func.timeFormat(now.metadata.duration)));
@@ -220,7 +219,7 @@ function CreatePlayer(message, args, bot) {
                             if (!Number(input))
                                 return;
                             var track = player_2.removeTrack(Number(input));
-                            msg_1.push(lang_1.MusicPlayerLang.PLAYER_REMOVE_EACH.replace(/%track_name%+/g, track.name).replace(/%track_requester%+/g, track.author.user.tag));
+                            msg_1.push(lang_1.MusicPlayerLang.PLAYER_REMOVE_EACH.replace(/%track_name%+/g, track.name).replace(/%track_requester%+/g, track.requester.user.tag));
                         });
                         msg_1.push(lang_1.MusicPlayerLang.PLAYER_REMOVE_FOOTER);
                         message.reply(msg_1.join("\n"));
@@ -254,7 +253,7 @@ function CreatePlayer(message, args, bot) {
                             msg.push(lang_1.MusicPlayerLang.PLAYER_LIST_EACH.replace(/%index%+/g, i.toString())
                                 .replace(/%track_name%+/g, queue[i].name)
                                 .replace(/%track_channel%+/g, queue[i].channel)
-                                .replace(/%track_requester%+/g, queue[i].author.user.tag)
+                                .replace(/%track_requester%+/g, queue[i].requester.user.tag)
                                 .replace(/%track_duration%+/g, func.timeFormat(queue[i].duration)));
                         msg.push(lang_1.MusicPlayerLang.PLAYER_LIST_FOOTER);
                         message.reply(msg.join("\n"));
