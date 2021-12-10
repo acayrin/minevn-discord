@@ -56,7 +56,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.CreatePlayer = void 0;
-var Discord = __importStar(require("discord.js"));
 var class_1 = require("./class/");
 var func = __importStar(require("./functions"));
 var lang_1 = require("./lang");
@@ -262,29 +261,14 @@ function CreatePlayer(message, args, bot) {
                     _e.label = 21;
                 case 21:
                     {
-                        (_c = check()) === null || _c === void 0 ? void 0 : _c.destroy(true);
+                        (_c = check()) === null || _c === void 0 ? void 0 : _c.disconnect(true);
                         return [3, 23];
                     }
                     _e.label = 22;
                 case 22:
                     {
                         message.channel.send({
-                            embeds: [
-                                new Discord.MessageEmbed()
-                                    .setTitle("Music player")
-                                    .setDescription("A simple music player since Susan decided to killed off most of available bots\n" +
-                                    "Some shit might break, well blame youtube for that, try disconnecting the bot if something really bad happens\n" +
-                                    "Subcommands below")
-                                    .setColor("#ed2261")
-                                    .setThumbnail(bot.cli().user.avatarURL())
-                                    .addField("yt play/p [query]", "Search and play a track, can be a video or playlist url")
-                                    .addField("yt search/sr [query]", "Search for a track")
-                                    .addField("yt skip/fs", "Skip current track (if somebody decided to put an earrape")
-                                    .addField("yt now", "Show current track info")
-                                    .addField("yt remove/rm [index(es)]", "Remove tracks from playlist, can be multiple, separated by spaces")
-                                    .addField("yt list/ls", "List all tracks in current queue")
-                                    .addField("yt stop/dc", "Destroy your music session and ruin your day"),
-                            ]
+                            embeds: [(0, lang_1.help)(bot)]
                         });
                     }
                     _e.label = 23;

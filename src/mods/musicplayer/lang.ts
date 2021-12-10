@@ -1,3 +1,6 @@
+import { SucklessBot } from "../../core/sucklessbot";
+import * as Discord from "discord.js";
+
 export enum MusicPlayerLang {
 	ERR_SEARCH_NO_INPUT = "I can't search for nothing, try again but type something",
 	ERR_SEARCH_NO_RESULT = "Something went wrong, please try again (Err: %error%)",
@@ -10,7 +13,7 @@ export enum MusicPlayerLang {
 	ERR_TRACK_NO_OPUS = "Skipped current track due to no suitable audio was found",
 	ERR_TRACK_UNKNOWN = "Skipped current track due to an unknown error (Err: %error%)",
 
-	PLAYER_DESTROYED = "Destroyed voice session",
+	PLAYER_DESTROYED = "Party's over, see y'all later",
 	PLAYER_RESUMED = "Resumed the audio player",
 	PLAYER_PAUSED = "Paused the audio player",
 	PLAYER_FINISHED = "Finished playing **%track_name%** (%track_requester%)",
@@ -38,3 +41,21 @@ export enum MusicPlayerLang {
 	PLAYER_REMOVE_EACH = "[-] %track_name% (%track_requester%)",
 	PLAYER_REMOVE_FOOTER = "```",
 }
+
+export const help = (bot: SucklessBot) =>
+	new Discord.MessageEmbed()
+		.setTitle("Music player")
+		.setDescription(
+			"A simple music player since Susan decided to killed off most of available bots\n" +
+				"Note: **THE BOT CAN ONLY BE DISCONNECTED BY ``yt dc`` SUBCOMMAND\n" +
+				"Subcommands below"
+		)
+		.setColor("#ed2261")
+		.setThumbnail(bot.cli().user.avatarURL())
+		.addField("yt play/p [query]", "Search and play a track, can be a video or playlist url")
+		.addField("yt search/sr [query]", "Search for a track")
+		.addField("yt skip/fs", "Skip current track (if somebody decided to put an earrape")
+		.addField("yt now/n", "Show current track info")
+		.addField("yt remove/rm [index(es)]", "Remove tracks from playlist, can be multiple, separated by spaces")
+		.addField("yt list/ls", "List all tracks in current queue")
+		.addField("yt stop/dc", "Destroy your music session and ruin your day");

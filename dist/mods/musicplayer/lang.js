@@ -1,6 +1,26 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 exports.__esModule = true;
-exports.MusicPlayerLang = void 0;
+exports.help = exports.MusicPlayerLang = void 0;
+var Discord = __importStar(require("discord.js"));
 var MusicPlayerLang;
 (function (MusicPlayerLang) {
     MusicPlayerLang["ERR_SEARCH_NO_INPUT"] = "I can't search for nothing, try again but type something";
@@ -11,7 +31,7 @@ var MusicPlayerLang;
     MusicPlayerLang["ERR_TRACK_RATE_LIMITED"] = "Being rate-limited by Youtube, retrying...";
     MusicPlayerLang["ERR_TRACK_NO_OPUS"] = "Skipped current track due to no suitable audio was found";
     MusicPlayerLang["ERR_TRACK_UNKNOWN"] = "Skipped current track due to an unknown error (Err: %error%)";
-    MusicPlayerLang["PLAYER_DESTROYED"] = "Destroyed voice session";
+    MusicPlayerLang["PLAYER_DESTROYED"] = "Party's over, see y'all later";
     MusicPlayerLang["PLAYER_RESUMED"] = "Resumed the audio player";
     MusicPlayerLang["PLAYER_PAUSED"] = "Paused the audio player";
     MusicPlayerLang["PLAYER_FINISHED"] = "Finished playing **%track_name%** (%track_requester%)";
@@ -34,3 +54,20 @@ var MusicPlayerLang;
     MusicPlayerLang["PLAYER_REMOVE_EACH"] = "[-] %track_name% (%track_requester%)";
     MusicPlayerLang["PLAYER_REMOVE_FOOTER"] = "```";
 })(MusicPlayerLang = exports.MusicPlayerLang || (exports.MusicPlayerLang = {}));
+var help = function (bot) {
+    return new Discord.MessageEmbed()
+        .setTitle("Music player")
+        .setDescription("A simple music player since Susan decided to killed off most of available bots\n" +
+        "Note: **THE BOT CAN ONLY BE DISCONNECTED BY ``yt dc`` SUBCOMMAND\n" +
+        "Subcommands below")
+        .setColor("#ed2261")
+        .setThumbnail(bot.cli().user.avatarURL())
+        .addField("yt play/p [query]", "Search and play a track, can be a video or playlist url")
+        .addField("yt search/sr [query]", "Search for a track")
+        .addField("yt skip/fs", "Skip current track (if somebody decided to put an earrape")
+        .addField("yt now/n", "Show current track info")
+        .addField("yt remove/rm [index(es)]", "Remove tracks from playlist, can be multiple, separated by spaces")
+        .addField("yt list/ls", "List all tracks in current queue")
+        .addField("yt stop/dc", "Destroy your music session and ruin your day");
+};
+exports.help = help;

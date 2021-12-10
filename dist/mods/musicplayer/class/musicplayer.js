@@ -98,6 +98,7 @@ var MusicPlayer = (function () {
                 switch (_c.label) {
                     case 0:
                         if (!(newState.status === Voice.VoiceConnectionStatus.Disconnected)) return [3, 5];
+                        this.__bot.emit("debug", "[MusicPlayer ".concat(this.id, "] Player disconnected"));
                         _c.label = 1;
                     case 1:
                         _c.trys.push([1, 3, , 4]);
@@ -111,7 +112,7 @@ var MusicPlayer = (function () {
                             this.__connection.rejoin();
                         }
                         else {
-                            (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] CONN - Encountered error while reconnecting: ").concat(e_1));
+                            (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] Player encountered error while reconnecting: ").concat(e_1));
                             this.__connection.destroy();
                         }
                         return [3, 4];
@@ -128,7 +129,7 @@ var MusicPlayer = (function () {
                         return [3, 9];
                     case 8:
                         e_2 = _c.sent();
-                        (_b = this.__bot) === null || _b === void 0 ? void 0 : _b.emit("debug", "[MusicPlayer - ".concat(this.id, "] CONN - Encountered error: ").concat(e_2));
+                        (_b = this.__bot) === null || _b === void 0 ? void 0 : _b.emit("debug", "[MusicPlayer - ".concat(this.id, "] Player encountered error: ").concat(e_2));
                         if (this.__connection.state.status !== Voice.VoiceConnectionStatus.Destroyed) {
                             this.__connection.destroy();
                         }
@@ -137,9 +138,9 @@ var MusicPlayer = (function () {
                     case 10:
                         if (newState.status === Voice.VoiceConnectionStatus.Destroyed) {
                             if (this.__reconnectAttempts < 5)
-                                this.destroy();
+                                this.disconnect();
                             else
-                                this.destroy(true);
+                                this.disconnect(true);
                         }
                         _c.label = 11;
                     case 11: return [2];
@@ -244,21 +245,39 @@ var MusicPlayer = (function () {
             ? (this.__player.pause(), this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_PAUSED))
             : (this.__player.unpause(), this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_RESUMED));
     };
-    MusicPlayer.prototype.destroy = function (forced) {
-        if (this.__vchannel.deleted || forced) {
-            try {
-                this.__connection.destroy();
-            }
-            catch (_a) { }
-            this.__bot.emit("debug", "[MusicPlayer - ".concat(this.id, "] Player was destroyed"));
-            this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_DESTROYED);
-            this.__manager.remove(this);
-        }
-        else {
-            this.__reconnectAttempts++;
-            this.__bot.emit("debug", "[MusicPlayer - ".concat(this.id, "] Attempting to reconnect the player (").concat(this.__reconnectAttempts, ")..."));
-            this.__connect();
-        }
+    MusicPlayer.prototype.disconnect = function (forced) {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function () {
+            var _c;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0:
+                        if (!(this.__vchannel.deleted || forced)) return [3, 5];
+                        _d.label = 1;
+                    case 1:
+                        _d.trys.push([1, 3, , 4]);
+                        this.__reconnectAttempts += 69;
+                        return [4, Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Destroyed, 20e3)];
+                    case 2:
+                        _d.sent();
+                        return [3, 4];
+                    case 3:
+                        _c = _d.sent();
+                        return [3, 4];
+                    case 4:
+                        (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] Player was destroyed"));
+                        this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_DESTROYED);
+                        this.__manager.remove(this);
+                        return [3, 6];
+                    case 5:
+                        this.__reconnectAttempts++;
+                        (_b = this.__bot) === null || _b === void 0 ? void 0 : _b.emit("debug", "[MusicPlayer - ".concat(this.id, "] Attempting to reconnect the player (").concat(this.__reconnectAttempts, ")..."));
+                        this.__connect();
+                        _d.label = 6;
+                    case 6: return [2];
+                }
+            });
+        });
     };
     return MusicPlayer;
 }());

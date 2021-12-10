@@ -153,12 +153,23 @@ export class MusicPlayer {
 
 		/**
 		 * Handle when the voice state changes
+		 *
+		 * If the player was disconnected,
+		 *   attempt to reconnect to server,
+		 *   after 5 unsuccessful attempts, it enters destroyed state
+		 * If the player is in connecting state,
+		 *   attempt to mark it as ready,
+		 *   else it enters destroyed state
+		 * If the player enters destroyed state,
+		 *   it will attempt to reconnect using new connection for 5 attempts,
+		 *   if not it will destroy itself completely
 		 */
 		this.__connection.on("debug", (m) => {
 			this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] ${m}`);
 		});
 		this.__connection.on("stateChange", async (_, newState: Voice.VoiceConnectionState) => {
 			if (newState.status === Voice.VoiceConnectionStatus.Disconnected) {
+				this.__bot.emit("debug", `[MusicPlayer ${this.id}] Player disconnected`);
 				try {
 					await Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Connecting, 20e3);
 				} catch (e) {
@@ -167,7 +178,7 @@ export class MusicPlayer {
 					} else {
 						this.__bot?.emit(
 							"debug",
-							`[MusicPlayer - ${this.id}] CONN - Encountered error while reconnecting: ${e}`
+							`[MusicPlayer - ${this.id}] Player encountered error while reconnecting: ${e}`
 						);
 						this.__connection.destroy();
 					}
@@ -179,7 +190,7 @@ export class MusicPlayer {
 				try {
 					await Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Ready, 20e3);
 				} catch (e) {
-					this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] CONN - Encountered error: ${e}`);
+					this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] Player encountered error: ${e}`);
 					if (this.__connection.state.status !== Voice.VoiceConnectionStatus.Destroyed) {
 						this.__connection.destroy();
 					}
@@ -397,17 +408,18 @@ export class MusicPlayer {
 	 * @memberof MusicPlayer
 	 * @param {boolean} forced Forced to destroy the player instead
 	 */
-	public disconnect(forced?: boolean): void {
+	public async disconnect(forced?: boolean): Promise<void> {
 		if (this.__vchannel.deleted || forced) {
 			try {
-				this.__connection.destroy();
+				this.__reconnectAttempts += 69;
+				await Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Destroyed, 20e3);
 			} catch {}
-			this.__bot.emit("debug", `[MusicPlayer - ${this.id}] Player was destroyed`);
+			this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] Player was destroyed`);
 			this.__tchannel.send(MusicPlayerLang.PLAYER_DESTROYED);
 			this.__manager.remove(this);
 		} else {
 			this.__reconnectAttempts++;
-			this.__bot.emit(
+			this.__bot?.emit(
 				"debug",
 				`[MusicPlayer - ${this.id}] Attempting to reconnect the player (${this.__reconnectAttempts})...`
 			);

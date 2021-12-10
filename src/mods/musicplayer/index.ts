@@ -2,7 +2,7 @@ import * as Discord from "discord.js";
 import { SucklessBot } from "../../core/sucklessbot";
 import { MusicManager, MusicPlayer, MusicTrack } from "./class/";
 import * as func from "./functions";
-import { MusicPlayerLang } from "./lang";
+import { help, MusicPlayerLang } from "./lang";
 
 let musicMgr: MusicManager;
 export async function CreatePlayer(message: Discord.Message, args: string[], bot: SucklessBot) {
@@ -212,27 +212,7 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 
 		default: {
 			message.channel.send({
-				embeds: [
-					new Discord.MessageEmbed()
-						.setTitle("Music player")
-						.setDescription(
-							"A simple music player since Susan decided to killed off most of available bots\n" +
-								"Some shit might break, well blame youtube for that, try disconnecting the bot if something really bad happens\n" +
-								"Subcommands below"
-						)
-						.setColor("#ed2261")
-						.setThumbnail(bot.cli().user.avatarURL())
-						.addField("yt play/p [query]", "Search and play a track, can be a video or playlist url")
-						.addField("yt search/sr [query]", "Search for a track")
-						.addField("yt skip/fs", "Skip current track (if somebody decided to put an earrape")
-						.addField("yt now", "Show current track info")
-						.addField(
-							"yt remove/rm [index(es)]",
-							"Remove tracks from playlist, can be multiple, separated by spaces"
-						)
-						.addField("yt list/ls", "List all tracks in current queue")
-						.addField("yt stop/dc", "Destroy your music session and ruin your day"),
-				],
+				embeds: [help(bot)],
 			});
 		}
 	}
