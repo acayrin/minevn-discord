@@ -412,11 +412,11 @@ export class MusicPlayer {
 		if (this.__vchannel.deleted || forced) {
 			try {
 				this.__reconnectAttempts += 69;
-				await Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Destroyed, 20e3);
+				this.__connection.destroy();
+				this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] Player was destroyed`);
+				this.__tchannel.send(MusicPlayerLang.PLAYER_DESTROYED);
+				this.__manager.remove(this);
 			} catch {}
-			this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] Player was destroyed`);
-			this.__tchannel.send(MusicPlayerLang.PLAYER_DESTROYED);
-			this.__manager.remove(this);
 		} else {
 			this.__reconnectAttempts++;
 			this.__bot?.emit(
