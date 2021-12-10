@@ -6,6 +6,7 @@ import { MusicPlayerLang } from "../lang";
 import { MusicManager } from "./musicmanager";
 import { MusicTrack } from "./musictrack";
 import ytdl = require("ytdl-core");
+import { timeFormat } from "../functions";
 
 /**
  * Music player instance
@@ -103,7 +104,7 @@ export class MusicPlayer {
 	private __bot: SucklessBot;
 
 	/**
-	 * Current playback duration in miliseconds
+	 * Current playback duration
 	 *
 	 * @private
 	 * @type {number}
@@ -218,12 +219,14 @@ export class MusicPlayer {
 			// debug
 			this.__bot?.emit(
 				"debug",
-				`[MusicPlayer - ${this.id}] PLAYER - Track: ${this.current.metadata.url} - Encountered error: ${e}`
+				`[MusicPlayer - ${this.id}] PLAYER - Track: ${this.current.metadata.url} (at ${timeFormat(
+					Math.floor(this.__playduration / 1000)
+				)}) - Encountered error: ${e}`
 			);
 		});
 
 		// state changes
-		this.__player.on("stateChange", (oldState, newState) => {
+		this.__player.on("stateChange", async (oldState, newState) => {
 			if (oldState.status !== Voice.AudioPlayerStatus.Idle && newState.status === Voice.AudioPlayerStatus.Idle) {
 				// get tracks info
 				const bf = this.__queue.shift();
@@ -231,38 +234,42 @@ export class MusicPlayer {
 
 				// delete current track
 				this.current = null;
-				this.__tchannel
-					.send(
-						MusicPlayerLang.PLAYER_FINISHED.replace(/%track_name%+/g, bf.name).replace(
-							/%track_requester%+/g,
-							bf.author.user.tag
-						)
-					)
-					.then(() => {
-						if (af)
-							this.__tchannel
-								.send(
-									MusicPlayerLang.PLAYER_STARTED.replace(/%track_name%+/g, af.name).replace(
-										/%track_requester%+/g,
-										af.author.user.tag
-									)
-								)
-								.then(() =>
-									setTimeout(() => {
-										// if 2 tracks are different, reset playback duration
-										if (af.url !== bf.url) this.__playduration = 0;
-										this.play();
-									}, 2e3)
-								);
-						else this.__tchannel.send(MusicPlayerLang.PLAYER_QUEUE_ENDED);
-					});
+				if (af) {
+					if (af.url.includes(bf.url)) {
+						await this.__tchannel.send(
+							MusicPlayerLang.PLAYER_TRACK_RESUMED.replace(/%track_name%+/g, bf.name).replace(
+								/%track_duration%+/g,
+								timeFormat(Math.floor(this.__playduration / 1000))
+							)
+						);
+					} else {
+						// if 2 tracks are different, reset playback duration
+						this.__playduration = 0;
+
+						await this.__tchannel.send(
+							MusicPlayerLang.PLAYER_FINISHED.replace(/%track_name%+/g, bf.name).replace(
+								/%track_requester%+/g,
+								bf.author.user.tag
+							)
+						);
+						await this.__tchannel.send(
+							MusicPlayerLang.PLAYER_STARTED.replace(/%track_name%+/g, af.name).replace(
+								/%track_requester%+/g,
+								af.author.user.tag
+							)
+						);
+					}
+					setTimeout(() => {
+						this.play();
+					}, 2e3);
+				} else this.__tchannel.send(MusicPlayerLang.PLAYER_QUEUE_ENDED);
 			}
 		});
 
 		// debug
-		this.__player.on("debug", (m) => {
+		/*this.__player.on("debug", (m) => {
 			this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] ${m}`);
-		});
+		});*/
 	}
 
 	/**
@@ -330,50 +337,28 @@ export class MusicPlayer {
 	/**
 	 * Start/Play the player
 	 *
-	 * @return {*}  {Promise<MusicPlayer>}
+	 * @return {*}  {MusicPlayer}
 	 * @memberof MusicPlayer
 	 */
-	public async play(): Promise<MusicPlayer> {
+	public play(): MusicPlayer {
 		// cancel if queue is empty
 		if (this.__queue.length === 0) return;
 
-		try {
-			this.__player.play(
-				// create an audio resource
-				(this.current ||= Voice.createAudioResource(
-					ytdl(this.__queue.at(0).url, {
-						filter: "audioonly",
-						quality: "highestaudio",
-						highWaterMark: 1 << 24,
-						begin: this.__playduration,
-					}).on("error", (e) => {
-						// if YTDL caught an error, retry
-						this.__tchannel.send(MusicPlayerLang.ERR_PLAYER_UNKNOWN.replace(/%error%+/g, e.message));
-						this.play();
-
-						// debug
-						this.__bot?.emit(
-							"debug",
-							`[MusicPlayer - ${this.id}] PLAY - Track: ${this.current.metadata.url} - Encountered error: ${e}`
-						);
-					}),
-					{
-						inputType: Voice.StreamType.WebmOpus,
-						metadata: this.__queue.at(0),
-					}
-				))
-			);
-		} catch (e) {
-			// if something caught an error, retry
-			this.__tchannel.send(MusicPlayerLang.ERR_PLAYER_UNKNOWN.replace(/%error%+/g, e.message));
-			this.play();
-
-			// debug
-			this.__bot?.emit(
-				"debug",
-				`[MusicPlayer - ${this.id}] PLAY - Track: ${this.current.metadata.url} - Encountered error: ${e}`
-			);
-		}
+		this.__player.play(
+			// create an audio resource
+			(this.current ||= Voice.createAudioResource(
+				ytdl(this.__queue.at(0).url, {
+					filter: "audioonly",
+					quality: "highestaudio",
+					highWaterMark: 1 << 24,
+					begin: this.__playduration,
+				}),
+				{
+					inputType: Voice.StreamType.WebmOpus,
+					metadata: this.__queue.at(0),
+				}
+			))
+		);
 		return this;
 	}
 

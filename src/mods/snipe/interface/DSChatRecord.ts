@@ -44,4 +44,12 @@ export interface DSChatRecord {
 	 * @memberof DSChatRecord
 	 */
 	avatar: string;
+
+	/**
+	 * Message timestamp
+	 *
+	 * @type {number}
+	 * @memberof DSChatRecord
+	 */
+	timestamp: number;
 }

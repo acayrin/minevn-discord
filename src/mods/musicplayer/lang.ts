@@ -16,9 +16,9 @@ export enum MusicPlayerLang {
 	PLAYER_FINISHED = "Finished playing **%track_name%** (%track_requester%)",
 	PLAYER_QUEUE_ENDED = "Finished playing all tracks",
 	PLAYER_STARTED = "Started playing **%track_name%** (%track_requester%)",
-
 	PLAYER_TRACK_ADDED = "Added **%track%** to the queue",
 	PLAYER_TRACK_REMOVED = "Removed **%track%** from the queue",
+	PLAYER_TRACK_RESUMED = "Resuming **%track_name%** at **%track_duration%**",
 
 	PLAYER_PLAYLIST_ADDED = "Added **%tracks%** tracks to the queue",
 

@@ -104,6 +104,7 @@ export const SnipeDelete = (message: Discord.Message, args: any, bot: SucklessBo
 		files: files,
 		owner: message.author.tag,
 		avatar: message.author.avatarURL(),
+		timestamp: message.createdTimestamp,
 	});
 };
 
@@ -145,6 +146,7 @@ export const SnipeUpdate = (oldMsg: Discord.Message, newMsg: Discord.Message, bo
 		files: files,
 		owner: oldMsg.author.tag,
 		avatar: oldMsg.author.avatarURL(),
+		timestamp: oldMsg.createdTimestamp,
 	});
 };
 
@@ -159,5 +161,5 @@ const _e = (a: DSChatRecord): Discord.MessageEmbed => {
 		.setColor("#ed2261")
 		.setAuthor(a.owner, a.avatar)
 		.setDescription(a.content)
-		.setTimestamp();
+		.setTimestamp(a.timestamp);
 };
