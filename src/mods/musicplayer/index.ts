@@ -206,7 +206,7 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 		case "dickmove":
 		case "stop":
 		case "dc": {
-			check()?.destroy();
+			check()?.disconnect(true);
 			break;
 		}
 

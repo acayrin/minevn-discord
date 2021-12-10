@@ -113,6 +113,15 @@ export class MusicPlayer {
 	private __playduration: number = 0;
 
 	/**
+	 * Player's reconnection attempts
+	 *
+	 * @private
+	 * @type {number}
+	 * @memberof MusicPlayer
+	 */
+	private __reconnectAttempts: number = 0;
+
+	/**
 	 * Creates an instance of MusicPlayer.
 	 *
 	 * @param {Discord.TextChannel | any} tchannel The text channel to send messages in
@@ -150,30 +159,18 @@ export class MusicPlayer {
 		});
 		this.__connection.on("stateChange", async (_, newState: Voice.VoiceConnectionState) => {
 			if (newState.status === Voice.VoiceConnectionStatus.Disconnected) {
-				if (
-					newState.reason === Voice.VoiceConnectionDisconnectReason.WebSocketClose &&
-					newState.closeCode === 4014
-				) {
-					try {
-						await Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Connecting, 20e3);
-					} catch (e) {
-						this.__connection.destroy();
-
+				try {
+					await Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Connecting, 20e3);
+				} catch (e) {
+					if (this.__connection.rejoinAttempts < 5) {
+						this.__connection.rejoin();
+					} else {
 						this.__bot?.emit(
 							"debug",
 							`[MusicPlayer - ${this.id}] CONN - Encountered error while reconnecting: ${e}`
 						);
+						this.__connection.destroy();
 					}
-				} else if (this.__connection.rejoinAttempts < 5) {
-					this.__bot?.emit(
-						"debug",
-						`[MusicPlayer - ${this.id}] CONN - Reconnecting attempt ${this.__connection.rejoinAttempts}`
-					);
-					await new Promise((r) => setTimeout(r, (this.__connection.rejoinAttempts + 1) * 3e3).unref());
-					this.__connection.rejoin();
-				} else {
-					this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] CONN - Disconnected after 5 attempts`);
-					this.__connection.destroy();
 				}
 			} else if (
 				newState.status === Voice.VoiceConnectionStatus.Connecting ||
@@ -188,7 +185,8 @@ export class MusicPlayer {
 					}
 				}
 			} else if (newState.status === Voice.VoiceConnectionStatus.Destroyed) {
-				this.destroy();
+				if (this.__reconnectAttempts < 5) this.disconnect();
+				else this.disconnect(true);
 			}
 		});
 
@@ -203,13 +201,16 @@ export class MusicPlayer {
 			// age restricted
 			if (e.message.includes("410")) {
 				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_AGE_RESTRICTED);
+
 				// no opus audio found
 			} else if (e.message.includes("EBML")) {
 				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_NO_OPUS);
+
 				// rate limited
 			} else if (e.message.includes("403")) {
 				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_RATE_LIMITED);
 				this.__queue.unshift(this.current.metadata);
+
 				// unknown
 			} else {
 				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
@@ -391,15 +392,26 @@ export class MusicPlayer {
 	public isPlaying = () => (this.__player?.state.status || false) === Voice.AudioPlayerStatus.Playing;
 
 	/**
-	 * Destroy this player instance
+	 * Despite the name, this will actually tries to reconnect the bot if possible, else destroy it by force
 	 *
 	 * @memberof MusicPlayer
+	 * @param {boolean} forced Forced to destroy the player instead
 	 */
-	public destroy(): void {
-		try {
-			this.__connection.destroy();
-		} catch {}
-		this.__tchannel.send(MusicPlayerLang.PLAYER_DESTROYED);
-		this.__manager.remove(this);
+	public disconnect(forced?: boolean): void {
+		if (this.__vchannel.deleted || forced) {
+			try {
+				this.__connection.destroy();
+			} catch {}
+			this.__bot.emit("debug", `[MusicPlayer - ${this.id}] Player was destroyed`);
+			this.__tchannel.send(MusicPlayerLang.PLAYER_DESTROYED);
+			this.__manager.remove(this);
+		} else {
+			this.__reconnectAttempts++;
+			this.__bot.emit(
+				"debug",
+				`[MusicPlayer - ${this.id}] Attempting to reconnect the player (${this.__reconnectAttempts})...`
+			);
+			this.__connect();
+		}
 	}
 }

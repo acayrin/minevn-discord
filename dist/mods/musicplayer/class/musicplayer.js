@@ -69,6 +69,7 @@ var MusicPlayer = (function () {
         this.id = (0, generateid_1.id)();
         this.__queue = [];
         this.__playduration = 0;
+        this.__reconnectAttempts = 0;
         this.getGuild = function () { return _this.__guild; };
         this.getQueue = function () { return _this.__queue; };
         this.addTrack = function (track) {
@@ -92,64 +93,56 @@ var MusicPlayer = (function () {
         });
         this.__connection.on("stateChange", function (_, newState) { return __awaiter(_this, void 0, void 0, function () {
             var e_1, e_2;
-            var _this = this;
-            var _a, _b, _c, _d;
-            return __generator(this, function (_e) {
-                switch (_e.label) {
+            var _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
-                        if (!(newState.status === Voice.VoiceConnectionStatus.Disconnected)) return [3, 9];
-                        if (!(newState.reason === Voice.VoiceConnectionDisconnectReason.WebSocketClose &&
-                            newState.closeCode === 4014)) return [3, 5];
-                        _e.label = 1;
+                        if (!(newState.status === Voice.VoiceConnectionStatus.Disconnected)) return [3, 5];
+                        _c.label = 1;
                     case 1:
-                        _e.trys.push([1, 3, , 4]);
+                        _c.trys.push([1, 3, , 4]);
                         return [4, Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Connecting, 20e3)];
                     case 2:
-                        _e.sent();
+                        _c.sent();
                         return [3, 4];
                     case 3:
-                        e_1 = _e.sent();
-                        this.__connection.destroy();
-                        (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] CONN - Encountered error while reconnecting: ").concat(e_1));
+                        e_1 = _c.sent();
+                        if (this.__connection.rejoinAttempts < 5) {
+                            this.__connection.rejoin();
+                        }
+                        else {
+                            (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] CONN - Encountered error while reconnecting: ").concat(e_1));
+                            this.__connection.destroy();
+                        }
                         return [3, 4];
-                    case 4: return [3, 8];
+                    case 4: return [3, 11];
                     case 5:
-                        if (!(this.__connection.rejoinAttempts < 5)) return [3, 7];
-                        (_b = this.__bot) === null || _b === void 0 ? void 0 : _b.emit("debug", "[MusicPlayer - ".concat(this.id, "] CONN - Reconnecting attempt ").concat(this.__connection.rejoinAttempts));
-                        return [4, new Promise(function (r) { return setTimeout(r, (_this.__connection.rejoinAttempts + 1) * 3e3).unref(); })];
-                    case 6:
-                        _e.sent();
-                        this.__connection.rejoin();
-                        return [3, 8];
-                    case 7:
-                        (_c = this.__bot) === null || _c === void 0 ? void 0 : _c.emit("debug", "[MusicPlayer - ".concat(this.id, "] CONN - Disconnected after 5 attempts"));
-                        this.__connection.destroy();
-                        _e.label = 8;
-                    case 8: return [3, 15];
-                    case 9:
                         if (!(newState.status === Voice.VoiceConnectionStatus.Connecting ||
-                            newState.status === Voice.VoiceConnectionStatus.Signalling)) return [3, 14];
-                        _e.label = 10;
-                    case 10:
-                        _e.trys.push([10, 12, , 13]);
+                            newState.status === Voice.VoiceConnectionStatus.Signalling)) return [3, 10];
+                        _c.label = 6;
+                    case 6:
+                        _c.trys.push([6, 8, , 9]);
                         return [4, Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Ready, 20e3)];
-                    case 11:
-                        _e.sent();
-                        return [3, 13];
-                    case 12:
-                        e_2 = _e.sent();
-                        (_d = this.__bot) === null || _d === void 0 ? void 0 : _d.emit("debug", "[MusicPlayer - ".concat(this.id, "] CONN - Encountered error: ").concat(e_2));
+                    case 7:
+                        _c.sent();
+                        return [3, 9];
+                    case 8:
+                        e_2 = _c.sent();
+                        (_b = this.__bot) === null || _b === void 0 ? void 0 : _b.emit("debug", "[MusicPlayer - ".concat(this.id, "] CONN - Encountered error: ").concat(e_2));
                         if (this.__connection.state.status !== Voice.VoiceConnectionStatus.Destroyed) {
                             this.__connection.destroy();
                         }
-                        return [3, 13];
-                    case 13: return [3, 15];
-                    case 14:
+                        return [3, 9];
+                    case 9: return [3, 11];
+                    case 10:
                         if (newState.status === Voice.VoiceConnectionStatus.Destroyed) {
-                            this.destroy();
+                            if (this.__reconnectAttempts < 5)
+                                this.destroy();
+                            else
+                                this.destroy(true);
                         }
-                        _e.label = 15;
-                    case 15: return [2];
+                        _c.label = 11;
+                    case 11: return [2];
                 }
             });
         }); });
@@ -251,13 +244,21 @@ var MusicPlayer = (function () {
             ? (this.__player.pause(), this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_PAUSED))
             : (this.__player.unpause(), this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_RESUMED));
     };
-    MusicPlayer.prototype.destroy = function () {
-        try {
-            this.__connection.destroy();
+    MusicPlayer.prototype.destroy = function (forced) {
+        if (this.__vchannel.deleted || forced) {
+            try {
+                this.__connection.destroy();
+            }
+            catch (_a) { }
+            this.__bot.emit("debug", "[MusicPlayer - ".concat(this.id, "] Player was destroyed"));
+            this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_DESTROYED);
+            this.__manager.remove(this);
         }
-        catch (_a) { }
-        this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_DESTROYED);
-        this.__manager.remove(this);
+        else {
+            this.__reconnectAttempts++;
+            this.__bot.emit("debug", "[MusicPlayer - ".concat(this.id, "] Attempting to reconnect the player (").concat(this.__reconnectAttempts, ")..."));
+            this.__connect();
+        }
     };
     return MusicPlayer;
 }());

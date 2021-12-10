@@ -262,7 +262,7 @@ function CreatePlayer(message, args, bot) {
                     _e.label = 21;
                 case 21:
                     {
-                        (_c = check()) === null || _c === void 0 ? void 0 : _c.destroy();
+                        (_c = check()) === null || _c === void 0 ? void 0 : _c.destroy(true);
                         return [3, 23];
                     }
                     _e.label = 22;
