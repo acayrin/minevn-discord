@@ -67,7 +67,7 @@ module.exports = {
                                 .setColor("#ed2261")
                                 .setTimestamp()
                                 .setTitle("".concat(json.host.toUpperCase()))
-                                .setDescription("".concat(json.description.descriptionText.replace(/§[a-z0-9]+/g, "")))
+                                .setDescription("".concat(json.description.descriptionText.replace(/§[a-z0-9]/g, "")))
                                 .setThumbnail("".concat(bot.cli().user.avatarURL()))
                                 .addField("Online", "".concat(json.onlinePlayers, "/").concat(json.maxPlayers))
                                 .addField("Version", "".concat(json.version)),

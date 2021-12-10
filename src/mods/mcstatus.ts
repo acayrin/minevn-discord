@@ -28,7 +28,7 @@ export = {
 								.setColor("#ed2261")
 								.setTimestamp()
 								.setTitle(`${json.host.toUpperCase()}`)
-								.setDescription(`${json.description.descriptionText.replace(/§[a-z0-9]+/g, "")}`)
+								.setDescription(`${json.description.descriptionText.replace(/§[a-z0-9]/g, "")}`)
 								.setThumbnail(`${bot.cli().user.avatarURL()}`)
 								.addField(`Online`, `${json.onlinePlayers}/${json.maxPlayers}`)
 								.addField(`Version`, `${json.version}`),
