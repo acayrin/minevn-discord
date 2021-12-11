@@ -152,60 +152,94 @@ export class MusicPlayer {
 	}
 
 	/**
+	 * Connect to voice channel and create a new voice connection
+	 *
+	 * @private
+	 * @return {*}  {Voice.VoiceConnection} New voice connection for this player
+	 * @memberof MusicPlayer
+	 */
+	private __connect(): Voice.VoiceConnection {
+		this.__connection = Voice.joinVoiceChannel({
+			channelId: this.__vchannel.id,
+			guildId: this.__guild.id,
+			adapterCreator: this.__vchannel.guild.voiceAdapterCreator,
+		});
+
+		this.__connection.subscribe(this.__player);
+		this.__connection.on("stateChange", this.__connectionStateChange.bind(this));
+
+		this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] Created new voice connection`);
+		return this.__connection;
+	}
+
+	/**
+	 * Attempt to reconnect the player using a new voice connection
+	 * If failed after 5(x3 seconds) times, the player will be destroyed
+	 *
+	 * @private
+	 * @memberof MusicPlayer
+	 */
+	private __reconnect(): void {
+		this.__reconnectAttempts++;
+		this.__bot?.emit(
+			"debug",
+			`[MusicPlayer - ${this.id}] Attempting to reconnect ${this.__reconnectAttempts}/5 after ${
+				this.__reconnectAttempts * 3
+			}s`
+		);
+		if (!this.__vchannel.deleted && this.__reconnectAttempts <= 5) {
+			this.__connection.removeAllListeners();
+			setTimeout(() => {
+				this.__connect();
+			}, this.__reconnectAttempts * 3e3);
+		} else {
+			this.__player = undefined;
+			this.__connection = undefined;
+			this.__manager.remove(this);
+			this.__tchannel.send(MusicPlayerLang.PLAYER_DESTROYED);
+			this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] Player was destroyed`);
+		}
+	}
+
+	/**
 	 *
 	 * Handle when the voice state changes
 	 *
-	 * If the player was disconnected,
-	 *   attempt to reconnect to server,
-	 *   after 5 unsuccessful attempts, it enters destroyed state
-	 * If the player is in connecting state,
-	 *   attempt to mark it as ready,
-	 *   else it enters destroyed state
-	 * If the player enters destroyed state,
-	 *   it will attempt to reconnect using new connection for 5 attempts,
-	 *   if not it will destroy itself completely
+	 * If the connection gets disconnected, it will tries to reconnect
+	 *   if an error occured, it will reconnect using a new voice session
+	 * If the connection gets an error while entering Ready state
+	 *   it will reconnect using a new voice session
+	 * If the connection was destroyed
+	 *   it will reconenct using a new voice session
 	 *
 	 * @private
 	 * @param {*} _
 	 * @param {Voice.VoiceConnectionState} newState Connection's new state
 	 * @memberof MusicPlayer
 	 */
-	private __connectionStateChange(_: any, newState: Voice.VoiceConnectionState) {
+	private async __connectionStateChange(_: any, newState: Voice.VoiceConnectionState) {
 		if (newState.status === Voice.VoiceConnectionStatus.Disconnected) {
-			this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] Player disconnected, attempting to reconnect`);
+			this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] VC disconnected, attempting to reconnect`);
 			Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Connecting, 20e3).catch((e) => {
-				if (this.__connection.rejoinAttempts <= 5) {
-					this.__bot?.emit(
-						"debug",
-						`[MusicPlayer - ${this.id}] [A] Attempting to reconnect (${this.__connection.rejoinAttempts}/5)`
-					);
-					this.__connection.rejoin();
-				} else {
-					this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] [A] Player encountered an error: ${e}`);
-					this.__connection.destroy();
-				}
+				this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] VC encountered an error [1]: ${e}`);
+				this.__reconnect();
 			});
 		} else if (
 			newState.status === Voice.VoiceConnectionStatus.Connecting ||
 			newState.status === Voice.VoiceConnectionStatus.Signalling
 		) {
-			Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Ready, 20e3).catch((e) => {
-				this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] [B] Player encountered an error: ${e}`);
-				this.__connection.destroy();
-			});
+			Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Ready, 20e3)
+				.then(() => {
+					this.__reconnectAttempts = 0;
+					this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] VC successfully connected`);
+				})
+				.catch((e) => {
+					this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] VC encountered an error [2]: ${e}`);
+					this.__reconnect();
+				});
 		} else if (newState.status === Voice.VoiceConnectionStatus.Destroyed) {
-			if (!this.__vchannel.deleted && this.__reconnectAttempts < 5) {
-				this.__reconnectAttempts++;
-				this.__bot?.emit(
-					"debug",
-					`[MusicPlayer - ${this.id}] [B] Attempting to reconnect (${this.__reconnectAttempts}/5)`
-				);
-				this.__connect();
-			} else {
-				this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] Player was destroyed`);
-				this.__tchannel.send(MusicPlayerLang.PLAYER_DESTROYED);
-				this.__manager.remove(this);
-			}
+			this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] VC was destroyed`);
+			this.__reconnect();
 		}
 	}
 
@@ -310,25 +344,6 @@ export class MusicPlayer {
 		}
 	}
 
-	/**
-	 * Connect to voice channel
-	 *
-	 * @private
-	 * @memberof MusicPlayer
-	 */
-	private __connect(): void {
-		// create a voice connection
-		this.__connection = Voice.joinVoiceChannel({
-			channelId: this.__vchannel.id,
-			guildId: this.__guild.id,
-			adapterCreator: this.__vchannel.guild.voiceAdapterCreator,
-		});
-
-		// subscribe player to connection
-		this.__connection.subscribe(this.__player);
-		this.__connection.on("stateChange", this.__connectionStateChange.bind(this));
-	}
-
 	// ================================== Editable parts ==================================
 
 	/**
@@ -382,22 +397,21 @@ export class MusicPlayer {
 	 */
 	public async play(): Promise<void> {
 		try {
-			const demux = await Voice.demuxProbe(
-				ytdl(this.__queue.at(0).url, {
-					filter: "audioonly",
-					quality: "highestaudio",
-					highWaterMark: 1 << 24,
-					begin: this.__playduration,
-				})
-			);
+			const track = ytdl(this.__queue.at(0).url, {
+				filter: "audioonly",
+				quality: "highestaudio",
+				highWaterMark: 1 << 24,
+				begin: this.__playduration,
+			});
 
-			this.__player.play(
-				// create an audio resource
-				(this.current ||= Voice.createAudioResource(demux.stream, {
-					inputType: demux.type,
-					metadata: this.__queue.at(0),
-				}))
-			);
+			const demux = await Voice.demuxProbe(track);
+			const resource = Voice.createAudioResource(demux.stream, {
+				inputType: demux.type,
+				metadata: this.__queue.at(0),
+			});
+
+			this.current = resource;
+			this.__player.play(resource);
 		} catch (e) {
 			this.__player.emit("error", e as Voice.AudioPlayerError);
 		}
@@ -409,11 +423,7 @@ export class MusicPlayer {
 	 * @memberof MusicPlayer
 	 */
 	public skip(): void {
-		// only trigger if queue is longer than 1
-		if (this.__queue.length > 1) {
-			this.current = null;
-			this.__player.stop();
-		}
+		this.__player.stop();
 	}
 
 	/**
