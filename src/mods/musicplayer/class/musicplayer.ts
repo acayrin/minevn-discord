@@ -226,7 +226,7 @@ export class MusicPlayer {
 			const af = this.__queue.at(0);
 
 			// delete current track
-			this.current = null;
+			this.current = undefined;
 			if (af) {
 				if (af.url.includes(bf.url)) {
 					await this.__tchannel.send(
@@ -274,35 +274,40 @@ export class MusicPlayer {
 	 * @memberof MusicPlayer
 	 */
 	private __playerOnError(e: Error) {
-		// store current playback duration
-		this.__playduration = this.current.playbackDuration;
-
-		// age restricted
-		if (e.message.includes("410")) {
-			this.__tchannel.send(MusicPlayerLang.ERR_TRACK_AGE_RESTRICTED);
-
-			// no opus audio found
-		} else if (e.message.includes("EBML")) {
-			this.__tchannel.send(MusicPlayerLang.ERR_TRACK_NO_OPUS);
-
-			// rate limited
-		} else if (e.message.includes("403")) {
-			this.__tchannel.send(MusicPlayerLang.ERR_TRACK_RATE_LIMITED);
-			this.__queue.unshift(this.current.metadata);
-
-			// unknown
-		} else {
-			this.__tchannel.send(MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
-			this.__queue.unshift(this.current.metadata);
-		}
-
 		// debug
 		this.__bot?.emit(
 			"debug",
-			`[MusicPlayer - ${this.id}] PLAYER - Track: ${this.current.metadata.url} (at ${timeFormat(
+			`[MusicPlayer - ${this.id}] PLAYER - Track: ${this.current?.metadata.url} (at ${timeFormat(
 				Math.floor(this.__playduration / 1000)
 			)}) - Encountered error: ${e}`
 		);
+
+		// if no audio was playing (startup)
+		if (!this.current) {
+			this.__tchannel.send(MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
+		} else {
+			// store current playback duration
+			this.__playduration = this.current.playbackDuration;
+
+			// age restricted
+			if (e.message.includes("410")) {
+				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_AGE_RESTRICTED);
+
+				// no playable audio found
+			} else if (e.message.includes("No such format found")) {
+				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_NO_OPUS);
+
+				// rate limited
+			} else if (e.message.includes("403")) {
+				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_RATE_LIMITED);
+				this.__queue.unshift(this.current.metadata);
+
+				// unknown
+			} else {
+				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
+				this.__queue.unshift(this.current.metadata);
+			}
+		}
 	}
 
 	/**
@@ -373,26 +378,29 @@ export class MusicPlayer {
 	/**
 	 * Start/Play the player
 	 *
-	 * @return {*}  {MusicPlayer}
 	 * @memberof MusicPlayer
 	 */
-	public play(): MusicPlayer {
-		this.__player.play(
-			// create an audio resource
-			(this.current ||= Voice.createAudioResource(
+	public async play(): Promise<void> {
+		try {
+			const demux = await Voice.demuxProbe(
 				ytdl(this.__queue.at(0).url, {
 					filter: "audioonly",
 					quality: "highestaudio",
 					highWaterMark: 1 << 24,
 					begin: this.__playduration,
-				}),
-				{
-					inputType: Voice.StreamType.WebmOpus,
+				})
+			);
+
+			this.__player.play(
+				// create an audio resource
+				(this.current ||= Voice.createAudioResource(demux.stream, {
+					inputType: demux.type,
 					metadata: this.__queue.at(0),
-				}
-			))
-		);
-		return this;
+				}))
+			);
+		} catch (e) {
+			this.__player.emit("error", e as Voice.AudioPlayerError);
+		}
 	}
 
 	/**

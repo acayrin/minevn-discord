@@ -138,7 +138,7 @@ var MusicPlayer = (function () {
                         if (!(oldState.status !== Voice.AudioPlayerStatus.Idle && newState.status === Voice.AudioPlayerStatus.Idle)) return [3, 7];
                         bf = this.__queue.shift();
                         af = this.__queue.at(0);
-                        this.current = null;
+                        this.current = undefined;
                         if (!af) return [3, 6];
                         if (!af.url.includes(bf.url)) return [3, 2];
                         return [4, this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_TRACK_RESUMED.replace(/%track_name%+/g, bf.name).replace(/%track_duration%+/g, (0, functions_1.timeFormat)(Math.floor(this.__playduration / 1000))))];
@@ -168,23 +168,28 @@ var MusicPlayer = (function () {
         });
     };
     MusicPlayer.prototype.__playerOnError = function (e) {
-        var _a;
-        this.__playduration = this.current.playbackDuration;
-        if (e.message.includes("410")) {
-            this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_AGE_RESTRICTED);
-        }
-        else if (e.message.includes("EBML")) {
-            this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_NO_OPUS);
-        }
-        else if (e.message.includes("403")) {
-            this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_RATE_LIMITED);
-            this.__queue.unshift(this.current.metadata);
+        var _a, _b;
+        (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] PLAYER - Track: ").concat((_b = this.current) === null || _b === void 0 ? void 0 : _b.metadata.url, " (at ").concat((0, functions_1.timeFormat)(Math.floor(this.__playduration / 1000)), ") - Encountered error: ").concat(e));
+        if (!this.current) {
+            this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
         }
         else {
-            this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
-            this.__queue.unshift(this.current.metadata);
+            this.__playduration = this.current.playbackDuration;
+            if (e.message.includes("410")) {
+                this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_AGE_RESTRICTED);
+            }
+            else if (e.message.includes("No such format found")) {
+                this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_NO_OPUS);
+            }
+            else if (e.message.includes("403")) {
+                this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_RATE_LIMITED);
+                this.__queue.unshift(this.current.metadata);
+            }
+            else {
+                this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
+                this.__queue.unshift(this.current.metadata);
+            }
         }
-        (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] PLAYER - Track: ").concat(this.current.metadata.url, " (at ").concat((0, functions_1.timeFormat)(Math.floor(this.__playduration / 1000)), ") - Encountered error: ").concat(e));
     };
     MusicPlayer.prototype.__connect = function () {
         this.__connection = Voice.joinVoiceChannel({
@@ -206,16 +211,33 @@ var MusicPlayer = (function () {
         return this.__queue.splice(this.__queue.indexOf(search), 1).shift();
     };
     MusicPlayer.prototype.play = function () {
-        this.__player.play((this.current || (this.current = Voice.createAudioResource(ytdl(this.__queue.at(0).url, {
-            filter: "audioonly",
-            quality: "highestaudio",
-            highWaterMark: 1 << 24,
-            begin: this.__playduration
-        }), {
-            inputType: Voice.StreamType.WebmOpus,
-            metadata: this.__queue.at(0)
-        }))));
-        return this;
+        return __awaiter(this, void 0, void 0, function () {
+            var demux, e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4, Voice.demuxProbe(ytdl(this.__queue.at(0).url, {
+                                filter: "audioonly",
+                                quality: "highestaudio",
+                                highWaterMark: 1 << 24,
+                                begin: this.__playduration
+                            }))];
+                    case 1:
+                        demux = _a.sent();
+                        this.__player.play((this.current || (this.current = Voice.createAudioResource(demux.stream, {
+                            inputType: demux.type,
+                            metadata: this.__queue.at(0)
+                        }))));
+                        return [3, 3];
+                    case 2:
+                        e_1 = _a.sent();
+                        this.__player.emit("error", e_1);
+                        return [3, 3];
+                    case 3: return [2];
+                }
+            });
+        });
     };
     MusicPlayer.prototype.skip = function () {
         if (this.__queue.length > 1) {
