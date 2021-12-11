@@ -50,7 +50,7 @@ function search(query, author) {
                 case 1:
                     f1 = _a.sent();
                     f2 = f1.get("Type").get("Video");
-                    return [4, ytsr(f2.url, { limit: 15 })];
+                    return [4, ytsr(f2.url, { limit: 10 })];
                 case 2:
                     yt = _a.sent();
                     res = [];

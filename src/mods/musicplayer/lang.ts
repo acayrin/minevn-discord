@@ -14,6 +14,7 @@ export enum MusicPlayerLang {
 	ERR_TRACK_UNKNOWN = "Skipped current track due to an unknown error (Err: %error%)",
 
 	PLAYER_DESTROYED = "Party's over, see y'all later",
+	PLAYER_ADY_DESTROYED = "Player's already destroyed or doesn't exist",
 	PLAYER_RESUMED = "Resumed the audio player",
 	PLAYER_PAUSED = "Paused the audio player",
 	PLAYER_FINISHED = "Finished playing **%track_name%** (%track_requester%)",
@@ -53,7 +54,7 @@ export const help = (bot: SucklessBot) =>
 		.setColor("#ed2261")
 		.setThumbnail(bot.cli().user.avatarURL())
 		.addField("yt play/p [query]", "Search and play a track, can be a video or playlist url")
-		.addField("yt search/sr [query]", "Search for a track")
+		.addField("yt search/s [query]", "Search for a track")
 		.addField("yt skip/fs", "Skip current track (if somebody decided to put an earrape")
 		.addField("yt now/n", "Show current track info")
 		.addField("yt remove/rm [index(es)]", "Remove tracks from playlist, can be multiple, separated by spaces")

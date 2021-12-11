@@ -59,10 +59,10 @@ exports.MusicPlayer = void 0;
 var Voice = __importStar(require("@discordjs/voice"));
 var Discord = __importStar(require("discord.js"));
 var generateid_1 = require("../../../core/utils/generateid");
+var functions_1 = require("../functions");
 var lang_1 = require("../lang");
 var musictrack_1 = require("./musictrack");
 var ytdl = require("ytdl-core");
-var functions_1 = require("../functions");
 var MusicPlayer = (function () {
     function MusicPlayer(tchannel, vchannel, manager, bot) {
         var _this = this;
@@ -87,86 +87,49 @@ var MusicPlayer = (function () {
         this.__player = Voice.createAudioPlayer();
         this.__bot = bot;
         this.__connect();
-        this.__connection.on("debug", function (m) {
-            var _a;
-            (_a = _this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(_this.id, "] ").concat(m));
-        });
-        this.__connection.on("stateChange", function (_, newState) { return __awaiter(_this, void 0, void 0, function () {
-            var e_1, e_2;
-            var _a, _b;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
-                    case 0:
-                        if (!(newState.status === Voice.VoiceConnectionStatus.Disconnected)) return [3, 5];
-                        this.__bot.emit("debug", "[MusicPlayer ".concat(this.id, "] Player disconnected"));
-                        _c.label = 1;
-                    case 1:
-                        _c.trys.push([1, 3, , 4]);
-                        return [4, Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Connecting, 20e3)];
-                    case 2:
-                        _c.sent();
-                        return [3, 4];
-                    case 3:
-                        e_1 = _c.sent();
-                        if (this.__connection.rejoinAttempts < 5) {
-                            this.__connection.rejoin();
-                        }
-                        else {
-                            (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] Player encountered error while reconnecting: ").concat(e_1));
-                            this.__connection.destroy();
-                        }
-                        return [3, 4];
-                    case 4: return [3, 11];
-                    case 5:
-                        if (!(newState.status === Voice.VoiceConnectionStatus.Connecting ||
-                            newState.status === Voice.VoiceConnectionStatus.Signalling)) return [3, 10];
-                        _c.label = 6;
-                    case 6:
-                        _c.trys.push([6, 8, , 9]);
-                        return [4, Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Ready, 20e3)];
-                    case 7:
-                        _c.sent();
-                        return [3, 9];
-                    case 8:
-                        e_2 = _c.sent();
-                        (_b = this.__bot) === null || _b === void 0 ? void 0 : _b.emit("debug", "[MusicPlayer - ".concat(this.id, "] Player encountered error: ").concat(e_2));
-                        if (this.__connection.state.status !== Voice.VoiceConnectionStatus.Destroyed) {
-                            this.__connection.destroy();
-                        }
-                        return [3, 9];
-                    case 9: return [3, 11];
-                    case 10:
-                        if (newState.status === Voice.VoiceConnectionStatus.Destroyed) {
-                            if (this.__reconnectAttempts < 5)
-                                this.disconnect();
-                            else
-                                this.disconnect(true);
-                        }
-                        _c.label = 11;
-                    case 11: return [2];
+        this.__player.on("error", this.__playerOnError.bind(this));
+        this.__player.on("stateChange", this.__playerStateChange.bind(this));
+    }
+    MusicPlayer.prototype.__connectionStateChange = function (_, newState) {
+        var _this = this;
+        var _a, _b, _c;
+        if (newState.status === Voice.VoiceConnectionStatus.Disconnected) {
+            (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] Player disconnected, attempting to reconnect"));
+            Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Connecting, 20e3)["catch"](function (e) {
+                var _a, _b;
+                if (_this.__connection.rejoinAttempts <= 5) {
+                    (_a = _this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(_this.id, "] [A] Attempting to reconnect (").concat(_this.__connection.rejoinAttempts, "/5)"));
+                    _this.__connection.rejoin();
+                }
+                else {
+                    (_b = _this.__bot) === null || _b === void 0 ? void 0 : _b.emit("debug", "[MusicPlayer - ".concat(_this.id, "] [A] Player encountered an error: ").concat(e));
+                    _this.__connection.destroy();
                 }
             });
-        }); });
-        this.__player.on("error", function (e) {
-            var _a;
-            _this.__playduration = _this.current.playbackDuration;
-            if (e.message.includes("410")) {
-                _this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_AGE_RESTRICTED);
-            }
-            else if (e.message.includes("EBML")) {
-                _this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_NO_OPUS);
-            }
-            else if (e.message.includes("403")) {
-                _this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_RATE_LIMITED);
-                _this.__queue.unshift(_this.current.metadata);
+        }
+        else if (newState.status === Voice.VoiceConnectionStatus.Connecting ||
+            newState.status === Voice.VoiceConnectionStatus.Signalling) {
+            Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Ready, 20e3)["catch"](function (e) {
+                var _a;
+                (_a = _this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(_this.id, "] [B] Player encountered an error: ").concat(e));
+                _this.__connection.destroy();
+            });
+        }
+        else if (newState.status === Voice.VoiceConnectionStatus.Destroyed) {
+            if (!this.__vchannel.deleted && this.__reconnectAttempts < 5) {
+                this.__reconnectAttempts++;
+                (_b = this.__bot) === null || _b === void 0 ? void 0 : _b.emit("debug", "[MusicPlayer - ".concat(this.id, "] [B] Attempting to reconnect (").concat(this.__reconnectAttempts, "/5)"));
+                this.__connect();
             }
             else {
-                _this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
-                _this.__queue.unshift(_this.current.metadata);
+                (_c = this.__bot) === null || _c === void 0 ? void 0 : _c.emit("debug", "[MusicPlayer - ".concat(this.id, "] Player was destroyed"));
+                this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_DESTROYED);
+                this.__manager.remove(this);
             }
-            (_a = _this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(_this.id, "] PLAYER - Track: ").concat(_this.current.metadata.url, " (at ").concat((0, functions_1.timeFormat)(Math.floor(_this.__playduration / 1000)), ") - Encountered error: ").concat(e));
-        });
-        this.__player.on("stateChange", function (oldState, newState) { return __awaiter(_this, void 0, void 0, function () {
+        }
+    };
+    MusicPlayer.prototype.__playerStateChange = function (oldState, newState) {
+        return __awaiter(this, void 0, void 0, function () {
             var bf, af;
             var _this = this;
             return __generator(this, function (_a) {
@@ -202,8 +165,27 @@ var MusicPlayer = (function () {
                     case 7: return [2];
                 }
             });
-        }); });
-    }
+        });
+    };
+    MusicPlayer.prototype.__playerOnError = function (e) {
+        var _a;
+        this.__playduration = this.current.playbackDuration;
+        if (e.message.includes("410")) {
+            this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_AGE_RESTRICTED);
+        }
+        else if (e.message.includes("EBML")) {
+            this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_NO_OPUS);
+        }
+        else if (e.message.includes("403")) {
+            this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_RATE_LIMITED);
+            this.__queue.unshift(this.current.metadata);
+        }
+        else {
+            this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
+            this.__queue.unshift(this.current.metadata);
+        }
+        (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] PLAYER - Track: ").concat(this.current.metadata.url, " (at ").concat((0, functions_1.timeFormat)(Math.floor(this.__playduration / 1000)), ") - Encountered error: ").concat(e));
+    };
     MusicPlayer.prototype.__connect = function () {
         this.__connection = Voice.joinVoiceChannel({
             channelId: this.__vchannel.id,
@@ -211,6 +193,7 @@ var MusicPlayer = (function () {
             adapterCreator: this.__vchannel.guild.voiceAdapterCreator
         });
         this.__connection.subscribe(this.__player);
+        this.__connection.on("stateChange", this.__connectionStateChange.bind(this));
     };
     MusicPlayer.prototype.removeTrack = function (input) {
         var search = input instanceof musictrack_1.MusicTrack
@@ -245,28 +228,14 @@ var MusicPlayer = (function () {
             ? (this.__player.pause(), this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_PAUSED))
             : (this.__player.unpause(), this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_RESUMED));
     };
-    MusicPlayer.prototype.disconnect = function (forced) {
-        var _a, _b;
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_c) {
-                if (this.__vchannel.deleted || forced) {
-                    try {
-                        this.__reconnectAttempts += 69;
-                        this.__connection.destroy();
-                        (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] Player was destroyed"));
-                        this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_DESTROYED);
-                        this.__manager.remove(this);
-                    }
-                    catch (_d) { }
-                }
-                else {
-                    this.__reconnectAttempts++;
-                    (_b = this.__bot) === null || _b === void 0 ? void 0 : _b.emit("debug", "[MusicPlayer - ".concat(this.id, "] Attempting to reconnect the player (").concat(this.__reconnectAttempts, ")..."));
-                    this.__connect();
-                }
-                return [2];
-            });
-        });
+    MusicPlayer.prototype.disconnect = function () {
+        try {
+            this.__reconnectAttempts += 69;
+            this.__connection.destroy();
+        }
+        catch (_a) {
+            this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_ADY_DESTROYED);
+        }
     };
     return MusicPlayer;
 }());

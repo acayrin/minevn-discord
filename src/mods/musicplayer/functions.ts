@@ -15,7 +15,7 @@ import ytpl = require("ytpl");
 export async function search(query: string, author: GuildMember): Promise<MusicTrack[]> {
 	const f1 = await ytsr.getFilters(query);
 	const f2 = f1.get("Type").get("Video");
-	const yt = await ytsr(f2.url, { limit: 15 });
+	const yt = await ytsr(f2.url, { limit: 10 });
 	const res: MusicTrack[] = [];
 	yt.items.forEach((item: any) => {
 		try {

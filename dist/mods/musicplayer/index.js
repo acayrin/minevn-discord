@@ -261,7 +261,7 @@ function CreatePlayer(message, args, bot) {
                     _e.label = 21;
                 case 21:
                     {
-                        (_c = check()) === null || _c === void 0 ? void 0 : _c.disconnect(true);
+                        (_c = check()) === null || _c === void 0 ? void 0 : _c.disconnect();
                         return [3, 23];
                     }
                     _e.label = 22;
