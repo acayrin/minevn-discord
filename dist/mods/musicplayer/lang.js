@@ -21,6 +21,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 exports.__esModule = true;
 exports.help = exports.MusicPlayerLang = void 0;
 var Discord = __importStar(require("discord.js"));
+var filters_1 = require("./filters");
 var MusicPlayerLang;
 (function (MusicPlayerLang) {
     MusicPlayerLang["ERR_SEARCH_NO_INPUT"] = "I can't search for nothing, try again but type something";
@@ -41,9 +42,11 @@ var MusicPlayerLang;
     MusicPlayerLang["PLAYER_TRACK_ADDED"] = "Added **%track%** to the queue";
     MusicPlayerLang["PLAYER_TRACK_REMOVED"] = "Removed **%track%** from the queue";
     MusicPlayerLang["PLAYER_TRACK_RESUMED"] = "Resuming **%track_name%** at **%track_duration%**";
+    MusicPlayerLang["PLAYER_FILTER_SET"] = "Applied filter **%filter%** for current player";
+    MusicPlayerLang["PLAYER_FILTER_RESET"] = "Removed filter from current player";
     MusicPlayerLang["PLAYER_PLAYLIST_ADDED"] = "Added **%tracks%** tracks to the queue";
-    MusicPlayerLang["PLAYER_NOW_FORMAT"] = "```%track_name% (%track_requester%)\n[\uD83C\uDFB6] [%track_bar%] [%track_now%/%track_duration%]```";
-    MusicPlayerLang["PLAYER_LIST_HEADER"] = "```Current queue (%page_current%/%page_all%)\n";
+    MusicPlayerLang["PLAYER_NOW_FORMAT"] = "```%track_name% (%track_requester%)\n[%filter%] [\uD83C\uDFB6] [%track_bar%] [%track_now%/%track_duration%]```";
+    MusicPlayerLang["PLAYER_LIST_HEADER"] = "```Current queue (%page_current%/%page_all%) [F: %filter%]\n";
     MusicPlayerLang["PLAYER_LIST_EACH"] = "[%index%] %track_name%\n \u2514\u2500 %track_requester% - %track_duration%";
     MusicPlayerLang["PLAYER_LIST_FOOTER"] = "\nTo switch between pages, use 'yt list [page]' ```";
     MusicPlayerLang["PLAYER_SEARCH_TIMEOUT"] = "Well you didn't choose anything";
@@ -58,7 +61,7 @@ var MusicPlayerLang;
 var help = function (bot) {
     return new Discord.MessageEmbed()
         .setTitle("Music player")
-        .setDescription("A simple music player since Susan decided to killed off most of available bots\n" +
+        .setDescription("A music player since Susan decided to kill off most of the bots, also this thing spams alot\n" +
         "Note: **THE BOT CAN ONLY BE DISCONNECTED BY ``yt dc`` SUBCOMMAND**\n" +
         "Subcommands below")
         .setColor("#ed2261")
@@ -66,9 +69,11 @@ var help = function (bot) {
         .addField("yt play/p [query]", "Search and play a track, can be a video or playlist url")
         .addField("yt search/s [query]", "Search for a track")
         .addField("yt skip/fs", "Skip current track (if somebody decided to put an earrape")
+        .addField("yt filter/af [name]", "Apply an audio filter to current player")
         .addField("yt now/n", "Show current track info")
         .addField("yt remove/rm [index(es)]", "Remove tracks from playlist, can be multiple, separated by spaces")
         .addField("yt list/ls", "List all tracks in current queue")
-        .addField("yt stop/dc", "Destroy your music session and ruin your day");
+        .addField("yt stop/dc", "Destroy your music session and ruin your day")
+        .addField("Available filters", "``".concat(Object.keys(filters_1.AudioFilter).join().replace("this", ""), "``"));
 };
 exports.help = help;

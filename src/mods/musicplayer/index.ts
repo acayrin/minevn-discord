@@ -121,14 +121,17 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 			const progress: string[] = [];
 			for (let i = 0; i < 50; i++)
 				progress.push(
-					Math.floor((now.playbackDuration / 1000 / now.metadata.duration) * 50) === i ? "🤡" : "─"
+					Math.floor(((now?.playbackDuration || 0) / 1000 / (now?.metadata.duration || 0)) * 50) === i
+						? "🤡"
+						: "─"
 				);
 			message.reply(
-				MusicPlayerLang.PLAYER_NOW_FORMAT.replace(/%track_name%+/g, now.metadata.name)
-					.replace(/%track_requester%+/g, now.metadata.requester.user.tag)
+				MusicPlayerLang.PLAYER_NOW_FORMAT.replace(/%track_name%+/g, now?.metadata.name)
+					.replace(/%track_requester%+/g, now?.metadata.requester.user.tag)
 					.replace(/%track_bar%+/g, progress.join(""))
-					.replace(/%track_now%+/g, func.timeFormat(now.playbackDuration / 1000))
-					.replace(/%track_duration%+/g, func.timeFormat(now.metadata.duration))
+					.replace(/%track_now%+/g, func.timeFormat((now?.playbackDuration || 0) / 1000))
+					.replace(/%track_duration%+/g, func.timeFormat(now?.metadata.duration))
+					.replace(/%filter%+/g, player.filter)
 			);
 			break;
 		}
@@ -157,21 +160,6 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 			break;
 		}
 
-		// force skip current track
-		case "skip":
-		case "fs": {
-			check()?.skip();
-			break;
-		}
-
-		// pause/resume the player
-		case "resume":
-		case "pause":
-		case "pr": {
-			check()?.togglePauseResume();
-			break;
-		}
-
 		// list current tracks in queue
 		case "playlist":
 		case "list":
@@ -195,9 +183,35 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 						.replace(/%track_channel%+/g, queue[i].channel)
 						.replace(/%track_requester%+/g, queue[i].requester.user.tag)
 						.replace(/%track_duration%+/g, func.timeFormat(queue[i].duration))
+						.replace(/%filter%+/g, player.filter)
 				);
 			msg.push(MusicPlayerLang.PLAYER_LIST_FOOTER);
 			message.reply(msg.join("\n"));
+			break;
+		}
+
+		// apply filter
+		case "filter":
+		case "af": {
+			if (args.length < 1) {
+				check()?.applyfilter("none");
+			} else {
+				check()?.applyfilter(args.join(""));
+			}
+		}
+
+		// force skip current track
+		case "skip":
+		case "fs": {
+			check()?.skip();
+			break;
+		}
+
+		// pause/resume the player
+		case "resume":
+		case "pause":
+		case "pr": {
+			check()?.togglePauseResume();
 			break;
 		}
 

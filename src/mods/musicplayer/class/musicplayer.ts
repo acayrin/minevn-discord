@@ -2,11 +2,12 @@ import * as Voice from "@discordjs/voice";
 import * as Discord from "discord.js";
 import { SucklessBot } from "../../../core/sucklessbot";
 import { id } from "../../../core/utils/generateid";
+import { AudioFilter } from "../filters";
 import { timeFormat } from "../functions";
 import { MusicPlayerLang } from "../lang";
 import { MusicManager } from "./musicmanager";
 import { MusicTrack } from "./musictrack";
-import ytdl = require("ytdl-core");
+import ytdl from "discord-ytdl-core";
 
 /**
  * Music player instance
@@ -30,6 +31,14 @@ export class MusicPlayer {
 	 * @memberof MusicPlayer
 	 */
 	public current: Voice.AudioResource<MusicTrack>;
+
+	/**
+	 * Audio filter for this player
+	 *
+	 * @type {string}
+	 * @memberof MusicPlayer
+	 */
+	public filter: string = "none";
 
 	/**
 	 * Current player's queue
@@ -104,15 +113,6 @@ export class MusicPlayer {
 	private __bot: SucklessBot;
 
 	/**
-	 * Current playback duration
-	 *
-	 * @private
-	 * @type {number}
-	 * @memberof MusicPlayer
-	 */
-	private __playduration: number = 0;
-
-	/**
 	 * Player's reconnection attempts
 	 *
 	 * @private
@@ -179,22 +179,21 @@ export class MusicPlayer {
 	 * @private
 	 * @memberof MusicPlayer
 	 */
-	private __reconnect(): void {
-		this.__reconnectAttempts++;
-		this.__bot?.emit(
-			"debug",
-			`[MusicPlayer - ${this.id}] Attempting to reconnect ${this.__reconnectAttempts}/5 after ${
-				this.__reconnectAttempts * 3
-			}s`
-		);
-		if (!this.__vchannel.deleted && this.__reconnectAttempts <= 5) {
+	private async __reconnect(): Promise<void> {
+		if (!this.__vchannel.deleted && this.__reconnectAttempts < 5) {
+			this.__reconnectAttempts++;
+			this.__bot?.emit(
+				"debug",
+				`[MusicPlayer - ${this.id}] Attempting to reconnect ${this.__reconnectAttempts}/5 after ${
+					this.__reconnectAttempts * 3
+				}s`
+			);
 			this.__connection.removeAllListeners();
-			setTimeout(() => {
-				this.__connect();
-			}, this.__reconnectAttempts * 3e3);
-		} else {
-			this.__player = undefined;
+			this.__connection.subscribe(null);
 			this.__connection = undefined;
+			await new Promise((r) => setTimeout(r, this.__reconnectAttempts * 3e3).unref());
+			this.__connect();
+		} else {
 			this.__manager.remove(this);
 			this.__tchannel.send(MusicPlayerLang.PLAYER_DESTROYED);
 			this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] Player was destroyed`);
@@ -259,19 +258,16 @@ export class MusicPlayer {
 			const bf = this.__queue.shift();
 			const af = this.__queue.at(0);
 
-			// delete current track
-			this.current = undefined;
 			if (af) {
 				if (af.url.includes(bf.url)) {
 					await this.__tchannel.send(
 						MusicPlayerLang.PLAYER_TRACK_RESUMED.replace(/%track_name%+/g, bf.name).replace(
 							/%track_duration%+/g,
-							timeFormat(Math.floor(this.__playduration / 1000))
+							timeFormat(Math.floor(this.current?.playbackDuration / 1000))
 						)
 					);
 				} else {
-					// if 2 tracks are different, reset playback duration
-					this.__playduration = 0;
+					this.current = undefined;
 
 					await this.__tchannel.send(
 						MusicPlayerLang.PLAYER_FINISHED.replace(/%track_name%+/g, bf.name).replace(
@@ -287,7 +283,7 @@ export class MusicPlayer {
 					);
 				}
 				setTimeout(() => {
-					this.play();
+					this.play(this.current?.playbackDuration / 1000);
 				}, 2e3);
 			} else this.__tchannel.send(MusicPlayerLang.PLAYER_QUEUE_ENDED);
 		}
@@ -312,7 +308,7 @@ export class MusicPlayer {
 		this.__bot?.emit(
 			"debug",
 			`[MusicPlayer - ${this.id}] PLAYER - Track: ${this.current?.metadata.url} (at ${timeFormat(
-				Math.floor(this.__playduration / 1000)
+				Math.floor(this.current?.playbackDuration || 0 / 1000)
 			)}) - Encountered error: ${e}`
 		);
 
@@ -320,9 +316,6 @@ export class MusicPlayer {
 		if (!this.current) {
 			this.__tchannel.send(MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
 		} else {
-			// store current playback duration
-			this.__playduration = this.current.playbackDuration;
-
 			// age restricted
 			if (e.message.includes("410")) {
 				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_AGE_RESTRICTED);
@@ -391,29 +384,57 @@ export class MusicPlayer {
 	}
 
 	/**
-	 * Start/Play the player
+	 * Start the player
 	 *
+	 * @param {number} [start] Starting point, in seconds
 	 * @memberof MusicPlayer
 	 */
-	public async play(): Promise<void> {
+	public play(start?: number): void {
 		try {
-			const track = ytdl(this.__queue.at(0).url, {
+			//const demux = await Voice.demuxProbe();
+			const filter = AudioFilter[this.filter];
+			const stream = ytdl(this.__queue.at(0).url, {
 				filter: "audioonly",
 				quality: "highestaudio",
 				highWaterMark: 1 << 24,
-				begin: this.__playduration,
+				seek: Math.floor(start),
+				opusEncoded: true,
+				encoderArgs: filter ? ["-af", filter] : [],
 			});
-
-			const demux = await Voice.demuxProbe(track);
-			const resource = Voice.createAudioResource(demux.stream, {
-				inputType: demux.type,
+			const resource = Voice.createAudioResource(stream, {
+				inputType: Voice.StreamType.Opus,
 				metadata: this.__queue.at(0),
 			});
 
 			this.current = resource;
+			this.current.playbackDuration = start ? start * 1000 : 0;
 			this.__player.play(resource);
 		} catch (e) {
 			this.__player.emit("error", e as Voice.AudioPlayerError);
+		}
+	}
+
+	/**
+	 * Apply filter to current player
+	 *
+	 * @param {string} name filter name
+	 * @memberof MusicPlayer
+	 */
+	public applyfilter(name: string): void {
+		if (name.toLowerCase().includes("none")) {
+			this.filter = "none";
+			this.__tchannel.send(MusicPlayerLang.PLAYER_FILTER_RESET);
+		} else {
+			Object.keys(AudioFilter).forEach((k) => {
+				if (k.toLowerCase().includes(name)) {
+					this.filter = k;
+					this.__tchannel.send(MusicPlayerLang.PLAYER_FILTER_SET.replace(/%filter%+/g, this.filter));
+				}
+			});
+		}
+		if (this.current) {
+			this.__queue.unshift(this.current.metadata);
+			this.__player.stop();
 		}
 	}
 
