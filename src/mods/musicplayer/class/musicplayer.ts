@@ -113,7 +113,7 @@ export class MusicPlayer {
 	 * @type {Voice.AudioPlayer}
 	 * @memberof MusicPlayer
 	 */
-	private __player: Voice.AudioPlayer;
+	private __player: Voice.AudioPlayer = Voice.createAudioPlayer();
 
 	/**
 	 * The manager which this player is in
@@ -182,7 +182,6 @@ export class MusicPlayer {
 		this.__vchannel = vchannel;
 		this.__guild = tchannel.guild;
 		this.__manager = manager;
-		this.__player = Voice.createAudioPlayer();
 		this.__bot = bot;
 
 		this.__connect();
@@ -228,9 +227,7 @@ export class MusicPlayer {
 				}s`
 			);
 			this.__connection.removeAllListeners();
-			this.__connection = undefined;
-			await new Promise((r) => setTimeout(r, this.__reconnectAttempts * 3e3).unref());
-			this.__connect();
+			await new Promise((resolve) => setTimeout(() => resolve(this.__connect()), this.__reconnectAttempts * 3e3));
 		} else {
 			this.__manager.remove(this);
 			this.__tchannel.send(MusicPlayerLang.PLAYER_DESTROYED);
@@ -259,7 +256,9 @@ export class MusicPlayer {
 			this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] VC disconnected, attempting to reconnect`);
 			Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Connecting, 20e3).catch((e) => {
 				this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] VC encountered an error [1]: ${e}`);
-				this.__reconnect();
+				try {
+					this.__connection.destroy();
+				} catch {}
 			});
 		} else if (
 			newState.status === Voice.VoiceConnectionStatus.Connecting ||
@@ -272,7 +271,9 @@ export class MusicPlayer {
 				})
 				.catch((e) => {
 					this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] VC encountered an error [2]: ${e}`);
-					this.__reconnect();
+					try {
+						this.__connection.destroy();
+					} catch {}
 				});
 		} else if (newState.status === Voice.VoiceConnectionStatus.Destroyed) {
 			this.__bot?.emit("debug", `[MusicPlayer - ${this.id}] VC was destroyed`);
@@ -292,15 +293,12 @@ export class MusicPlayer {
 	 */
 	private async __playerStateChange(oldState: Voice.AudioPlayerState, newState: Voice.AudioPlayerState) {
 		if (oldState.status !== Voice.AudioPlayerStatus.Idle && newState.status === Voice.AudioPlayerStatus.Idle) {
-			// get tracks info
-			let bf = this.__queue.shift();
-			let af = this.__queue.at(0);
+			const bf = this.__queue.at(0);
 
 			// continue playback after error
 			if (this.__e_continue && this.__e_continue_attempts < 5) {
 				this.__e_continue = false;
 				this.__e_continue_attempts++;
-				this.__queue.unshift(bf);
 
 				await this.__tchannel.send(
 					MusicPlayerLang.PLAYER_TRACK_RESUMED.replace(/%track_name%+/g, bf.name).replace(
@@ -310,18 +308,20 @@ export class MusicPlayer {
 				);
 				this.play(this.current?.playbackDuration / 1000);
 			} else {
+				if (this.loop === 1 && this.__e_continue_attempts === 5) this.loop = 0;
+				this.__e_continue_attempts = 0;
+
 				// loop track
 				if (this.loop === 1) {
-					// remove single loop mode for bad track
-					if ((this.__e_continue_attempts = 5)) this.loop = 0;
-					else {
-						this.__queue.unshift(bf);
-						af = undefined;
-					}
+					return this.play();
 				}
+
+				this.__equeue.push(this.__queue.shift());
+				const af = this.__queue.at(0);
 
 				// continue playback
 				if (af) {
+					/**
 					await this.__tchannel.send(
 						MusicPlayerLang.PLAYER_FINISHED.replace(/%track_name%+/g, bf.name).replace(
 							/%track_requester%+/g,
@@ -333,22 +333,19 @@ export class MusicPlayer {
 							/%track_requester%+/g,
 							af.requester.user.tag
 						)
-					);
-					this.play();
+					);*/
+					return this.play();
 				}
 
 				// loop queue
 				else if (this.loop === 2) {
 					this.__queue = this.__equeue;
 					this.__equeue = [];
-
-					// remove bad track
-					if ((this.__e_continue_attempts = 5)) this.__queue.shift();
 					this.play();
-				} else this.__tchannel.send(MusicPlayerLang.PLAYER_QUEUE_ENDED);
+				}
 
-				// reset attempts
-				this.__e_continue_attempts = 0;
+				// end of queue
+				else this.__tchannel.send(MusicPlayerLang.PLAYER_QUEUE_ENDED);
 			}
 		}
 	}
@@ -368,11 +365,12 @@ export class MusicPlayer {
 	 * @memberof MusicPlayer
 	 */
 	private __playerOnError(e: Error) {
+		console.log(this.__queue);
 		// debug
 		this.__bot?.emit(
 			"debug",
 			`[MusicPlayer - ${this.id}] PLAYER - Track: ${this.current?.metadata.url} (at ${timeFormat(
-				Math.floor(this.current?.playbackDuration || 0 / 1000)
+				Math.floor((this.current?.playbackDuration || 0) / 1000)
 			)}) - Encountered error: ${e}`
 		);
 
@@ -507,9 +505,9 @@ export class MusicPlayer {
 	public applyloop(mode: any): void {
 		if ([0, 1, 2].includes(Number(mode))) {
 			this.loop = Number(mode);
-			if ((this.loop = 1)) this.__tchannel.send(MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "current"));
-			if ((this.loop = 2)) this.__tchannel.send(MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "queue"));
-			if ((this.loop = 0)) this.__tchannel.send(MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "none"));
+			if (this.loop === 1) this.__tchannel.send(MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "current"));
+			if (this.loop === 2) this.__tchannel.send(MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "queue"));
+			if (this.loop === 0) this.__tchannel.send(MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "none"));
 		}
 	}
 

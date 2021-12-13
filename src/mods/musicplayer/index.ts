@@ -133,7 +133,7 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 					.replace(/%track_now%+/g, func.timeFormat((now?.playbackDuration || 0) / 1000))
 					.replace(/%track_duration%+/g, func.timeFormat(now?.metadata.duration))
 					.replace(/%filter%+/g, player.filter)
-					.replace(/%loop%+/g, (player.loop = 0) ? "none" : (player.loop = 1) ? "current" : "queue")
+					.replace(/%loop%+/g, player.loop === 0 ? "none" : player.loop === 1 ? "current" : "queue")
 			);
 			break;
 		}
@@ -174,7 +174,7 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 				MusicPlayerLang.PLAYER_LIST_HEADER.replace(/%page_current%+/g, page.toString())
 					.replace(/%page_all%+/g, Math.floor(queue.length / 10).toString())
 					.replace(/%filter%+/g, player.filter)
-					.replace(/%loop%+/g, (player.loop = 0) ? "none" : (player.loop = 1) ? "current" : "queue"),
+					.replace(/%loop%+/g, player.loop === 0 ? "none" : player.loop === 1 ? "current" : "queue"),
 			];
 			const i1 = page * 10 > queue.length ? queue.length : page * 10;
 			const i2 = (page - 1) * 10;
@@ -199,6 +199,7 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 			} else {
 				check()?.applyfilter(args.join(""));
 			}
+			break;
 		}
 
 		// apply loop mode
@@ -209,6 +210,7 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 			} else {
 				check()?.applyloop(args.join(""));
 			}
+			break;
 		}
 
 		// force skip current track

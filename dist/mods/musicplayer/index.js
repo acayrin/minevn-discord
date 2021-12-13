@@ -213,7 +213,7 @@ function CreatePlayer(message, args, bot) {
                             .replace(/%track_now%+/g, func.timeFormat(((now === null || now === void 0 ? void 0 : now.playbackDuration) || 0) / 1000))
                             .replace(/%track_duration%+/g, func.timeFormat(now === null || now === void 0 ? void 0 : now.metadata.duration))
                             .replace(/%filter%+/g, player.filter)
-                            .replace(/%loop%+/g, (player.loop = 0) ? "none" : (player.loop = 1) ? "current" : "queue"));
+                            .replace(/%loop%+/g, player.loop === 0 ? "none" : player.loop === 1 ? "current" : "queue"));
                         return [3, 25];
                     }
                     _j.label = 17;
@@ -244,7 +244,7 @@ function CreatePlayer(message, args, bot) {
                             lang_1.MusicPlayerLang.PLAYER_LIST_HEADER.replace(/%page_current%+/g, page.toString())
                                 .replace(/%page_all%+/g, Math.floor(queue.length / 10).toString())
                                 .replace(/%filter%+/g, player.filter)
-                                .replace(/%loop%+/g, (player.loop = 0) ? "none" : (player.loop = 1) ? "current" : "queue"),
+                                .replace(/%loop%+/g, player.loop === 0 ? "none" : player.loop === 1 ? "current" : "queue"),
                         ];
                         i1 = page * 10 > queue.length ? queue.length : page * 10;
                         i2 = (page - 1) * 10;
@@ -267,6 +267,7 @@ function CreatePlayer(message, args, bot) {
                         else {
                             (_b = check()) === null || _b === void 0 ? void 0 : _b.applyfilter(args.join(""));
                         }
+                        return [3, 25];
                     }
                     _j.label = 20;
                 case 20:
@@ -277,6 +278,7 @@ function CreatePlayer(message, args, bot) {
                         else {
                             (_d = check()) === null || _d === void 0 ? void 0 : _d.applyloop(args.join(""));
                         }
+                        return [3, 25];
                     }
                     _j.label = 21;
                 case 21:

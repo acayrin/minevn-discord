@@ -75,6 +75,7 @@ var MusicPlayer = (function () {
         this.__queue = [];
         this.__equeue = [];
         this.loop = 0;
+        this.__player = Voice.createAudioPlayer();
         this.__reconnectAttempts = 0;
         this.__e_continue = false;
         this.__e_continue_attempts = 0;
@@ -92,7 +93,6 @@ var MusicPlayer = (function () {
         this.__vchannel = vchannel;
         this.__guild = tchannel.guild;
         this.__manager = manager;
-        this.__player = Voice.createAudioPlayer();
         this.__bot = bot;
         this.__connect();
         this.__player.on("error", this.__playerOnError.bind(this));
@@ -121,11 +121,9 @@ var MusicPlayer = (function () {
                         this.__reconnectAttempts++;
                         (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] Attempting to reconnect ").concat(this.__reconnectAttempts, "/5 after ").concat(this.__reconnectAttempts * 3, "s"));
                         this.__connection.removeAllListeners();
-                        this.__connection = undefined;
-                        return [4, new Promise(function (r) { return setTimeout(r, _this.__reconnectAttempts * 3e3).unref(); })];
+                        return [4, new Promise(function (resolve) { return setTimeout(function () { return resolve(_this.__connect()); }, _this.__reconnectAttempts * 3e3); })];
                     case 1:
                         _c.sent();
-                        this.__connect();
                         return [3, 3];
                     case 2:
                         this.__manager.remove(this);
@@ -147,7 +145,10 @@ var MusicPlayer = (function () {
                     Voice.entersState(this.__connection, Voice.VoiceConnectionStatus.Connecting, 20e3)["catch"](function (e) {
                         var _a;
                         (_a = _this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(_this.id, "] VC encountered an error [1]: ").concat(e));
-                        _this.__reconnect();
+                        try {
+                            _this.__connection.destroy();
+                        }
+                        catch (_b) { }
                     });
                 }
                 else if (newState.status === Voice.VoiceConnectionStatus.Connecting ||
@@ -160,7 +161,10 @@ var MusicPlayer = (function () {
                     })["catch"](function (e) {
                         var _a;
                         (_a = _this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(_this.id, "] VC encountered an error [2]: ").concat(e));
-                        _this.__reconnect();
+                        try {
+                            _this.__connection.destroy();
+                        }
+                        catch (_b) { }
                     });
                 }
                 else if (newState.status === Voice.VoiceConnectionStatus.Destroyed) {
@@ -178,58 +182,45 @@ var MusicPlayer = (function () {
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0:
-                        if (!(oldState.status !== Voice.AudioPlayerStatus.Idle && newState.status === Voice.AudioPlayerStatus.Idle)) return [3, 7];
-                        bf = this.__queue.shift();
-                        af = this.__queue.at(0);
+                        if (!(oldState.status !== Voice.AudioPlayerStatus.Idle && newState.status === Voice.AudioPlayerStatus.Idle)) return [3, 3];
+                        bf = this.__queue.at(0);
                         if (!(this.__e_continue && this.__e_continue_attempts < 5)) return [3, 2];
                         this.__e_continue = false;
                         this.__e_continue_attempts++;
-                        this.__queue.unshift(bf);
                         return [4, this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_TRACK_RESUMED.replace(/%track_name%+/g, bf.name).replace(/%track_duration%+/g, (0, functions_1.timeFormat)(Math.floor(((_a = this.current) === null || _a === void 0 ? void 0 : _a.playbackDuration) / 1000))))];
                     case 1:
                         _c.sent();
                         this.play(((_b = this.current) === null || _b === void 0 ? void 0 : _b.playbackDuration) / 1000);
-                        return [3, 7];
+                        return [3, 3];
                     case 2:
+                        if (this.loop === 1 && this.__e_continue_attempts === 5)
+                            this.loop = 0;
+                        this.__e_continue_attempts = 0;
                         if (this.loop === 1) {
-                            if ((this.__e_continue_attempts = 5))
-                                this.loop = 0;
-                            else {
-                                this.__queue.unshift(bf);
-                                af = undefined;
-                            }
+                            return [2, this.play()];
                         }
-                        if (!af) return [3, 5];
-                        return [4, this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_FINISHED.replace(/%track_name%+/g, bf.name).replace(/%track_requester%+/g, bf.requester.user.tag))];
-                    case 3:
-                        _c.sent();
-                        return [4, this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_STARTED.replace(/%track_name%+/g, af.name).replace(/%track_requester%+/g, af.requester.user.tag))];
-                    case 4:
-                        _c.sent();
-                        this.play();
-                        return [3, 6];
-                    case 5:
-                        if (this.loop === 2) {
+                        this.__equeue.push(this.__queue.shift());
+                        af = this.__queue.at(0);
+                        if (af) {
+                            return [2, this.play()];
+                        }
+                        else if (this.loop === 2) {
                             this.__queue = this.__equeue;
                             this.__equeue = [];
-                            if ((this.__e_continue_attempts = 5))
-                                this.__queue.shift();
                             this.play();
                         }
                         else
                             this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_QUEUE_ENDED);
-                        _c.label = 6;
-                    case 6:
-                        this.__e_continue_attempts = 0;
-                        _c.label = 7;
-                    case 7: return [2];
+                        _c.label = 3;
+                    case 3: return [2];
                 }
             });
         });
     };
     MusicPlayer.prototype.__playerOnError = function (e) {
         var _a, _b, _c;
-        (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] PLAYER - Track: ").concat((_b = this.current) === null || _b === void 0 ? void 0 : _b.metadata.url, " (at ").concat((0, functions_1.timeFormat)(Math.floor(((_c = this.current) === null || _c === void 0 ? void 0 : _c.playbackDuration) || 0 / 1000)), ") - Encountered error: ").concat(e));
+        console.log(this.__queue);
+        (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] PLAYER - Track: ").concat((_b = this.current) === null || _b === void 0 ? void 0 : _b.metadata.url, " (at ").concat((0, functions_1.timeFormat)(Math.floor((((_c = this.current) === null || _c === void 0 ? void 0 : _c.playbackDuration) || 0) / 1000)), ") - Encountered error: ").concat(e));
         if (!this.current) {
             this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
         }
@@ -301,11 +292,11 @@ var MusicPlayer = (function () {
     MusicPlayer.prototype.applyloop = function (mode) {
         if ([0, 1, 2].includes(Number(mode))) {
             this.loop = Number(mode);
-            if ((this.loop = 1))
+            if (this.loop === 1)
                 this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "current"));
-            if ((this.loop = 2))
+            if (this.loop === 2)
                 this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "queue"));
-            if ((this.loop = 0))
+            if (this.loop === 0)
                 this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "none"));
         }
     };
