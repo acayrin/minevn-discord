@@ -38,6 +38,8 @@ Change `config.json.example` to `config.json`
 
 Then edit it to suit your needs
 
+Alternatively you can use `SUCKLESS_CONFIG` env variable with the absolute path to your config file
+
 Currently custom configs are not supported
 
 ## Creating a mod

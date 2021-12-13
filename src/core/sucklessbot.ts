@@ -92,7 +92,7 @@ export class SucklessBot extends EventEmitter {
 	 * @public
 	 * @memberof SucklessBot
 	 */
-	public readonly config = JSON.parse(fs.readFileSync(`${path}/config.json`, "utf-8"));
+	public readonly config = JSON.parse(fs.readFileSync(process.env.SUCKLESS_CONFIG || `${path}/config.json`, "utf-8"));
 
 	/**
 	 * SucklessBot's mods collection
