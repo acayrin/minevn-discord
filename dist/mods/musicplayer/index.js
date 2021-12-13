@@ -61,11 +61,11 @@ var func = __importStar(require("./functions"));
 var lang_1 = require("./lang");
 var musicMgr;
 function CreatePlayer(message, args, bot) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f, _g;
     return __awaiter(this, void 0, void 0, function () {
-        var check, subcmd, _f, player, vid, e_1, vids, e_2, vid, player_1, tmp_1, res_1, msg, i, j, player, now, progress, i, player_2, msg_1, player, queue, get, page, msg, i1, i2, i;
-        return __generator(this, function (_g) {
-            switch (_g.label) {
+        var check, subcmd, _h, player, vid, e_1, vids, e_2, vid, player_1, tmp_1, res_1, msg, i, j, player, now, progress, i, player_2, msg_1, player, queue, get, page, msg, i1, i2, i;
+        return __generator(this, function (_j) {
+            switch (_j.label) {
                 case 0:
                     if (!args)
                         return [2];
@@ -83,9 +83,8 @@ function CreatePlayer(message, args, bot) {
                         return player;
                     };
                     subcmd = args.shift();
-                    _f = subcmd;
-                    switch (_f) {
-                        case "search": return [3, 1];
+                    _h = subcmd;
+                    switch (_h) {
                         case "play": return [3, 1];
                         case "p": return [3, 1];
                         case "search": return [3, 14];
@@ -99,71 +98,75 @@ function CreatePlayer(message, args, bot) {
                         case "ls": return [3, 18];
                         case "filter": return [3, 19];
                         case "af": return [3, 19];
-                        case "skip": return [3, 20];
-                        case "fs": return [3, 20];
-                        case "resume": return [3, 21];
-                        case "pause": return [3, 21];
-                        case "pr": return [3, 21];
-                        case "disconnect": return [3, 22];
-                        case "dickmove": return [3, 22];
-                        case "stop": return [3, 22];
-                        case "dc": return [3, 22];
+                        case "loop": return [3, 20];
+                        case "lp": return [3, 20];
+                        case "skip": return [3, 21];
+                        case "fs": return [3, 21];
+                        case "resume": return [3, 22];
+                        case "pause": return [3, 22];
+                        case "pr": return [3, 22];
+                        case "disconnect": return [3, 23];
+                        case "dickmove": return [3, 23];
+                        case "stop": return [3, 23];
+                        case "dc": return [3, 23];
                     }
-                    return [3, 23];
+                    return [3, 24];
                 case 1:
                     if (args.length < 1)
                         return [2, message.reply(lang_1.MusicPlayerLang.ERR_SEARCH_NO_INPUT)];
                     player = check();
                     if (!func.vVideo(args.join())) return [3, 6];
-                    _g.label = 2;
+                    _j.label = 2;
                 case 2:
-                    _g.trys.push([2, 4, , 5]);
+                    _j.trys.push([2, 4, , 5]);
                     return [4, func.parseVideo(args.join(), message.member)];
                 case 3:
-                    vid = _g.sent();
+                    vid = _j.sent();
                     message.reply(lang_1.MusicPlayerLang.PLAYER_TRACK_ADDED.replace(/%track%+/g, vid.name));
                     player.addTrack(vid);
                     if (!player.isPlaying())
                         player.play();
                     return [3, 5];
                 case 4:
-                    e_1 = _g.sent();
+                    e_1 = _j.sent();
                     message.reply(lang_1.MusicPlayerLang.ERR_SEARCH_NO_RESULT.replace(/%error%+/g, e_1.message));
                     return [3, 5];
                 case 5: return [3, 13];
                 case 6:
                     if (!func.vPlaylist(args.join())) return [3, 11];
-                    _g.label = 7;
+                    _j.label = 7;
                 case 7:
-                    _g.trys.push([7, 9, , 10]);
+                    _j.trys.push([7, 9, , 10]);
                     return [4, func.parsePlaylist(args.join(), message.member)];
                 case 8:
-                    vids = _g.sent();
+                    vids = _j.sent();
                     message.reply(lang_1.MusicPlayerLang.PLAYER_PLAYLIST_ADDED.replace(/%tracks%+/g, vids.length.toString()));
                     player.addTrack(vids);
                     if (!player.isPlaying())
                         player.play();
                     return [3, 10];
                 case 9:
-                    e_2 = _g.sent();
+                    e_2 = _j.sent();
                     message.reply(lang_1.MusicPlayerLang.ERR_SEARCH_NO_RESULT.replace(/%error%+/g, e_2.message));
                     return [3, 10];
                 case 10: return [3, 13];
                 case 11: return [4, func.search(args.join(" "), message.member)];
                 case 12:
-                    vid = (_g.sent()).shift();
+                    vid = (_j.sent()).shift();
                     message.reply(lang_1.MusicPlayerLang.PLAYER_TRACK_ADDED.replace(/%track%+/g, vid.name));
                     player.addTrack(vid);
                     if (!player.isPlaying())
                         player.play();
-                    _g.label = 13;
-                case 13: return [3, 24];
+                    _j.label = 13;
+                case 13: return [3, 25];
                 case 14:
+                    if (args.length < 1)
+                        return [2, message.reply(lang_1.MusicPlayerLang.ERR_SEARCH_NO_INPUT)];
                     player_1 = check();
                     tmp_1 = new Map();
                     return [4, func.search(args.join(" "), message.member)];
                 case 15:
-                    res_1 = _g.sent();
+                    res_1 = _j.sent();
                     msg = [lang_1.MusicPlayerLang.PLAYER_SEARCH_HEADER];
                     for (i = 0, j = res_1.length; i < j; i++) {
                         tmp_1.set(i, res_1[i]);
@@ -194,7 +197,7 @@ function CreatePlayer(message, args, bot) {
                             message.reply(lang_1.MusicPlayerLang.PLAYER_SEARCH_TIMEOUT);
                         });
                     });
-                    return [3, 24];
+                    return [3, 25];
                 case 16:
                     {
                         player = check();
@@ -209,10 +212,11 @@ function CreatePlayer(message, args, bot) {
                             .replace(/%track_bar%+/g, progress.join(""))
                             .replace(/%track_now%+/g, func.timeFormat(((now === null || now === void 0 ? void 0 : now.playbackDuration) || 0) / 1000))
                             .replace(/%track_duration%+/g, func.timeFormat(now === null || now === void 0 ? void 0 : now.metadata.duration))
-                            .replace(/%filter%+/g, player.filter));
-                        return [3, 24];
+                            .replace(/%filter%+/g, player.filter)
+                            .replace(/%loop%+/g, (player.loop = 0) ? "none" : (player.loop = 1) ? "current" : "queue"));
+                        return [3, 25];
                     }
-                    _g.label = 17;
+                    _j.label = 17;
                 case 17:
                     {
                         if (args.length < 1)
@@ -227,9 +231,9 @@ function CreatePlayer(message, args, bot) {
                         });
                         msg_1.push(lang_1.MusicPlayerLang.PLAYER_REMOVE_FOOTER);
                         message.reply(msg_1.join("\n"));
-                        return [3, 24];
+                        return [3, 25];
                     }
-                    _g.label = 18;
+                    _j.label = 18;
                 case 18:
                     {
                         player = check();
@@ -237,7 +241,10 @@ function CreatePlayer(message, args, bot) {
                         get = Number(args[0]) || 1;
                         page = queue.length > 10 && queue.length - get * 10 < 0 ? 1 : get;
                         msg = [
-                            lang_1.MusicPlayerLang.PLAYER_LIST_HEADER.replace(/%page_current%+/g, page.toString()).replace(/%page_all%+/g, Math.floor(queue.length / 10).toString()),
+                            lang_1.MusicPlayerLang.PLAYER_LIST_HEADER.replace(/%page_current%+/g, page.toString())
+                                .replace(/%page_all%+/g, Math.floor(queue.length / 10).toString())
+                                .replace(/%filter%+/g, player.filter)
+                                .replace(/%loop%+/g, (player.loop = 0) ? "none" : (player.loop = 1) ? "current" : "queue"),
                         ];
                         i1 = page * 10 > queue.length ? queue.length : page * 10;
                         i2 = (page - 1) * 10;
@@ -246,13 +253,12 @@ function CreatePlayer(message, args, bot) {
                                 .replace(/%track_name%+/g, queue[i].name)
                                 .replace(/%track_channel%+/g, queue[i].channel)
                                 .replace(/%track_requester%+/g, queue[i].requester.user.tag)
-                                .replace(/%track_duration%+/g, func.timeFormat(queue[i].duration))
-                                .replace(/%filter%+/g, player.filter));
+                                .replace(/%track_duration%+/g, func.timeFormat(queue[i].duration)));
                         msg.push(lang_1.MusicPlayerLang.PLAYER_LIST_FOOTER);
                         message.reply(msg.join("\n"));
-                        return [3, 24];
+                        return [3, 25];
                     }
-                    _g.label = 19;
+                    _j.label = 19;
                 case 19:
                     {
                         if (args.length < 1) {
@@ -262,33 +268,43 @@ function CreatePlayer(message, args, bot) {
                             (_b = check()) === null || _b === void 0 ? void 0 : _b.applyfilter(args.join(""));
                         }
                     }
-                    _g.label = 20;
+                    _j.label = 20;
                 case 20:
                     {
-                        (_c = check()) === null || _c === void 0 ? void 0 : _c.skip();
-                        return [3, 24];
+                        if (args.length < 1) {
+                            (_c = check()) === null || _c === void 0 ? void 0 : _c.applyloop(0);
+                        }
+                        else {
+                            (_d = check()) === null || _d === void 0 ? void 0 : _d.applyloop(args.join(""));
+                        }
                     }
-                    _g.label = 21;
+                    _j.label = 21;
                 case 21:
                     {
-                        (_d = check()) === null || _d === void 0 ? void 0 : _d.togglePauseResume();
-                        return [3, 24];
+                        (_e = check()) === null || _e === void 0 ? void 0 : _e.skip();
+                        return [3, 25];
                     }
-                    _g.label = 22;
+                    _j.label = 22;
                 case 22:
                     {
-                        (_e = check()) === null || _e === void 0 ? void 0 : _e.disconnect();
-                        return [3, 24];
+                        (_f = check()) === null || _f === void 0 ? void 0 : _f.togglePauseResume();
+                        return [3, 25];
                     }
-                    _g.label = 23;
+                    _j.label = 23;
                 case 23:
+                    {
+                        (_g = check()) === null || _g === void 0 ? void 0 : _g.disconnect();
+                        return [3, 25];
+                    }
+                    _j.label = 24;
+                case 24:
                     {
                         message.channel.send({
                             embeds: [(0, lang_1.help)(bot)]
                         });
                     }
-                    _g.label = 24;
-                case 24: return [2];
+                    _j.label = 25;
+                case 25: return [2];
             }
         });
     });

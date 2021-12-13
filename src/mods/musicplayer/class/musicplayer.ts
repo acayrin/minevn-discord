@@ -50,6 +50,27 @@ export class MusicPlayer {
 	private __queue: MusicTrack[] = [];
 
 	/**
+	 * Current player's ended queue
+	 *
+	 * @private
+	 * @type {MusicTrack[]}
+	 * @memberof MusicPlayer
+	 */
+	private __equeue: MusicTrack[] = [];
+
+	/**
+	 * Player's loop mode
+	 *   0 - disabled
+	 *   1 - track
+	 *   2 - queue
+	 *
+	 * @private
+	 * @type {number}
+	 * @memberof MusicPlayer
+	 */
+	public loop: number = 0;
+
+	/**
 	 * The guild which this player is in
 	 *
 	 * @private
@@ -122,6 +143,24 @@ export class MusicPlayer {
 	private __reconnectAttempts: number = 0;
 
 	/**
+	 * Whether the player is in continue playback state
+	 *
+	 * @private
+	 * @type {boolean}
+	 * @memberof MusicPlayer
+	 */
+	private __e_continue: boolean = false;
+
+	/**
+	 * Player's attempts to continue after error
+	 *
+	 * @private
+	 * @type {number}
+	 * @memberof MusicPlayer
+	 */
+	private __e_continue_attempts: number = 0;
+
+	/**
 	 * Creates an instance of MusicPlayer.
 	 *
 	 * @param {Discord.TextChannel | any} tchannel The text channel to send messages in
@@ -189,7 +228,6 @@ export class MusicPlayer {
 				}s`
 			);
 			this.__connection.removeAllListeners();
-			this.__connection.subscribe(null);
 			this.__connection = undefined;
 			await new Promise((r) => setTimeout(r, this.__reconnectAttempts * 3e3).unref());
 			this.__connect();
@@ -255,20 +293,35 @@ export class MusicPlayer {
 	private async __playerStateChange(oldState: Voice.AudioPlayerState, newState: Voice.AudioPlayerState) {
 		if (oldState.status !== Voice.AudioPlayerStatus.Idle && newState.status === Voice.AudioPlayerStatus.Idle) {
 			// get tracks info
-			const bf = this.__queue.shift();
-			const af = this.__queue.at(0);
+			let bf = this.__queue.shift();
+			let af = this.__queue.at(0);
 
-			if (af) {
-				if (af.url.includes(bf.url)) {
-					await this.__tchannel.send(
-						MusicPlayerLang.PLAYER_TRACK_RESUMED.replace(/%track_name%+/g, bf.name).replace(
-							/%track_duration%+/g,
-							timeFormat(Math.floor(this.current?.playbackDuration / 1000))
-						)
-					);
-				} else {
-					this.current = undefined;
+			// continue playback after error
+			if (this.__e_continue && this.__e_continue_attempts < 5) {
+				this.__e_continue = false;
+				this.__e_continue_attempts++;
+				this.__queue.unshift(bf);
 
+				await this.__tchannel.send(
+					MusicPlayerLang.PLAYER_TRACK_RESUMED.replace(/%track_name%+/g, bf.name).replace(
+						/%track_duration%+/g,
+						timeFormat(Math.floor(this.current?.playbackDuration / 1000))
+					)
+				);
+				this.play(this.current?.playbackDuration / 1000);
+			} else {
+				// loop track
+				if (this.loop === 1) {
+					// remove single loop mode for bad track
+					if ((this.__e_continue_attempts = 5)) this.loop = 0;
+					else {
+						this.__queue.unshift(bf);
+						af = undefined;
+					}
+				}
+
+				// continue playback
+				if (af) {
 					await this.__tchannel.send(
 						MusicPlayerLang.PLAYER_FINISHED.replace(/%track_name%+/g, bf.name).replace(
 							/%track_requester%+/g,
@@ -281,11 +334,22 @@ export class MusicPlayer {
 							af.requester.user.tag
 						)
 					);
+					this.play();
 				}
-				setTimeout(() => {
-					this.play(this.current?.playbackDuration / 1000);
-				}, 2e3);
-			} else this.__tchannel.send(MusicPlayerLang.PLAYER_QUEUE_ENDED);
+
+				// loop queue
+				else if (this.loop === 2) {
+					this.__queue = this.__equeue;
+					this.__equeue = [];
+
+					// remove bad track
+					if ((this.__e_continue_attempts = 5)) this.__queue.shift();
+					this.play();
+				} else this.__tchannel.send(MusicPlayerLang.PLAYER_QUEUE_ENDED);
+
+				// reset attempts
+				this.__e_continue_attempts = 0;
+			}
 		}
 	}
 
@@ -327,12 +391,12 @@ export class MusicPlayer {
 				// rate limited
 			} else if (e.message.includes("403")) {
 				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_RATE_LIMITED);
-				this.__queue.unshift(this.current.metadata);
+				this.__e_continue = true;
 
 				// unknown
 			} else {
 				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
-				this.__queue.unshift(this.current.metadata);
+				this.__e_continue = true;
 			}
 		}
 	}
@@ -417,7 +481,7 @@ export class MusicPlayer {
 	/**
 	 * Apply filter to current player
 	 *
-	 * @param {string} name filter name
+	 * @param {string} name filter name1
 	 * @memberof MusicPlayer
 	 */
 	public applyfilter(name: string): void {
@@ -432,9 +496,20 @@ export class MusicPlayer {
 				}
 			});
 		}
-		if (this.current) {
-			this.__queue.unshift(this.current.metadata);
-			this.__player.stop();
+	}
+
+	/**
+	 * Apply loop mode for player
+	 *
+	 * @param {any} [mode] input mode
+	 * @memberof MusicPlayer
+	 */
+	public applyloop(mode: any): void {
+		if ([0, 1, 2].includes(Number(mode))) {
+			this.loop = Number(mode);
+			if ((this.loop = 1)) this.__tchannel.send(MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "current"));
+			if ((this.loop = 2)) this.__tchannel.send(MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "queue"));
+			if ((this.loop = 0)) this.__tchannel.send(MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "none"));
 		}
 	}
 
@@ -444,7 +519,7 @@ export class MusicPlayer {
 	 * @memberof MusicPlayer
 	 */
 	public skip(): void {
-		this.__player.stop();
+		this.__player.stop(true);
 	}
 
 	/**
@@ -454,7 +529,7 @@ export class MusicPlayer {
 	 */
 	public togglePauseResume(): void {
 		this.isPlaying()
-			? (this.__player.pause(), this.__tchannel.send(MusicPlayerLang.PLAYER_PAUSED))
+			? (this.__player.pause(true), this.__tchannel.send(MusicPlayerLang.PLAYER_PAUSED))
 			: (this.__player.unpause(), this.__tchannel.send(MusicPlayerLang.PLAYER_RESUMED));
 	}
 

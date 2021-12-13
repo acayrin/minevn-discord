@@ -42,11 +42,12 @@ var MusicPlayerLang;
     MusicPlayerLang["PLAYER_TRACK_ADDED"] = "Added **%track%** to the queue";
     MusicPlayerLang["PLAYER_TRACK_REMOVED"] = "Removed **%track%** from the queue";
     MusicPlayerLang["PLAYER_TRACK_RESUMED"] = "Resuming **%track_name%** at **%track_duration%**";
-    MusicPlayerLang["PLAYER_FILTER_SET"] = "Applied filter **%filter%** for current player";
-    MusicPlayerLang["PLAYER_FILTER_RESET"] = "Removed filter from current player";
+    MusicPlayerLang["PLAYER_FILTER_SET"] = "Set filter **%filter%** for current player, will be applied on next track";
+    MusicPlayerLang["PLAYER_FILTER_RESET"] = "Removed filter from current player, will be applied on next track";
+    MusicPlayerLang["PLAYER_LOOP_SET"] = "Set player's loop mode to **%loop%**";
     MusicPlayerLang["PLAYER_PLAYLIST_ADDED"] = "Added **%tracks%** tracks to the queue";
-    MusicPlayerLang["PLAYER_NOW_FORMAT"] = "```%track_name% (%track_requester%)\n[%filter%] [\uD83C\uDFB6] [%track_bar%] [%track_now%/%track_duration%]```";
-    MusicPlayerLang["PLAYER_LIST_HEADER"] = "```Current queue (%page_current%/%page_all%) [F: %filter%]\n";
+    MusicPlayerLang["PLAYER_NOW_FORMAT"] = "```%track_name% (%track_requester%)\n[\uD83C\uDFB6] [%filter% - %loop%] [%track_bar%] [%track_now%/%track_duration%]```";
+    MusicPlayerLang["PLAYER_LIST_HEADER"] = "```Current queue (%page_current%/%page_all%) [F: %filter%] [L: %loop%]\n";
     MusicPlayerLang["PLAYER_LIST_EACH"] = "[%index%] %track_name%\n \u2514\u2500 %track_requester% - %track_duration%";
     MusicPlayerLang["PLAYER_LIST_FOOTER"] = "\nTo switch between pages, use 'yt list [page]' ```";
     MusicPlayerLang["PLAYER_SEARCH_TIMEOUT"] = "Well you didn't choose anything";
@@ -70,10 +71,12 @@ var help = function (bot) {
         .addField("yt search/s [query]", "Search for a track")
         .addField("yt skip/fs", "Skip current track (if somebody decided to put an earrape")
         .addField("yt filter/af [name]", "Apply an audio filter to current player")
+        .addField("Available filters", "``".concat(Object.keys(filters_1.AudioFilter).join().replace("this", ""), "``"))
+        .addField("yt loop/lp [number]", "Apply loop mode to current player")
+        .addField("Loop modes", "0 - none, 1 - current, 2 - queue")
         .addField("yt now/n", "Show current track info")
         .addField("yt remove/rm [index(es)]", "Remove tracks from playlist, can be multiple, separated by spaces")
         .addField("yt list/ls", "List all tracks in current queue")
-        .addField("yt stop/dc", "Destroy your music session and ruin your day")
-        .addField("Available filters", "``".concat(Object.keys(filters_1.AudioFilter).join().replace("this", ""), "``"));
+        .addField("yt stop/dc", "Destroy your music session and ruin your day");
 };
 exports.help = help;

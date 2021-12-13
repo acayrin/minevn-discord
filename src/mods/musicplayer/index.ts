@@ -28,7 +28,6 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 	const subcmd = args.shift();
 	switch (subcmd) {
 		// play subcommand
-		case "search":
 		case "play":
 		case "p": {
 			// no input
@@ -70,6 +69,8 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 		// search subcommand
 		case "search":
 		case "s": {
+			// no input
+			if (args.length < 1) return message.reply(MusicPlayerLang.ERR_SEARCH_NO_INPUT);
 			const player = check();
 			const tmp = new Map<number, MusicTrack>();
 			const res = await func.search(args.join(" "), message.member);
@@ -132,6 +133,7 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 					.replace(/%track_now%+/g, func.timeFormat((now?.playbackDuration || 0) / 1000))
 					.replace(/%track_duration%+/g, func.timeFormat(now?.metadata.duration))
 					.replace(/%filter%+/g, player.filter)
+					.replace(/%loop%+/g, (player.loop = 0) ? "none" : (player.loop = 1) ? "current" : "queue")
 			);
 			break;
 		}
@@ -169,10 +171,10 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 			const get = Number(args[0]) || 1;
 			const page = queue.length > 10 && queue.length - get * 10 < 0 ? 1 : get;
 			const msg: string[] = [
-				MusicPlayerLang.PLAYER_LIST_HEADER.replace(/%page_current%+/g, page.toString()).replace(
-					/%page_all%+/g,
-					Math.floor(queue.length / 10).toString()
-				),
+				MusicPlayerLang.PLAYER_LIST_HEADER.replace(/%page_current%+/g, page.toString())
+					.replace(/%page_all%+/g, Math.floor(queue.length / 10).toString())
+					.replace(/%filter%+/g, player.filter)
+					.replace(/%loop%+/g, (player.loop = 0) ? "none" : (player.loop = 1) ? "current" : "queue"),
 			];
 			const i1 = page * 10 > queue.length ? queue.length : page * 10;
 			const i2 = (page - 1) * 10;
@@ -183,7 +185,6 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 						.replace(/%track_channel%+/g, queue[i].channel)
 						.replace(/%track_requester%+/g, queue[i].requester.user.tag)
 						.replace(/%track_duration%+/g, func.timeFormat(queue[i].duration))
-						.replace(/%filter%+/g, player.filter)
 				);
 			msg.push(MusicPlayerLang.PLAYER_LIST_FOOTER);
 			message.reply(msg.join("\n"));
@@ -197,6 +198,16 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 				check()?.applyfilter("none");
 			} else {
 				check()?.applyfilter(args.join(""));
+			}
+		}
+
+		// apply loop mode
+		case "loop":
+		case "lp": {
+			if (args.length < 1) {
+				check()?.applyloop(0);
+			} else {
+				check()?.applyloop(args.join(""));
 			}
 		}
 

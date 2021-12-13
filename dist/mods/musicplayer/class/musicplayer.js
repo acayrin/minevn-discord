@@ -73,7 +73,11 @@ var MusicPlayer = (function () {
         this.id = (0, generateid_1.id)();
         this.filter = "none";
         this.__queue = [];
+        this.__equeue = [];
+        this.loop = 0;
         this.__reconnectAttempts = 0;
+        this.__e_continue = false;
+        this.__e_continue_attempts = 0;
         this.getGuild = function () { return _this.__guild; };
         this.getQueue = function () { return _this.__queue; };
         this.addTrack = function (track) {
@@ -117,7 +121,6 @@ var MusicPlayer = (function () {
                         this.__reconnectAttempts++;
                         (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] Attempting to reconnect ").concat(this.__reconnectAttempts, "/5 after ").concat(this.__reconnectAttempts * 3, "s"));
                         this.__connection.removeAllListeners();
-                        this.__connection.subscribe(null);
                         this.__connection = undefined;
                         return [4, new Promise(function (r) { return setTimeout(r, _this.__reconnectAttempts * 3e3).unref(); })];
                     case 1:
@@ -169,40 +172,56 @@ var MusicPlayer = (function () {
         });
     };
     MusicPlayer.prototype.__playerStateChange = function (oldState, newState) {
-        var _a;
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
             var bf, af;
-            var _this = this;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
                         if (!(oldState.status !== Voice.AudioPlayerStatus.Idle && newState.status === Voice.AudioPlayerStatus.Idle)) return [3, 7];
                         bf = this.__queue.shift();
                         af = this.__queue.at(0);
-                        if (!af) return [3, 6];
-                        if (!af.url.includes(bf.url)) return [3, 2];
+                        if (!(this.__e_continue && this.__e_continue_attempts < 5)) return [3, 2];
+                        this.__e_continue = false;
+                        this.__e_continue_attempts++;
+                        this.__queue.unshift(bf);
                         return [4, this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_TRACK_RESUMED.replace(/%track_name%+/g, bf.name).replace(/%track_duration%+/g, (0, functions_1.timeFormat)(Math.floor(((_a = this.current) === null || _a === void 0 ? void 0 : _a.playbackDuration) / 1000))))];
                     case 1:
-                        _b.sent();
-                        return [3, 5];
+                        _c.sent();
+                        this.play(((_b = this.current) === null || _b === void 0 ? void 0 : _b.playbackDuration) / 1000);
+                        return [3, 7];
                     case 2:
-                        this.current = undefined;
+                        if (this.loop === 1) {
+                            if ((this.__e_continue_attempts = 5))
+                                this.loop = 0;
+                            else {
+                                this.__queue.unshift(bf);
+                                af = undefined;
+                            }
+                        }
+                        if (!af) return [3, 5];
                         return [4, this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_FINISHED.replace(/%track_name%+/g, bf.name).replace(/%track_requester%+/g, bf.requester.user.tag))];
                     case 3:
-                        _b.sent();
+                        _c.sent();
                         return [4, this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_STARTED.replace(/%track_name%+/g, af.name).replace(/%track_requester%+/g, af.requester.user.tag))];
                     case 4:
-                        _b.sent();
-                        _b.label = 5;
+                        _c.sent();
+                        this.play();
+                        return [3, 6];
                     case 5:
-                        setTimeout(function () {
-                            var _a;
-                            _this.play(((_a = _this.current) === null || _a === void 0 ? void 0 : _a.playbackDuration) / 1000);
-                        }, 2e3);
-                        return [3, 7];
+                        if (this.loop === 2) {
+                            this.__queue = this.__equeue;
+                            this.__equeue = [];
+                            if ((this.__e_continue_attempts = 5))
+                                this.__queue.shift();
+                            this.play();
+                        }
+                        else
+                            this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_QUEUE_ENDED);
+                        _c.label = 6;
                     case 6:
-                        this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_QUEUE_ENDED);
-                        _b.label = 7;
+                        this.__e_continue_attempts = 0;
+                        _c.label = 7;
                     case 7: return [2];
                 }
             });
@@ -223,11 +242,11 @@ var MusicPlayer = (function () {
             }
             else if (e.message.includes("403")) {
                 this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_RATE_LIMITED);
-                this.__queue.unshift(this.current.metadata);
+                this.__e_continue = true;
             }
             else {
                 this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
-                this.__queue.unshift(this.current.metadata);
+                this.__e_continue = true;
             }
         }
     };
@@ -278,17 +297,24 @@ var MusicPlayer = (function () {
                 }
             });
         }
-        if (this.current) {
-            this.__queue.unshift(this.current.metadata);
-            this.__player.stop();
+    };
+    MusicPlayer.prototype.applyloop = function (mode) {
+        if ([0, 1, 2].includes(Number(mode))) {
+            this.loop = Number(mode);
+            if ((this.loop = 1))
+                this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "current"));
+            if ((this.loop = 2))
+                this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "queue"));
+            if ((this.loop = 0))
+                this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_LOOP_SET.replace(/%loop%+/g, "none"));
         }
     };
     MusicPlayer.prototype.skip = function () {
-        this.__player.stop();
+        this.__player.stop(true);
     };
     MusicPlayer.prototype.togglePauseResume = function () {
         this.isPlaying()
-            ? (this.__player.pause(), this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_PAUSED))
+            ? (this.__player.pause(true), this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_PAUSED))
             : (this.__player.unpause(), this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_RESUMED));
     };
     MusicPlayer.prototype.disconnect = function () {
