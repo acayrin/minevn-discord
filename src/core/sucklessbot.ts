@@ -127,8 +127,8 @@ export class SucklessBot extends EventEmitter {
 
 			// temp to load any mods
 			const mod: DSMod = require(`${path}/mods/${item}`);
-			if (!mod.command || mod.command.length === 0)
-				return this.logger.warn(`File mods/${item} is not a valid mod`);
+			//if (!mod.command || mod.command.length === 0)
+			//	return this.logger.warn(`File mods/${item} is not a valid mod`);
 
 			// ignore disabled
 			if (mod.disabled) return;
@@ -200,20 +200,22 @@ export class SucklessBot extends EventEmitter {
 	private __onMessage = (message: Discord.Message) => {
 		// if doesn't start with prefix
 		if (!message.content.startsWith(this.config.prefix))
-			return this.mods.forEach((mod) => mod.onMsgCreate(message, undefined, this));
+			return this.mods.forEach((mod) => {
+				if (mod.onMsgCreate) mod.onMsgCreate(message, undefined, this);
+			});
 
 		const msg = message.content.replace(this.config.prefix, "").trim();
 		const arg = msg.split(/ +/);
 		const cmd = arg.shift().toLocaleLowerCase(); // command
 
 		// if command not found, process it as a normal message
-		if (!this.cmdMgr.getMod(cmd)) return this.mods.forEach((mod) => mod.onMsgCreate(message, undefined, this));
+		if (!this.cmdMgr.getMod(cmd))
+			return this.mods.forEach((mod) => {
+				if (mod.onMsgCreate) mod.onMsgCreate(message, undefined, this);
+			});
 
-		try {
-			this.cmdMgr.getMod(cmd).onMsgCreate(message, arg, this);
-		} catch (error) {
-			this.logger.error(`Error while executing command '${message.content}'\n${error}`);
-		}
+		const mod = this.cmdMgr.getMod(cmd);
+		if (mod.onMsgCreate) mod.onMsgCreate(message, arg, this);
 	};
 
 	/**

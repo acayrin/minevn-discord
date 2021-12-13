@@ -95,8 +95,6 @@ var SucklessBot = (function (_super) {
                 if (!item.endsWith(".js"))
                     return;
                 var mod = require("".concat(path, "/mods/").concat(item));
-                if (!mod.command || mod.command.length === 0)
-                    return _this.logger.warn("File mods/".concat(item, " is not a valid mod"));
                 if (mod.disabled)
                     return;
                 mod.intents.forEach(function (intent) {
@@ -127,18 +125,21 @@ var SucklessBot = (function (_super) {
         }); };
         _this.__onMessage = function (message) {
             if (!message.content.startsWith(_this.config.prefix))
-                return _this.mods.forEach(function (mod) { return mod.onMsgCreate(message, undefined, _this); });
+                return _this.mods.forEach(function (mod) {
+                    if (mod.onMsgCreate)
+                        mod.onMsgCreate(message, undefined, _this);
+                });
             var msg = message.content.replace(_this.config.prefix, "").trim();
             var arg = msg.split(/ +/);
             var cmd = arg.shift().toLocaleLowerCase();
             if (!_this.cmdMgr.getMod(cmd))
-                return _this.mods.forEach(function (mod) { return mod.onMsgCreate(message, undefined, _this); });
-            try {
-                _this.cmdMgr.getMod(cmd).onMsgCreate(message, arg, _this);
-            }
-            catch (error) {
-                _this.logger.error("Error while executing command '".concat(message.content, "'\n").concat(error));
-            }
+                return _this.mods.forEach(function (mod) {
+                    if (mod.onMsgCreate)
+                        mod.onMsgCreate(message, undefined, _this);
+                });
+            var mod = _this.cmdMgr.getMod(cmd);
+            if (mod.onMsgCreate)
+                mod.onMsgCreate(message, arg, _this);
         };
         _this.__onDelete = function (message) {
             var mods = [];
