@@ -3,4 +3,3 @@
 **/config.json
 **/fly.toml
 node_modules
-libmimalloc.so
