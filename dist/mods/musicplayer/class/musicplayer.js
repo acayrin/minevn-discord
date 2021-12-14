@@ -176,11 +176,12 @@ var MusicPlayer = (function () {
         });
     };
     MusicPlayer.prototype.__playerStateChange = function (oldState, newState) {
-        var _a, _b;
+        var _a;
         return __awaiter(this, void 0, void 0, function () {
             var bf, af;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            var _this = this;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
                         if (!(oldState.status !== Voice.AudioPlayerStatus.Idle && newState.status === Voice.AudioPlayerStatus.Idle)) return [3, 3];
                         bf = this.__queue.at(0);
@@ -189,8 +190,8 @@ var MusicPlayer = (function () {
                         this.__e_continue_attempts++;
                         return [4, this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_TRACK_RESUMED.replace(/%track_name%+/g, bf.name).replace(/%track_duration%+/g, (0, functions_1.timeFormat)(Math.floor(((_a = this.current) === null || _a === void 0 ? void 0 : _a.playbackDuration) / 1000))))];
                     case 1:
-                        _c.sent();
-                        this.play(((_b = this.current) === null || _b === void 0 ? void 0 : _b.playbackDuration) / 1000);
+                        _b.sent();
+                        setTimeout(function () { var _a; return _this.play(((_a = _this.current) === null || _a === void 0 ? void 0 : _a.playbackDuration) / 1000); }, 1e3);
                         return [3, 3];
                     case 2:
                         if (this.loop === 1 && this.__e_continue_attempts === 5)
@@ -211,7 +212,7 @@ var MusicPlayer = (function () {
                         }
                         else
                             this.__tchannel.send(lang_1.MusicPlayerLang.PLAYER_QUEUE_ENDED);
-                        _c.label = 3;
+                        _b.label = 3;
                     case 3: return [2];
                 }
             });
@@ -219,7 +220,6 @@ var MusicPlayer = (function () {
     };
     MusicPlayer.prototype.__playerOnError = function (e) {
         var _a, _b, _c;
-        console.log(this.__queue);
         (_a = this.__bot) === null || _a === void 0 ? void 0 : _a.emit("debug", "[MusicPlayer - ".concat(this.id, "] PLAYER - Track: ").concat((_b = this.current) === null || _b === void 0 ? void 0 : _b.metadata.url, " (at ").concat((0, functions_1.timeFormat)(Math.floor((((_c = this.current) === null || _c === void 0 ? void 0 : _c.playbackDuration) || 0) / 1000)), ") - Encountered error: ").concat(e));
         if (!this.current) {
             this.__tchannel.send(lang_1.MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
@@ -257,7 +257,7 @@ var MusicPlayer = (function () {
             var stream = (0, discord_ytdl_core_1["default"])(this.__queue.at(0).url, {
                 filter: "audioonly",
                 quality: "highestaudio",
-                highWaterMark: 1 << 24,
+                highWaterMark: 1 << 16,
                 seek: Math.floor(start),
                 opusEncoded: true,
                 encoderArgs: filter ? ["-af", filter] : []
@@ -288,6 +288,8 @@ var MusicPlayer = (function () {
                 }
             });
         }
+        this.__e_continue = true;
+        this.__player.stop();
     };
     MusicPlayer.prototype.applyloop = function (mode) {
         if ([0, 1, 2].includes(Number(mode))) {

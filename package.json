@@ -9,10 +9,10 @@
 	"type": "commonjs",
 	"scripts": {
 		"build": "rm -rf dist && ./node_modules/typescript/bin/tsc",
-		"start": "cp config.json ./dist/ && node dist/index.js"
+		"start": "cp config.json ./dist/ && LD_PRELOAD=others/libmimalloc.so node dist/index.js"
 	},
 	"author": "acayrin <iacayrin@gmail.com>",
-	"license": "ISC",
+	"license": "MIT",
 	"dependencies": {
 		"@discordjs/voice": "^0.7.5",
 		"bufferutil": "^4.0.5",

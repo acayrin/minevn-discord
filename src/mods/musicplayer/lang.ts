@@ -25,8 +25,8 @@ export enum MusicPlayerLang {
 	PLAYER_TRACK_REMOVED = "Removed **%track%** from the queue",
 	PLAYER_TRACK_RESUMED = "Resuming **%track_name%** at **%track_duration%**",
 
-	PLAYER_FILTER_SET = "Set filter **%filter%** for current player, will be applied on next track",
-	PLAYER_FILTER_RESET = "Removed filter from current player, will be applied on next track",
+	PLAYER_FILTER_SET = "Set filter **%filter%** for current player, please hold",
+	PLAYER_FILTER_RESET = "Removed filter from current player, please hold",
 
 	PLAYER_LOOP_SET = "Set player's loop mode to **%loop%**",
 

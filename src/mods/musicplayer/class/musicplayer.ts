@@ -306,7 +306,7 @@ export class MusicPlayer {
 						timeFormat(Math.floor(this.current?.playbackDuration / 1000))
 					)
 				);
-				this.play(this.current?.playbackDuration / 1000);
+				setTimeout(() => this.play(this.current?.playbackDuration / 1000), 1e3);
 			} else {
 				if (this.loop === 1 && this.__e_continue_attempts === 5) this.loop = 0;
 				this.__e_continue_attempts = 0;
@@ -365,7 +365,6 @@ export class MusicPlayer {
 	 * @memberof MusicPlayer
 	 */
 	private __playerOnError(e: Error) {
-		console.log(this.__queue);
 		// debug
 		this.__bot?.emit(
 			"debug",
@@ -381,18 +380,18 @@ export class MusicPlayer {
 			// age restricted
 			if (e.message.includes("410")) {
 				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_AGE_RESTRICTED);
-
-				// no playable audio found
-			} else if (e.message.includes("No such format found")) {
+			}
+			// no playable audio found
+			else if (e.message.includes("No such format found")) {
 				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_NO_OPUS);
-
-				// rate limited
-			} else if (e.message.includes("403")) {
+			}
+			// rate limited
+			else if (e.message.includes("403")) {
 				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_RATE_LIMITED);
 				this.__e_continue = true;
-
-				// unknown
-			} else {
+			}
+			// unknown
+			else {
 				this.__tchannel.send(MusicPlayerLang.ERR_TRACK_UNKNOWN.replace(/%error%+/g, e.message));
 				this.__e_continue = true;
 			}
@@ -458,7 +457,7 @@ export class MusicPlayer {
 			const stream = ytdl(this.__queue.at(0).url, {
 				filter: "audioonly",
 				quality: "highestaudio",
-				highWaterMark: 1 << 24,
+				highWaterMark: 1 << 16,
 				seek: Math.floor(start),
 				opusEncoded: true,
 				encoderArgs: filter ? ["-af", filter] : [],
@@ -494,6 +493,8 @@ export class MusicPlayer {
 				}
 			});
 		}
+		this.__e_continue = true;
+		this.__player.stop();
 	}
 
 	/**
