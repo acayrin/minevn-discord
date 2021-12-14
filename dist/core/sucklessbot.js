@@ -104,12 +104,17 @@ var SucklessBot = (function (_super) {
                 _this.cmdMgr.register(mod);
                 _this.mods.push(mod);
                 if (mod.onInit)
-                    mod.onInit(_this);
+                    try {
+                        mod.onInit(_this);
+                    }
+                    catch (e) {
+                        _this.logger.error("[".concat(mod.name, "] ").concat(e, "\n").concat(e.stack));
+                    }
                 _this.logger.log("[LOADER] Loaded mod: ".concat(mod.name, " (").concat(item, ")"));
                 if (mod.aliases)
-                    _this.logger.log("  ".concat(mod.name, " registered Aliases: ").concat(mod.aliases.toString()));
-                _this.logger.log("  ".concat(mod.name, " registered Commands: ").concat(mod.command.toString()));
-                _this.logger.log("  ".concat(mod.name, " requested Intents: ").concat(mod.intents));
+                    _this.logger.log("- ".concat(mod.name, " registered Aliases: ").concat(mod.aliases.toString()));
+                _this.logger.log("- ".concat(mod.name, " registered Commands: ").concat(mod.command.toString()));
+                _this.logger.log("- ".concat(mod.name, " requested Intents: ").concat(mod.intents));
             });
             if (_this.__clientOptions.intents.toString() !== "")
                 intents = _this.__clientOptions.intents;
@@ -126,20 +131,35 @@ var SucklessBot = (function (_super) {
         _this.__onMessage = function (message) {
             if (!message.content.startsWith(_this.config.prefix))
                 return _this.mods.forEach(function (mod) {
-                    if (mod.onMsgCreate)
-                        mod.onMsgCreate(message, undefined, _this);
+                    try {
+                        if (mod.onMsgCreate)
+                            mod.onMsgCreate(message, undefined, _this);
+                    }
+                    catch (e) {
+                        _this.logger.error("[".concat(mod.name, "] ").concat(e, "\n").concat(e.stack));
+                    }
                 });
             var msg = message.content.replace(_this.config.prefix, "").trim();
             var arg = msg.split(/ +/);
             var cmd = arg.shift().toLocaleLowerCase();
             if (!_this.cmdMgr.getMod(cmd))
                 return _this.mods.forEach(function (mod) {
-                    if (mod.onMsgCreate)
-                        mod.onMsgCreate(message, undefined, _this);
+                    try {
+                        if (mod.onMsgCreate)
+                            mod.onMsgCreate(message, undefined, _this);
+                    }
+                    catch (e) {
+                        _this.logger.error("[".concat(mod.name, "] ").concat(e, "\n").concat(e.stack));
+                    }
                 });
             var mod = _this.cmdMgr.getMod(cmd);
             if (mod.onMsgCreate)
-                mod.onMsgCreate(message, arg, _this);
+                try {
+                    mod.onMsgCreate(message, arg, _this);
+                }
+                catch (e) {
+                    _this.logger.error("[".concat(mod.name, "] ").concat(e, "\n").concat(e.stack));
+                }
         };
         _this.__onDelete = function (message) {
             var mods = [];
@@ -149,7 +169,12 @@ var SucklessBot = (function (_super) {
             });
             mods.forEach(function (mod) {
                 if (mod.onMsgDelete)
-                    mod.onMsgDelete(message, message.content.split(/ +/), _this);
+                    try {
+                        mod.onMsgDelete(message, message.content.split(/ +/), _this);
+                    }
+                    catch (e) {
+                        _this.logger.error("[".concat(mod.name, "] ").concat(e, "\n").concat(e.stack));
+                    }
             });
         };
         _this.__onUpdate = function (oldMessage, newMessage) {
@@ -160,7 +185,12 @@ var SucklessBot = (function (_super) {
             });
             mods.forEach(function (mod) {
                 if (mod.onMsgUpdate)
-                    mod.onMsgUpdate(oldMessage, newMessage, _this);
+                    try {
+                        mod.onMsgUpdate(oldMessage, newMessage, _this);
+                    }
+                    catch (e) {
+                        _this.logger.error("[".concat(mod.name, "] ").concat(e, "\n").concat(e.stack));
+                    }
             });
         };
         _this.debug = options.debug;

@@ -29,9 +29,8 @@ export const Snipe = (message: Discord.Message, args: string[], bot: SucklessBot
 		// normal snipe
 		case "s":
 		case "snipe": {
-			if (record_D[message.channelId].length < 1) return;
-
 			const rep = record_D[message.channelId].at(num || -1);
+			if (!rep) return;
 			message.reply({
 				embeds: [_e(rep)],
 				files: rep.files || null,
@@ -41,9 +40,8 @@ export const Snipe = (message: Discord.Message, args: string[], bot: SucklessBot
 		// edit snipe
 		case "es":
 		case "editsnipe": {
-			if (record_U[message.channelId].length < 1) return;
-
 			const rep = record_U[message.channelId].at(num || -1);
+			if (!rep) return;
 			message.reply({
 				embeds: [_e(rep)],
 				files: rep.files || null,

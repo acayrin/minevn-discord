@@ -144,13 +144,18 @@ export class SucklessBot extends EventEmitter {
 			this.mods.push(mod);
 
 			// mod's init phase (if any)
-			if (mod.onInit) mod.onInit(this);
+			if (mod.onInit)
+				try {
+					mod.onInit(this);
+				} catch (e) {
+					this.logger.error(`[${mod.name}] ${e}\n${e.stack}`);
+				}
 
 			// logger
 			this.logger.log(`[LOADER] Loaded mod: ${mod.name} (${item})`);
-			if (mod.aliases) this.logger.log(`  ${mod.name} registered Aliases: ${mod.aliases.toString()}`);
-			this.logger.log(`  ${mod.name} registered Commands: ${mod.command.toString()}`);
-			this.logger.log(`  ${mod.name} requested Intents: ${mod.intents}`);
+			if (mod.aliases) this.logger.log(`- ${mod.name} registered Aliases: ${mod.aliases.toString()}`);
+			this.logger.log(`- ${mod.name} registered Commands: ${mod.command.toString()}`);
+			this.logger.log(`- ${mod.name} requested Intents: ${mod.intents}`);
 		});
 
 		// if bot is configured with intents, use those instead
@@ -201,7 +206,11 @@ export class SucklessBot extends EventEmitter {
 		// if doesn't start with prefix
 		if (!message.content.startsWith(this.config.prefix))
 			return this.mods.forEach((mod) => {
-				if (mod.onMsgCreate) mod.onMsgCreate(message, undefined, this);
+				try {
+					if (mod.onMsgCreate) mod.onMsgCreate(message, undefined, this);
+				} catch (e) {
+					this.logger.error(`[${mod.name}] ${e}\n${e.stack}`);
+				}
 			});
 
 		const msg = message.content.replace(this.config.prefix, "").trim();
@@ -211,11 +220,20 @@ export class SucklessBot extends EventEmitter {
 		// if command not found, process it as a normal message
 		if (!this.cmdMgr.getMod(cmd))
 			return this.mods.forEach((mod) => {
-				if (mod.onMsgCreate) mod.onMsgCreate(message, undefined, this);
+				try {
+					if (mod.onMsgCreate) mod.onMsgCreate(message, undefined, this);
+				} catch (e) {
+					this.logger.error(`[${mod.name}] ${e}\n${e.stack}`);
+				}
 			});
 
 		const mod = this.cmdMgr.getMod(cmd);
-		if (mod.onMsgCreate) mod.onMsgCreate(message, arg, this);
+		if (mod.onMsgCreate)
+			try {
+				mod.onMsgCreate(message, arg, this);
+			} catch (e) {
+				this.logger.error(`[${mod.name}] ${e}\n${e.stack}`);
+			}
 	};
 
 	/**
@@ -231,7 +249,12 @@ export class SucklessBot extends EventEmitter {
 			if (!mods.includes(mod)) mods.push(mod);
 		});
 		mods.forEach((mod) => {
-			if (mod.onMsgDelete) mod.onMsgDelete(message, message.content.split(/ +/), this);
+			if (mod.onMsgDelete)
+				try {
+					mod.onMsgDelete(message, message.content.split(/ +/), this);
+				} catch (e) {
+					this.logger.error(`[${mod.name}] ${e}\n${e.stack}`);
+				}
 		});
 	};
 
@@ -249,7 +272,12 @@ export class SucklessBot extends EventEmitter {
 			if (!mods.includes(mod)) mods.push(mod);
 		});
 		mods.forEach((mod) => {
-			if (mod.onMsgUpdate) mod.onMsgUpdate(oldMessage, newMessage, this);
+			if (mod.onMsgUpdate)
+				try {
+					mod.onMsgUpdate(oldMessage, newMessage, this);
+				} catch (e) {
+					this.logger.error(`[${mod.name}] ${e}\n${e.stack}`);
+				}
 		});
 	};
 }

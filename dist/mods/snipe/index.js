@@ -75,9 +75,9 @@ var Snipe = function (message, args, bot) {
     switch (cmd) {
         case "s":
         case "snipe": {
-            if (record_D[message.channelId].length < 1)
-                return;
             var rep = record_D[message.channelId].at(num || -1);
+            if (!rep)
+                return;
             message.reply({
                 embeds: [_e(rep)],
                 files: rep.files || null
@@ -86,9 +86,9 @@ var Snipe = function (message, args, bot) {
         }
         case "es":
         case "editsnipe": {
-            if (record_U[message.channelId].length < 1)
-                return;
             var rep = record_U[message.channelId].at(num || -1);
+            if (!rep)
+                return;
             message.reply({
                 embeds: [_e(rep)],
                 files: rep.files || null
