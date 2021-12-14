@@ -9,7 +9,7 @@
 	"type": "commonjs",
 	"scripts": {
 		"build": "rm -rf dist && ./node_modules/typescript/bin/tsc",
-		"start": "cp config.json ./dist/ && LD_PRELOAD=others/libmimalloc.so node dist/index.js"
+		"start": "cp config.json ./dist/ && LD_PRELOAD=libmimalloc.so node dist/index.js"
 	},
 	"author": "acayrin <iacayrin@gmail.com>",
 	"license": "MIT",
