@@ -47,7 +47,7 @@ module.exports = {
     command: ["mcstatus"],
     aliases: ["mc"],
     description: "Ping a minecraft server",
-    usage: "%prefix%<command/alias> [ip:port]",
+    usage: "%prefix%<command/alias> [ip] [port]",
     onMsgCreate: function (message, args, bot) { return __awaiter(void 0, void 0, void 0, function () {
         var ip, port;
         var _a, _b;

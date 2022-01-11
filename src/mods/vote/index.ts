@@ -61,7 +61,7 @@ async function VoteSomebody(message: Message, args: string[], bot: SucklessBot, 
 	// vote unmute
 	if (unmute) {
 		if (user.roles.cache.has(role.id)) {
-			return new VoteUnmute(user, message.channel, bot, {
+			return new VoteUnmute(user, message.member, message.channel, bot, {
 				reason: reason || undefined,
 				timer: bot.config.mute.timer,
 			}).vote();
@@ -86,7 +86,7 @@ async function VoteSomebody(message: Message, args: string[], bot: SucklessBot, 
 	}
 
 	// vote mute
-	new VoteMute(user, message.channel, bot, {
+	new VoteMute(user, message.member, message.channel, bot, {
 		reason: reason || undefined,
 		timer: bot.config.mute.timer,
 	}).vote();

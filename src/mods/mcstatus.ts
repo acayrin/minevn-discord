@@ -9,7 +9,7 @@ export = {
 	command: ["mcstatus"],
 	aliases: ["mc"],
 	description: "Ping a minecraft server",
-	usage: "%prefix%<command/alias> [ip:port]",
+	usage: "%prefix%<command/alias> [ip] [port]",
 	onMsgCreate: async (message: Message, args: string[], bot: SucklessBot): Promise<void> => {
 		if (!args) return;
 

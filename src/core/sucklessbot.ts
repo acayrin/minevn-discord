@@ -115,6 +115,7 @@ export class SucklessBot extends EventEmitter {
 	 * @memberof SucklessBot
 	 */
 	private __init = () => {
+		this.logger.log(`Suckless ver: 1.0.0`);
 		this.logger.log(
 			`Platform ${process.platform} ${process.arch} - Node ${process.version.match(/^v(\d+\.\d+)/)[1]}`
 		);
