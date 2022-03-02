@@ -153,8 +153,8 @@ export class SucklessBot extends EventEmitter {
 
 			// logger
 			this.logger.log(`[LOADER] Loaded mod: ${mod.name} (${item})`);
-			if (mod.aliases) this.logger.log(`- ${mod.name} registered Aliases: ${mod.aliases.toString()}`);
-			this.logger.log(`- ${mod.name} registered Commands: ${mod.command.toString()}`);
+			if (mod.aliases) this.logger.log(`- ${mod.name} registered Aliases: ${mod.aliases?.toString()}`);
+			this.logger.log(`- ${mod.name} registered Commands: ${mod.command?.toString()}`);
 			this.logger.log(`- ${mod.name} requested Intents: ${mod.intents}`);
 		});
 

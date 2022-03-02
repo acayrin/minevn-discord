@@ -2,7 +2,7 @@
 var discord_js_1 = require("discord.js");
 var vote_1 = require("./vote");
 module.exports = {
-    name: "Vote unmute",
+    name: "VoteUnmute",
     author: "acayrin",
     intents: [
         discord_js_1.Intents.FLAGS.GUILDS,

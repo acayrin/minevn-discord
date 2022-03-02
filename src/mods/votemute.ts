@@ -2,7 +2,7 @@ import { Intents } from "discord.js";
 import { VM } from "./vote";
 
 export = {
-	name: "Vote mute",
+	name: "VoteMute",
 	author: "acayrin",
 	intents: [
 		Intents.FLAGS.GUILDS,

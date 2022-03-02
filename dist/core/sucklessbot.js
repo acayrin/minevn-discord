@@ -92,6 +92,7 @@ var SucklessBot = (function (_super) {
             _this.logger.log("Platform ".concat(process.platform, " ").concat(process.arch, " - Node ").concat(process.version.match(/^v(\d+\.\d+)/)[1]));
             var intents = [];
             fs.readdirSync("".concat(path, "/mods")).forEach(function (item) {
+                var _a, _b;
                 if (!item.endsWith(".js"))
                     return;
                 var mod = require("".concat(path, "/mods/").concat(item));
@@ -112,8 +113,8 @@ var SucklessBot = (function (_super) {
                     }
                 _this.logger.log("[LOADER] Loaded mod: ".concat(mod.name, " (").concat(item, ")"));
                 if (mod.aliases)
-                    _this.logger.log("- ".concat(mod.name, " registered Aliases: ").concat(mod.aliases.toString()));
-                _this.logger.log("- ".concat(mod.name, " registered Commands: ").concat(mod.command.toString()));
+                    _this.logger.log("- ".concat(mod.name, " registered Aliases: ").concat((_a = mod.aliases) === null || _a === void 0 ? void 0 : _a.toString()));
+                _this.logger.log("- ".concat(mod.name, " registered Commands: ").concat((_b = mod.command) === null || _b === void 0 ? void 0 : _b.toString()));
                 _this.logger.log("- ".concat(mod.name, " requested Intents: ").concat(mod.intents));
             });
             if (_this.__clientOptions.intents.toString() !== "")

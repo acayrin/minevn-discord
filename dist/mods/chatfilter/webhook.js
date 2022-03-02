@@ -35,49 +35,39 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-var discord_js_1 = require("discord.js");
-var node_fetch_1 = __importDefault(require("node-fetch"));
-module.exports = {
-    name: "MinecraftServerStatus",
-    author: "acayrin",
-    intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES],
-    command: ["mcstatus"],
-    aliases: ["mc"],
-    description: "Ping a minecraft server",
-    usage: "%prefix%<command/alias> [ip] [port]",
-    onMsgCreate: function (message, args, bot) { return __awaiter(void 0, void 0, void 0, function () {
-        var ip, port;
-        var _a, _b;
-        return __generator(this, function (_c) {
-            if (!args)
-                return [2];
-            ip = (_a = args.shift()) !== null && _a !== void 0 ? _a : "minevn.net";
-            port = (_b = args.shift()) !== null && _b !== void 0 ? _b : 25565;
-            (0, node_fetch_1["default"])("https://mcsrv.vercel.app/?ip=".concat(ip, "&port=").concat(port)).then(function (res) {
-                return res
-                    .text()
-                    .then(function (txt) {
-                    var json = JSON.parse(txt);
-                    message.channel.send({
-                        embeds: [
-                            new discord_js_1.MessageEmbed()
-                                .setColor("#ed2261")
-                                .setTimestamp()
-                                .setTitle("".concat(json.host.toUpperCase()))
-                                .setDescription("".concat(json.description.descriptionText.replace(/§[a-z0-9]/g, "")))
-                                .setThumbnail("".concat(bot.cli().user.avatarURL()))
-                                .addField("Online", "".concat(json.onlinePlayers, "/").concat(json.maxPlayers))
-                                .addField("Version", "".concat(json.version)),
-                        ]
-                    });
-                })["catch"](function () {
-                    message.channel.send("I wasn't able to sneak up onto **".concat(ip, ":").concat(port, "** and steal their goodies"));
-                });
+exports.__esModule = true;
+exports.whook = void 0;
+var whook = (function () {
+    function whook(bot, channel) {
+        this.__bot = undefined;
+        this.__channel = undefined;
+        this.__bot = bot;
+        this.__channel = channel;
+    }
+    ;
+    whook.prototype.getHook = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, this.__channel.fetchWebhooks()];
+                    case 1: return [2, (_a.sent()).find(function (h) { return h.owner.id === _this.__bot.cli().user.id; }) || this.createHook()];
+                }
             });
-            return [2];
         });
-    }); }
-};
+    };
+    whook.prototype.createHook = function (channel) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, (channel || this.__channel).createWebhook(this.__bot.cli().user.username, {
+                            avatar: this.__bot.cli().user.avatarURL()
+                        })];
+                    case 1: return [2, _a.sent()];
+                }
+            });
+        });
+    };
+    return whook;
+}());
+exports.whook = whook;

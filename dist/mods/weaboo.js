@@ -2,7 +2,7 @@
 var discord_js_1 = require("discord.js");
 var weaboo_1 = require("./weaboo/");
 module.exports = {
-    name: "Weaboo for Life",
+    name: "WeabooForLife",
     author: "not acayrin",
     intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES],
     command: ["wibu"],

@@ -2,7 +2,7 @@
 var discord_js_1 = require("discord.js");
 var musicplayer_1 = require("./musicplayer/");
 module.exports = {
-    name: "Music player",
+    name: "MusicPlayer",
     description: "A simple music player since Susan decided to killed off most of available bots",
     intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES, discord_js_1.Intents.FLAGS.GUILD_VOICE_STATES],
     command: ["player", "youtube"],

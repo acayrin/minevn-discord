@@ -2,7 +2,7 @@ import { Intents } from "discord.js";
 import { SendImg } from "./weaboo/";
 
 export = {
-	name: "Weaboo for Life",
+	name: "WeabooForLife",
 	author: "not acayrin",
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 	command: ["wibu"],

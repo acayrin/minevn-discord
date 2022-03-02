@@ -3,13 +3,13 @@ import fetch from "node-fetch";
 import { SucklessBot } from "../core/sucklessbot";
 
 export = {
-	name: "Minecraft Server Status",
+	name: "MinecraftServerStatus",
 	author: "acayrin",
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 	command: ["mcstatus"],
 	aliases: ["mc"],
 	description: "Ping a minecraft server",
-	usage: "%prefix%<command/alias> [ip:port]",
+	usage: "%prefix%<command/alias> [ip] [port]",
 	onMsgCreate: async (message: Message, args: string[], bot: SucklessBot): Promise<void> => {
 		if (!args) return;
 
