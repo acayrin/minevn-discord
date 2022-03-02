@@ -1,6 +1,6 @@
-# A Somewhat Suckless Discord Bot
+# MineVN discord bot
 
-As the title said, mainly used in MineVN's Discord server
+A suckass bot mainly used in MineVN's Discord server
 
 This project was made mainly for fun, and for the purpose of learning Typescript (~~why when i could just stick with java instead~~)
 
@@ -11,6 +11,7 @@ This project was made mainly for fun, and for the purpose of learning Typescript
 -   Minecraft status - a simple minecraft server tracker (Hẻo đã hẻo)
 -   Random weeb shit - send random images from nekos.fun/nekos.life
 -   Music player - a simple, suckass youtube audio player but it works out of the box (keep getting hit with rate-limits tho)
+-	Chat filtering - a fast chat filtering system (less than 5 seconds on lengthy messages)
 -   To be added:
     -   basic moderation features? most likely no
     -   full size minecraft server tracker?
@@ -20,7 +21,7 @@ This project was made mainly for fun, and for the purpose of learning Typescript
 
 ## Requirements
 
--   NodeJS `16.x`
+-   NodeJS `16.x+`
 -   Knowledge about Typescript/Javascript
 -   Time to rethink about the purpose of this thing that i made
 
