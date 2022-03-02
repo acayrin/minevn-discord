@@ -102,7 +102,7 @@ function VoteSomebody(message, args, bot, unmute) {
                     }
                     if (unmute) {
                         if (user.roles.cache.has(role.id)) {
-                            return [2, new class_1.VoteUnmute(user, message.channel, bot, {
+                            return [2, new class_1.VoteUnmute(user, message.member, message.channel, bot, {
                                     reason: reason || undefined,
                                     timer: bot.config.mute.timer
                                 }).vote()];
@@ -120,7 +120,7 @@ function VoteSomebody(message, args, bot, unmute) {
                     if (user.roles.highest.comparePositionTo(role) > 0) {
                         return [2, message.channel.send("User **".concat(user.user.tag, "** is too powerful, can't abuse them"))];
                     }
-                    new class_1.VoteMute(user, message.channel, bot, {
+                    new class_1.VoteMute(user, message.member, message.channel, bot, {
                         reason: reason || undefined,
                         timer: bot.config.mute.timer
                     }).vote();

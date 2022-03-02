@@ -18,6 +18,14 @@ export class Vote {
 	public target: Discord.GuildMember = undefined;
 
 	/**
+	 * The vote owner user ID
+	 *
+	 * @type {GuildMember}
+	 * @memberof Vote
+	 */
+	public owner: Discord.GuildMember = undefined;
+
+	/**
 	 * The text channel that the vote is held
 	 *
 	 * @type {TextChannel}
@@ -112,6 +120,7 @@ export class Vote {
 	 * Creates an instance of Vote.
 	 *
 	 * @param {GuildMember} target User to mute
+	 * @param {GuildMember} owner The owner of the vote
 	 * @param {(TextChannel | any)} channel Base text channel
 	 * @param {SucklessBot} bot SucklessBot instance
 	 * @param {any} options vote options
@@ -119,6 +128,7 @@ export class Vote {
 	 */
 	constructor(
 		target: Discord.GuildMember,
+		owner: Discord.GuildMember,
 		channel: Discord.TextChannel | any,
 		bot: SucklessBot,
 		options?: { reason?: string; timer?: number }
@@ -128,6 +138,7 @@ export class Vote {
 		this.channel = channel;
 		this.guild = channel.guild;
 		this.target = target;
+		this.owner = owner;
 		if (options) {
 			if (options.reason) this.reason = options.reason;
 			if (options.timer) this.timer = options.timer;
@@ -234,6 +245,7 @@ export class Vote {
 	 * @memberof Vote
 	 */
 	protected async _onCollect(react: Discord.MessageReaction): Promise<void> {
+		if ((await react.users.fetch()).first().id === this.owner.id) return;
 		if ("👍".includes(react.emoji.name)) this._vote_Y++;
 		if ("👎".includes(react.emoji.name)) this._vote_N++;
 	}
@@ -247,6 +259,7 @@ export class Vote {
 	 * @memberof Vote
 	 */
 	protected async _onRemove(react: Discord.MessageReaction): Promise<void> {
+		if ((await react.users.fetch()).first().id === this.owner.id) return;
 		if ("👍".includes(react.emoji.name)) this._vote_Y--;
 		if ("👎".includes(react.emoji.name)) this._vote_N--;
 	}

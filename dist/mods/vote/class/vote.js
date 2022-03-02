@@ -60,8 +60,9 @@ var Discord = __importStar(require("discord.js"));
 var __1 = require("..");
 var generateid_1 = require("../../../core/utils/generateid");
 var Vote = (function () {
-    function Vote(target, channel, bot, options) {
+    function Vote(target, owner, channel, bot, options) {
         this.target = undefined;
+        this.owner = undefined;
         this.channel = undefined;
         this.guild = undefined;
         this.msg = undefined;
@@ -76,6 +77,7 @@ var Vote = (function () {
         this.channel = channel;
         this.guild = channel.guild;
         this.target = target;
+        this.owner = owner;
         if (options) {
             if (options.reason)
                 this.reason = options.reason;
@@ -160,22 +162,34 @@ var Vote = (function () {
     Vote.prototype._onCollect = function (react) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                if ("👍".includes(react.emoji.name))
-                    this._vote_Y++;
-                if ("👎".includes(react.emoji.name))
-                    this._vote_N++;
-                return [2];
+                switch (_a.label) {
+                    case 0: return [4, react.users.fetch()];
+                    case 1:
+                        if ((_a.sent()).first().id === this.owner.id)
+                            return [2];
+                        if ("👍".includes(react.emoji.name))
+                            this._vote_Y++;
+                        if ("👎".includes(react.emoji.name))
+                            this._vote_N++;
+                        return [2];
+                }
             });
         });
     };
     Vote.prototype._onRemove = function (react) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                if ("👍".includes(react.emoji.name))
-                    this._vote_Y--;
-                if ("👎".includes(react.emoji.name))
-                    this._vote_N--;
-                return [2];
+                switch (_a.label) {
+                    case 0: return [4, react.users.fetch()];
+                    case 1:
+                        if ((_a.sent()).first().id === this.owner.id)
+                            return [2];
+                        if ("👍".includes(react.emoji.name))
+                            this._vote_Y--;
+                        if ("👎".includes(react.emoji.name))
+                            this._vote_N--;
+                        return [2];
+                }
             });
         });
     };
