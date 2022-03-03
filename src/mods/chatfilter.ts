@@ -1,6 +1,6 @@
 import { Intents } from "discord.js";
 import { chatfilter } from "./chatfilter/";
-const cf: chatfilter = new chatfilter("https://raw.githubusercontent.com/minhquantommy/CircusBot/main/badwords.json");
+const cf: chatfilter = new chatfilter();
 
 export = {
 	name: "ChatFilter",

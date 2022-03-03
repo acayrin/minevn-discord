@@ -1,7 +1,7 @@
 "use strict";
 var discord_js_1 = require("discord.js");
 var chatfilter_1 = require("./chatfilter/");
-var cf = new chatfilter_1.chatfilter("https://raw.githubusercontent.com/minhquantommy/CircusBot/main/badwords.json");
+var cf = new chatfilter_1.chatfilter();
 module.exports = {
     name: "ChatFilter",
     author: "acayrin",

@@ -5,13 +5,8 @@ import { preload } from "./preload";
 import { whook } from "./webhook";
 
 export class chatfilter {
-    private __url: string = undefined;
     private __filter: filter = undefined;
     private __list: string[] = undefined;
-
-    constructor(url: string) {
-        this.__url = url;
-    };
     
     public async makeThisChatClean(message: Message, args: string[], bot: SucklessBot): Promise<void> {
         // ignore bot + non-text based channels
@@ -20,7 +15,7 @@ export class chatfilter {
         
         // list
         if (!this.__list)
-            this.__list = await preload.loadDB(this.__url);
+            this.__list = await preload.loadDB("https://raw.githubusercontent.com/minhquantommy/CircusBot/main/badwords.json");
         
         // get filter
         this.__filter = new filter(this.__list);
