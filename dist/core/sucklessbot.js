@@ -89,6 +89,7 @@ var SucklessBot = (function (_super) {
         _this.mods = [];
         _this.cli = function () { return _this.__client; };
         _this.__init = function () {
+            _this.logger.log("Suckless ver: 1.0.0");
             _this.logger.log("Platform ".concat(process.platform, " ").concat(process.arch, " - Node ").concat(process.version.match(/^v(\d+\.\d+)/)[1]));
             var intents = [];
             fs.readdirSync("".concat(path, "/mods")).forEach(function (item) {

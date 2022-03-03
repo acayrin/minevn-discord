@@ -70,30 +70,6 @@ var preload = (function () {
                             if (/ +/g.test(check)) {
                                 db.push(check.replace(/ +/g, ''));
                                 _c++;
-                                if (this.__reg_A(check)) {
-                                    db.push(this.__reg_A(check.replace(/ +/g, ''))), _c++;
-                                }
-                                ;
-                                if (this.__reg_D(check)) {
-                                    db.push(this.__reg_D(check.replace(/ +/g, ''))), _c++;
-                                }
-                                ;
-                                if (this.__reg_I(check)) {
-                                    db.push(this.__reg_I(check.replace(/ +/g, ''))), _c++;
-                                }
-                                ;
-                            }
-                            ;
-                            if (this.__reg_A(check)) {
-                                db.push(this.__reg_A(check)), _c++;
-                            }
-                            ;
-                            if (this.__reg_D(check)) {
-                                db.push(this.__reg_D(check)), _c++;
-                            }
-                            ;
-                            if (this.__reg_I(check)) {
-                                db.push(this.__reg_I(check)), _c++;
                             }
                             ;
                             __logger.debug("[Filter] DB :: Added '".concat(check, "' (").concat(_c, " additions)"));

@@ -56,18 +56,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.filter = void 0;
-var utils_1 = require("../../core/utils");
 var promise = __importStar(require("bluebird"));
 var filter = (function () {
     function filter(list) {
         this.__list = undefined;
-        this.__logger = new utils_1.Logger();
         this.__list = list;
     }
     ;
     filter.prototype.clear = function (input) {
         return input
-            .replace(/  +/g, " ")
+            .replace(/ +/g, "")
+            .replace(/\\n+/g, "")
             .replace(/[\u200B-\u200D\uFEFF]/g, '')
             .replace(/[`~!@#$%^&*()_+-=[\]{};':",.\/<>?\\|]/g, '');
     };
@@ -75,7 +74,6 @@ var filter = (function () {
         return __awaiter(this, void 0, void 0, function () {
             var _i, _a, f;
             return __generator(this, function (_b) {
-                input = this.clear(input).replace(/\n/g, "的").replace(/ /g, "常");
                 for (_i = 0, _a = this.__list; _i < _a.length; _i++) {
                     f = _a[_i];
                     input = input.replace(new RegExp(f, "gi"), "是");
@@ -87,13 +85,12 @@ var filter = (function () {
     ;
     filter.prototype.adv_replace = function (msg) {
         return __awaiter(this, void 0, void 0, function () {
-            var input, split, chunks, indexes, prt, _i, indexes_1, obj, c, res;
+            var split, chunks, indexes, prt, _i, indexes_1, obj, c, res;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        input = msg.replace(/\n/g, "的").replace(/ /g, "常");
-                        split = input.split('');
+                        split = msg.split('');
                         chunks = this.to_chunk(split, Math.ceil(split.length / (split.length >= 1500 ? 64 :
                             split.length >= 1000 ? 32 :
                                 split.length >= 500 ? 16 :
@@ -107,23 +104,26 @@ var filter = (function () {
                                         case 0:
                                             ck_base_index = chunks[0].length * ck_index;
                                             return [4, promise.Promise.map(chunk, function (char, cr_index) {
-                                                    if (char === "的" ||
-                                                        char === "常" ||
+                                                    if (char === "\n" ||
+                                                        char === " " ||
                                                         (/[`~!@#$%^&*()_+-=[\]{};':",.\/<>?\\|]/g).test(chunk[cr_index]) ||
                                                         (/[\u200B-\u200D\uFEFF]/g).test(chunk[cr_index]))
                                                         return;
                                                     var cf_index = cr_index;
                                                     var tmp_string = char;
                                                     while (++cf_index < chunk.length) {
-                                                        if (chunk[cf_index] === "的" ||
-                                                            chunk[cf_index] === "常" ||
+                                                        if (chunk[cf_index] === "\n" ||
+                                                            chunk[cf_index] === " " ||
                                                             (/[`~!@#$%^&*()_+-=[\]{};':",.\/<>?\\|]/g).test(chunk[cf_index]) ||
                                                             (/[\u200B-\u200D\uFEFF]/g).test(chunk[cf_index]))
                                                             continue;
                                                         tmp_string += chunk[cf_index];
                                                         var x = _this.__list.length;
                                                         while (--x) {
-                                                            if (_this.clear(tmp_string).toLowerCase().replace(/的/g, "").replace(/常/g, "") === _this.__list[x].toLowerCase()) {
+                                                            if (_this.clear(tmp_string)
+                                                                .replace(/ +/g, "")
+                                                                .replace(/\\n+/g, "")
+                                                                .toLowerCase() === _this.__list[x].toLowerCase()) {
                                                                 indexes.push([
                                                                     ck_base_index + cr_index++,
                                                                     ck_base_index + cf_index++
@@ -148,7 +148,7 @@ var filter = (function () {
                             })];
                     case 1:
                         _a.sent();
-                        prt = msg.replace(/\n/g, "的").replace(/ /g, "常").split('');
+                        prt = msg.split('');
                         for (_i = 0, indexes_1 = indexes; _i < indexes_1.length; _i++) {
                             obj = indexes_1[_i];
                             for (c = obj[0]; c <= obj[1]; c++) {
@@ -158,7 +158,7 @@ var filter = (function () {
                             ;
                         }
                         ;
-                        res = prt.join('').replace(/的/g, "\n").replace(/常/g, " ");
+                        res = prt.join('');
                         return [2, [
                                 res.replace(/是/g, "<:mvncat:861078127551971338>").length < 1900 ?
                                     res.replace(/是/g, "<:mvncat:861078127551971338>") :

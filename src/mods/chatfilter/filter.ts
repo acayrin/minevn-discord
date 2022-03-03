@@ -14,20 +14,18 @@ export class filter {
      */
     public clear(input: string): string {
         return input
-            .replace(/  +/g, " ") // replace multiple spaces into one
+            .replace(/ +/g, "") // remove white spaces
+            .replace(/\\n+/g, "") // remove line breaks
             .replace(/[\u200B-\u200D\uFEFF]/g, '') // zero-width no joiner
             .replace(/[`~!@#$%^&*()_+-=[\]{};':",.\/<>?\\|]/g, '') // specials chars
     }
 
     /**
-     * Simple check, for long paragraphs
+     * Simple check, for long paragraphs (OBSOLETE)
      * @param input message/ string
      * @returns fixed string
      */
     public async simple_replace(input: string): Promise<string> {
-        // replace all symbols
-        input = this.clear(input).replace(/\n/g, "的").replace(/ /g, "常");
-
         // replace all
         for (const f of this.__list)
             input = input.replace(new RegExp(f, "gi"), "是");
@@ -42,11 +40,8 @@ export class filter {
      * @returns fixed string
      */
     public async adv_replace(msg: string): Promise<[string, number, number]> {
-        // 常 = whitespace
-        // 的 = line break
-        const input = msg.replace(/\n/g, "的").replace(/ /g, "常");
         // split into characters
-        const split = input.split('');
+        const split = msg.split('');
         // dynamic chunking
         const chunks = this.to_chunk(split, Math.ceil(
             split.length / (
@@ -79,8 +74,8 @@ export class filter {
              */
             await promise.Promise.map(chunk, (char: string, cr_index) => {
                 if (
-                    char === "的" ||                                                    // ignore line breaks
-                    char === "常" ||                                                    // ignore spaces
+                    char === "\n" ||                                                    // ignore line breaks
+                    char === " "  ||                                                    // ignore spaces
                     (/[`~!@#$%^&*()_+-=[\]{};':",.\/<>?\\|]/g).test(chunk[cr_index]) || // ignore special chars
                     (/[\u200B-\u200D\uFEFF]/g).test(chunk[cr_index])                    // ignore zero-width no joiner
                 ) return;
@@ -91,8 +86,8 @@ export class filter {
     
                 while (++cf_index < chunk.length) {
                     if (
-                        chunk[cf_index] === "的" ||                                         // ignore line breaks
-                        chunk[cf_index] === "常" ||                                         // ignore spaces
+                        chunk[cf_index] === "\n" ||                                         // ignore line breaks
+                        chunk[cf_index] === " "  ||                                         // ignore spaces
                         (/[`~!@#$%^&*()_+-=[\]{};':",.\/<>?\\|]/g).test(chunk[cf_index]) || // ignore special chars
                         (/[\u200B-\u200D\uFEFF]/g).test(chunk[cf_index])                    // ignore zero-width no joiner
                     ) continue;
@@ -103,7 +98,11 @@ export class filter {
                     let x = this.__list.length;
                     while (--x) {
                         // if the [removed symbols] string is equal to one of the filter, execute next
-                        if (this.clear(tmp_string).toLowerCase().replace(/的/g, "").replace(/常/g, "") === this.__list[x].toLowerCase()) {
+                        if (this.clear(tmp_string)
+                            .replace(/ +/g, "")
+                            .replace(/\\n+/g, "")
+                            .toLowerCase() === this.__list[x].toLowerCase())
+                        {
                             // append to indexes
                             indexes.push([
                                 ck_base_index + cr_index++, // current index
@@ -123,7 +122,7 @@ export class filter {
         });
         
         // split into characters
-        const prt = msg.replace(/\n/g, "的").replace(/ /g, "常").split('');
+        const prt = msg.split('');
 
         // replace all
         for (const obj of indexes) {
@@ -134,7 +133,7 @@ export class filter {
         };
 
         // return
-        const res = prt.join('').replace(/的/g, "\n").replace(/常/g, " ");
+        const res = prt.join('');
         return [
             res.replace(/是/g, "<:mvncat:861078127551971338>").length < 1900 ?
             res.replace(/是/g, "<:mvncat:861078127551971338>") : // :mvncat:
@@ -144,6 +143,12 @@ export class filter {
         ];
     };
 
+    /**
+     * Split an array into chunks of wanted size
+     * @param arr array to split
+     * @param size chunk size
+     * @returns chunks
+     */
     private to_chunk(arr: string | any[], size: number) {
         if (size <= 0) throw "Invalid chunk size";
         var R = [];

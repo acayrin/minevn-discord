@@ -42,9 +42,11 @@ var filter_1 = require("./filter");
 var preload_1 = require("./preload");
 var webhook_1 = require("./webhook");
 var chatfilter = (function () {
-    function chatfilter() {
+    function chatfilter(url) {
+        this.__url = undefined;
         this.__filter = undefined;
         this.__list = undefined;
+        this.__url = url;
     }
     ;
     chatfilter.prototype.makeThisChatClean = function (message, args, bot) {
@@ -53,11 +55,11 @@ var chatfilter = (function () {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        if (message.author.bot)
+                        if (message.author.bot || !message.channel.isText())
                             return [2];
                         if (!!this.__list) return [3, 2];
                         _a = this;
-                        return [4, preload_1.preload.loadDB("https://raw.githubusercontent.com/minhquantommy/CircusBot/main/badwords.json")];
+                        return [4, preload_1.preload.loadDB(this.__url)];
                     case 1:
                         _a.__list = _b.sent();
                         _b.label = 2;
