@@ -18,7 +18,7 @@ export class VoteMute extends Vote {
 	 */
 	async vote(): Promise<void> {
 		this._run({
-			embed: this._embed().setTitle(`Mute: ${this.target.user.tag} for ${this._bot.config.mute.duration}m`),
+			embed: this._embed().setTitle(`Mute: ${this.target.user.tag} for ${this._bot.configs.get("vote.json")['duration']}m`),
 		});
 	}
 
@@ -28,12 +28,12 @@ export class VoteMute extends Vote {
 	 * @memberof Vote
 	 */
 	protected async _onWin(): Promise<any> {
-		const role = await getRole(this._bot.config.mute.role || "mute", this.channel.guild);
+		const role = await getRole(this._bot.configs.get("vote.json")['role']|| "mute", this.channel.guild);
 
 		this.msg.edit({
 			embeds: [
 				this._embed()
-					.setTitle(`Muted: ${this.target.user.tag} [${this._bot.config.mute.duration}m]`)
+					.setTitle(`Muted: ${this.target.user.tag} [${this._bot.configs.get("vote.json")['duration']}m]`)
 					.setDescription(`reason: ${this.reason}\namount ${this._vote_Y} 👍 : ${this._vote_N} 👎`),
 			],
 		});
@@ -51,7 +51,7 @@ export class VoteMute extends Vote {
 				recentmutes.add(this.target.id);
 				setTimeout(() => {
 					recentmutes.remove(this.target.id);
-				}, this._bot.config.mute.duration * 3 * 60000);
+				}, this._bot.configs.get("vote.json")['duration'] * 3 * 60000);
 
 				// only when the user is still in the server
 				// remove role after timeout
@@ -75,7 +75,7 @@ export class VoteMute extends Vote {
 							`[Vote - ${this.id}] User ${this.target.id} got their muted role removed, ignoring`
 						);
 					}
-				}, this._bot.config.mute.duration * 60000);
+				}, this._bot.configs.get("vote.json")['duration'] * 60000);
 			});
 	}
 }

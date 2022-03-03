@@ -10,9 +10,13 @@ export = {
 	onMsgCreate: (msg: Message, args: string[], bot: SucklessBot): void => {
 		if (msg.embeds?.length > 0) {
 			const title = msg.embeds?.at(0).title;
-			if (title?.match(/free/gi) && title?.match(/nitro/gi)) {
-				msg.delete();
-			}
-		}
+			//const url = msg.embeds?.at(0).url;
+			//const desc = msg.embeds?.at(0).description;
+			if (title?.match(/free/gi) && title?.match(/nitro/gi) && title?.match(/steam/gi)) {
+				msg.delete().then(() => {
+					msg.channel.send(`${msg.author} **YOU'RE FORBIDDEN FROM POSTING FAKE DISCORD NITRO WEBSITES!**`);
+				});
+			};
+		};
 	},
 };

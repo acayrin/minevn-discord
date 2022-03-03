@@ -39,13 +39,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.preload = void 0;
-var node_fetch_1 = __importDefault(require("node-fetch"));
+exports.database = void 0;
 var utils_1 = require("../../core/utils");
-var preload = (function () {
-    function preload() {
+var node_fetch_1 = __importDefault(require("node-fetch"));
+var database = (function () {
+    function database() {
     }
-    preload.loadDB = function (url) {
+    database.loadDB = function (url) {
         return __awaiter(this, void 0, void 0, function () {
             var __logger, f1, f2, json, db, _i, db_1, check, _c;
             return __generator(this, function (_a) {
@@ -82,27 +82,27 @@ var preload = (function () {
         });
     };
     ;
-    preload.__reg_D = function (input) {
+    database.__reg_D = function (input) {
         var reg = new RegExp(/đ|Đ+/g);
         if (reg.test(input))
             return input.replace(reg, 'd');
         return undefined;
     };
     ;
-    preload.__reg_I = function (input) {
+    database.__reg_I = function (input) {
         var reg = new RegExp(/í|Í|ị|Ị|ĩ|Ĩ+/g);
         if (reg.test(input))
             return input.replace(reg, 'i');
         return undefined;
     };
     ;
-    preload.__reg_A = function (input) {
+    database.__reg_A = function (input) {
         var reg = new RegExp(/ặ|Ặ/g);
         if (reg.test(input))
             return input.replace(reg, 'a');
         return undefined;
     };
     ;
-    return preload;
+    return database;
 }());
-exports.preload = preload;
+exports.database = database;

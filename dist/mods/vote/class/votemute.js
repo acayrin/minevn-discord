@@ -83,7 +83,7 @@ var VoteMute = (function (_super) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 this._run({
-                    embed: this._embed().setTitle("Mute: ".concat(this.target.user.tag, " for ").concat(this._bot.config.mute.duration, "m"))
+                    embed: this._embed().setTitle("Mute: ".concat(this.target.user.tag, " for ").concat(this._bot.configs.get("vote.json")['duration'], "m"))
                 });
                 return [2];
             });
@@ -95,13 +95,13 @@ var VoteMute = (function (_super) {
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, (0, utils_1.getRole)(this._bot.config.mute.role || "mute", this.channel.guild)];
+                    case 0: return [4, (0, utils_1.getRole)(this._bot.configs.get("vote.json")['role'] || "mute", this.channel.guild)];
                     case 1:
                         role = _a.sent();
                         this.msg.edit({
                             embeds: [
                                 this._embed()
-                                    .setTitle("Muted: ".concat(this.target.user.tag, " [").concat(this._bot.config.mute.duration, "m]"))
+                                    .setTitle("Muted: ".concat(this.target.user.tag, " [").concat(this._bot.configs.get("vote.json")['duration'], "m]"))
                                     .setDescription("reason: ".concat(this.reason, "\namount ").concat(this._vote_Y, " \uD83D\uDC4D : ").concat(this._vote_N, " \uD83D\uDC4E")),
                             ]
                         });
@@ -113,7 +113,7 @@ var VoteMute = (function (_super) {
                             recentmutes.add(_this.target.id);
                             setTimeout(function () {
                                 recentmutes.remove(_this.target.id);
-                            }, _this._bot.config.mute.duration * 3 * 60000);
+                            }, _this._bot.configs.get("vote.json")['duration'] * 3 * 60000);
                             setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
                                 var _this = this;
                                 return __generator(this, function (_a) {
@@ -131,7 +131,7 @@ var VoteMute = (function (_super) {
                                     }
                                     return [2];
                                 });
-                            }); }, _this._bot.config.mute.duration * 60000);
+                            }); }, _this._bot.configs.get("vote.json")['duration'] * 60000);
                         });
                         return [2];
                 }

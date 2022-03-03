@@ -14,9 +14,9 @@ export class filter {
      */
     public clear(input: string): string {
         return input
-            .replace(/ +/g, "") // remove white spaces
-            .replace(/\\n+/g, "") // remove line breaks
-            .replace(/[\u200B-\u200D\uFEFF]/g, '') // zero-width no joiner
+            .replace(/ /g, "") // remove white spaces
+            .replace(/\\n/g, "") // remove line breaks
+            .replace(/[\u200B-\u200D\uFEFF\u17B5]/g, '') // zero-width no joiner
             .replace(/[`~!@#$%^&*()_+-=[\]{};':",.\/<>?\\|]/g, '') // specials chars
     }
 
@@ -77,7 +77,7 @@ export class filter {
                     char === "\n" ||                                                    // ignore line breaks
                     char === " "  ||                                                    // ignore spaces
                     (/[`~!@#$%^&*()_+-=[\]{};':",.\/<>?\\|]/g).test(chunk[cr_index]) || // ignore special chars
-                    (/[\u200B-\u200D\uFEFF]/g).test(chunk[cr_index])                    // ignore zero-width no joiner
+                    (/[\u200B-\u200D\uFEFF\u17B5]/g).test(chunk[cr_index])              // ignore zero-width no joiner
                 ) return;
                 
                 // char after current index
@@ -89,7 +89,7 @@ export class filter {
                         chunk[cf_index] === "\n" ||                                         // ignore line breaks
                         chunk[cf_index] === " "  ||                                         // ignore spaces
                         (/[`~!@#$%^&*()_+-=[\]{};':",.\/<>?\\|]/g).test(chunk[cf_index]) || // ignore special chars
-                        (/[\u200B-\u200D\uFEFF]/g).test(chunk[cf_index])                    // ignore zero-width no joiner
+                        (/[\u200B-\u200D\uFEFF\u17B5]/g).test(chunk[cf_index])              // ignore zero-width no joiner
                     ) continue;
 
                     // append to current string
@@ -98,11 +98,7 @@ export class filter {
                     let x = this.__list.length;
                     while (--x) {
                         // if the [removed symbols] string is equal to one of the filter, execute next
-                        if (this.clear(tmp_string)
-                            .replace(/ +/g, "")
-                            .replace(/\\n+/g, "")
-                            .toLowerCase() === this.__list[x].toLowerCase())
-                        {
+                        if (this.clear(tmp_string).toLowerCase() === this.__list[x].toLowerCase()) {
                             // append to indexes
                             indexes.push([
                                 ck_base_index + cr_index++, // current index

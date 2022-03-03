@@ -20,7 +20,7 @@ export class VoteUnmute extends Vote {
 	 * @memberof VoteUnmute
 	 */
 	protected async _onWin(): Promise<any> {
-		const role = await getRole(this._bot.config.mute.role || "mute", this.channel.guild);
+		const role = await getRole(this._bot.configs.get("vote.json")['role'] || "mute", this.channel.guild);
 
 		this.msg.edit({
 			embeds: [

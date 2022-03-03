@@ -36,7 +36,7 @@ var getHelp = function (message, args, bot) {
                     .setTitle("[Mod] ".concat(mod.name))
                     .setDescription("".concat((_a = mod.description) !== null && _a !== void 0 ? _a : "*This mod doesn't have any description*"))
                     .addField("Command: `` ".concat(bot.cmdMgr.getCommands(mod).join(", "), " ``"), "Aliases: `` ".concat(bot.cmdMgr.getAliases(mod).join(", "), " ``"))
-                    .addField("Usage", "".concat(mod.usage.replace(/%prefix%+/, bot.config.prefix)))
+                    .addField("Usage", "".concat(mod.usage.replace(/%prefix%+/, bot.configs.get("core.json")['prefix'])))
                     .setFooter("by ".concat((_b = mod.author) !== null && _b !== void 0 ? _b : "unknown")),
             ]
         });
@@ -54,7 +54,7 @@ var getHelp = function (message, args, bot) {
                     .setDescription("A some-what useful guide on how to use this thing, idk")
                     .addField("Loaded mods", "".concat(mods_1.join(", ")))
                     .addField("Availabe commands", "".concat(bot.cmdMgr.commands.join(", ")))
-                    .addField("\u200B", "for command specific help, use `` ".concat(bot.config.prefix, " help <command> ``")),
+                    .addField("\u200B", "for command specific help, use `` ".concat(bot.configs.get("core.json")['prefix'], " help <command> ``")),
             ]
         });
     }

@@ -1,7 +1,7 @@
-import fetch from "node-fetch";
 import { Logger } from "../../core/utils";
+import fetch from "node-fetch";
 
-export class preload {
+export class database {
     public static async loadDB(url: string): Promise<string[]> {
         // logger
         const __logger = new Logger();

@@ -6,7 +6,7 @@ import { SucklessBot } from "../sucklessbot";
  * @export
  * @class BaseManager
  */
-export class BaseManager {
+export abstract class BaseManager {
 	/**
 	 * The SucklessBot instance this manager belongs to
 	 *

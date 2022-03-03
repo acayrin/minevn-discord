@@ -21,7 +21,7 @@ export const Snipe = (message: Discord.Message, args: string[], bot: SucklessBot
 	// if message is not a command
 	if (!args) return;
 
-	const arg = message.content.replace(bot.config.prefix, "").trim().split(/ +/);
+	const arg = message.content.replace(bot.configs.get("core.json")['prefix'], "").trim().split(/ +/);
 	const cmd = arg.shift().toLocaleLowerCase();
 	const num = -1 - Math.abs(Number(arg.shift()));
 
@@ -32,7 +32,7 @@ export const Snipe = (message: Discord.Message, args: string[], bot: SucklessBot
 			const rep = record_D[message.channelId].at(num || -1);
 			if (!rep) return;
 			message.reply({
-				embeds: [_e(rep)],
+				embeds: [_e(rep, bot)],
 				files: rep.files || null,
 			});
 			break;
@@ -43,7 +43,7 @@ export const Snipe = (message: Discord.Message, args: string[], bot: SucklessBot
 			const rep = record_U[message.channelId].at(num || -1);
 			if (!rep) return;
 			message.reply({
-				embeds: [_e(rep)],
+				embeds: [_e(rep, bot)],
 				files: rep.files || null,
 			});
 			break;
@@ -78,13 +78,13 @@ export const SnipeDelete = (message: Discord.Message, args: any, bot: SucklessBo
 	record_U[message.channelId] ||= [];
 
 	// shift oldest record
-	if (record_D[message.channelId].length > bot.config.snipe.limit) record_D[message.channelId].shift();
+	if (record_D[message.channelId].length > bot.configs.get("snipe.json")['limit']) record_D[message.channelId].shift();
 
 	// debug
 	bot?.emit(
 		"debug",
 		`[Snipe - ${message.channelId}] Deleted +${message.id} (${record_D[message.channelId].length}/${
-			bot.config.snipe.limit
+			bot.configs.get("snipe.json")['limit']
 		})`
 	);
 
@@ -120,13 +120,13 @@ export const SnipeUpdate = (oldMsg: Discord.Message, newMsg: Discord.Message, bo
 	record_U[oldMsg.channelId] ||= [];
 
 	// shift oldest record
-	if (record_U[oldMsg.channelId].length > bot.config.snipe.limit) record_U[oldMsg.channelId].shift();
+	if (record_U[oldMsg.channelId].length > bot.configs.get("snipe.json")['limit']) record_U[oldMsg.channelId].shift();
 
 	// debug
 	bot.emit(
 		"debug",
 		`[Snipe - ${oldMsg.channelId}] Updated +${oldMsg.id} (${record_U[oldMsg.channelId].length}/${
-			bot.config.snipe.limit
+			bot.configs.get("snipe.json")['limit']
 		})`
 	);
 
@@ -152,11 +152,12 @@ export const SnipeUpdate = (oldMsg: Discord.Message, newMsg: Discord.Message, bo
  * Generates a new embed, for snipe responses
  *
  * @param {DSChatRecord} a Chat record
+ * @param {SucklessBot} b SucklessBot instance, for embed color
  * @return {MessageEmbed} Discord embed
  */
-const _e = (a: DSChatRecord): Discord.MessageEmbed => {
+const _e = (a: DSChatRecord, b: SucklessBot): Discord.MessageEmbed => {
 	return new Discord.MessageEmbed()
-		.setColor("#ed2261")
+		.setColor(b.configs.get("core.json")['color'])
 		.setAuthor(a.owner, a.avatar)
 		.setDescription(a.content)
 		.setTimestamp(a.timestamp);

@@ -64,7 +64,7 @@ module.exports = {
                     message.channel.send({
                         embeds: [
                             new discord_js_1.MessageEmbed()
-                                .setColor("#ed2261")
+                                .setColor(bot.configs.get("core.json")['color'])
                                 .setTimestamp()
                                 .setTitle("".concat(json.host.toUpperCase()))
                                 .setDescription("".concat(json.description.descriptionText.replace(/§[a-z0-9]/g, "")))

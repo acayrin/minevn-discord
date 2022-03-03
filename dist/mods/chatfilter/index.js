@@ -38,33 +38,33 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.chatfilter = void 0;
 var discord_js_1 = require("discord.js");
+var database_1 = require("./database");
 var filter_1 = require("./filter");
-var preload_1 = require("./preload");
 var webhook_1 = require("./webhook");
 var chatfilter = (function () {
-    function chatfilter() {
+    function chatfilter(url) {
+        var _this = this;
         this.__filter = undefined;
-        this.__list = undefined;
+        if (url)
+            database_1.database.loadDB(url).then(function (db) { return _this.__filter = new filter_1.filter(db); });
     }
-    chatfilter.prototype.makeThisChatClean = function (message, args, bot) {
+    ;
+    chatfilter.prototype.load = function (url) {
+        var _this = this;
+        database_1.database.loadDB(url).then(function (db) { return _this.__filter = new filter_1.filter(db); });
+    };
+    ;
+    chatfilter.prototype.makeThisChatClean = function (message, bot) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, webhook, __d_start;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var webhook, __d_start;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
                         if (message.author.bot || !message.channel.isText())
                             return [2];
-                        if (!!this.__list) return [3, 2];
-                        _a = this;
-                        return [4, preload_1.preload.loadDB("https://raw.githubusercontent.com/minhquantommy/CircusBot/main/badwords.json")];
-                    case 1:
-                        _a.__list = _b.sent();
-                        _b.label = 2;
-                    case 2:
-                        this.__filter = new filter_1.filter(this.__list);
                         return [4, (new webhook_1.whook(bot, message.channel)).getHook()];
-                    case 3:
-                        webhook = _b.sent();
+                    case 1:
+                        webhook = _a.sent();
                         __d_start = Date.now();
                         this.__filter.adv_replace(message.content).then(function (out) {
                             var _a, _b;
@@ -94,4 +94,4 @@ var chatfilter = (function () {
     return chatfilter;
 }());
 exports.chatfilter = chatfilter;
-1;
+;

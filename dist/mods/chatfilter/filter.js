@@ -65,9 +65,9 @@ var filter = (function () {
     ;
     filter.prototype.clear = function (input) {
         return input
-            .replace(/ +/g, "")
-            .replace(/\\n+/g, "")
-            .replace(/[\u200B-\u200D\uFEFF]/g, '')
+            .replace(/ /g, "")
+            .replace(/\\n/g, "")
+            .replace(/[\u200B-\u200D\uFEFF\u17B5]/g, '')
             .replace(/[`~!@#$%^&*()_+-=[\]{};':",.\/<>?\\|]/g, '');
     };
     filter.prototype.simple_replace = function (input) {
@@ -107,7 +107,7 @@ var filter = (function () {
                                                     if (char === "\n" ||
                                                         char === " " ||
                                                         (/[`~!@#$%^&*()_+-=[\]{};':",.\/<>?\\|]/g).test(chunk[cr_index]) ||
-                                                        (/[\u200B-\u200D\uFEFF]/g).test(chunk[cr_index]))
+                                                        (/[\u200B-\u200D\uFEFF\u17B5]/g).test(chunk[cr_index]))
                                                         return;
                                                     var cf_index = cr_index;
                                                     var tmp_string = char;
@@ -115,15 +115,12 @@ var filter = (function () {
                                                         if (chunk[cf_index] === "\n" ||
                                                             chunk[cf_index] === " " ||
                                                             (/[`~!@#$%^&*()_+-=[\]{};':",.\/<>?\\|]/g).test(chunk[cf_index]) ||
-                                                            (/[\u200B-\u200D\uFEFF]/g).test(chunk[cf_index]))
+                                                            (/[\u200B-\u200D\uFEFF\u17B5]/g).test(chunk[cf_index]))
                                                             continue;
                                                         tmp_string += chunk[cf_index];
                                                         var x = _this.__list.length;
                                                         while (--x) {
-                                                            if (_this.clear(tmp_string)
-                                                                .replace(/ +/g, "")
-                                                                .replace(/\\n+/g, "")
-                                                                .toLowerCase() === _this.__list[x].toLowerCase()) {
+                                                            if (_this.clear(tmp_string).toLowerCase() === _this.__list[x].toLowerCase()) {
                                                                 indexes.push([
                                                                     ck_base_index + cr_index++,
                                                                     ck_base_index + cf_index++

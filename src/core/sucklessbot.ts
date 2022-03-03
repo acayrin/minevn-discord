@@ -17,31 +17,18 @@ export class SucklessBot extends EventEmitter {
 	/**
 	 * Creates an instance of SucklessBot.
 	 *
-	 * @param {string} token Your Discord bot token, if not specified, will use one in configuration instead
-	 * @paran {string} config Path to your configuration file
 	 * @param {boolean} debug Enable debug mode
 	 * @param {Discord.ClientOptions} clientOptions Client options, leave 'intents' empty, else if 'intents' are specified, they will override mods intents requirements
 	 * @memberof SucklessBot
 	 */
-	constructor(options?: { token?: string; config?: string; debug?: boolean; clientOptions?: Discord.ClientOptions }) {
+	constructor(options?: { debug?: boolean; clientOptions?: Discord.ClientOptions }) {
 		super();
 		this.debug = options.debug;
-		this.__token = options.token || this.config.token;
-		if (options.clientOptions) this.__clientOptions = options.clientOptions;
-		if (options.config) this.config = JSON.parse(fs.readFileSync(options.config, "utf8"));
+		this.__clientOptions = options.clientOptions;
 
 		// debugging
 		this.on("debug", (m: string) => (this.debug ? this.logger.debug(m) : undefined));
-	}
-
-	/**
-	 * SucklessBot's super secret token, DO NOT SHARE THIS !!
-	 *
-	 * @private
-	 * @type {string}
-	 * @memberof SucklessBot
-	 */
-	private __token: string;
+	};
 
 	/**
 	 * SucklessBot's debug mode (default off)
@@ -87,12 +74,15 @@ export class SucklessBot extends EventEmitter {
 	public logger: Logger = new Logger();
 
 	/**
-	 * SucklessBot's configuration, contains token so DO NOT SHARE THIS !!
+	 * SucklessBot's configuration files, including core config and mod configs
+	 * You can get a config file using the "configs" variable from a SucklessBot instance
+	 * 
+	 * filename:json_object
 	 *
-	 * @public
+	 * @type {Discord.Collection<String, any>}
 	 * @memberof SucklessBot
 	 */
-	public readonly config = JSON.parse(fs.readFileSync(process.env.SUCKLESS_CONFIG || `${path}/config.json`, "utf-8"));
+	public readonly configs: Discord.Collection<String, any> = new Discord.Collection();
 
 	/**
 	 * SucklessBot's mods collection
@@ -115,13 +105,30 @@ export class SucklessBot extends EventEmitter {
 	 * @memberof SucklessBot
 	 */
 	private __init = () => {
-		this.logger.log(`Suckless ver: 1.0.0`);
+		this.logger.log(`===================== Suckless Bot =====================`);
 		this.logger.log(
 			`Platform ${process.platform} ${process.arch} - Node ${process.version.match(/^v(\d+\.\d+)/)[1]}`
 		);
 
+		// load configurations
+		fs.readdirSync(`${path}/../config`).forEach((name) => {
+			// ignore any that isn't json
+			if (!name.endsWith(".json")) return;
+
+			// configuration file
+			const obj = JSON.parse(fs.readFileSync(`${path}/../config/${name}`, "utf-8"));
+
+			// set configuration file to map
+			this.configs.set(name, obj);
+
+			// logger
+			this.logger.log(`[CONFIGURATION] Loaded config file "${name}"`);
+		});
+		
+		// bot's intents
 		let intents: any = [];
 
+		// load mods
 		fs.readdirSync(`${path}/mods`).forEach((item) => {
 			// ignore any that isn't javascript
 			if (!item.endsWith(".js")) return;
@@ -178,13 +185,13 @@ export class SucklessBot extends EventEmitter {
 	 */
 	public start() {
 		this.__init();
-		this.__client.login(this.__token);
+		this.__client.login(this.configs.get("core.json")['token']);
 		this.__client.on("ready", this.__onConnect.bind(this));
 		this.__client.on("messageCreate", this.__onMessage.bind(this));
 		this.__client.on("messageDelete", this.__onDelete.bind(this));
 		this.__client.on("messageUpdate", this.__onUpdate.bind(this));
 		if (this.debug === "full") this.__client.on("debug", (e) => this.logger.debug(e));
-	}
+	};
 
 	/**
 	 * Triggers when SucklessBot successfully connects to Discord
@@ -205,16 +212,16 @@ export class SucklessBot extends EventEmitter {
 	 */
 	private __onMessage = (message: Discord.Message) => {
 		// if doesn't start with prefix
-		if (!message.content.startsWith(this.config.prefix))
+		if (!message.content.startsWith(this.configs.get("core.json")['prefix']))
 			return this.mods.forEach((mod) => {
 				try {
 					if (mod.onMsgCreate) mod.onMsgCreate(message, undefined, this);
 				} catch (e) {
 					this.logger.error(`[${mod.name}] ${e}\n${e.stack}`);
-				}
+				};
 			});
 
-		const msg = message.content.replace(this.config.prefix, "").trim();
+		const msg = message.content.replace(this.configs.get("core.json")['prefix'], "").trim();
 		const arg = msg.split(/ +/);
 		const cmd = arg.shift().toLocaleLowerCase(); // command
 
@@ -225,7 +232,7 @@ export class SucklessBot extends EventEmitter {
 					if (mod.onMsgCreate) mod.onMsgCreate(message, undefined, this);
 				} catch (e) {
 					this.logger.error(`[${mod.name}] ${e}\n${e.stack}`);
-				}
+				};
 			});
 
 		const mod = this.cmdMgr.getMod(cmd);
@@ -234,7 +241,7 @@ export class SucklessBot extends EventEmitter {
 				mod.onMsgCreate(message, arg, this);
 			} catch (e) {
 				this.logger.error(`[${mod.name}] ${e}\n${e.stack}`);
-			}
+			};
 	};
 
 	/**
@@ -278,7 +285,7 @@ export class SucklessBot extends EventEmitter {
 					mod.onMsgUpdate(oldMessage, newMessage, this);
 				} catch (e) {
 					this.logger.error(`[${mod.name}] ${e}\n${e.stack}`);
-				}
+				};
 		});
 	};
 }

@@ -65,7 +65,7 @@ var help = function (bot) {
         .setDescription("A music player since Susan decided to kill off most of the bots, also this thing spams alot\n" +
         "Note: **THE BOT CAN ONLY BE DISCONNECTED BY ``yt dc`` SUBCOMMAND**\n" +
         "Subcommands below")
-        .setColor("#ed2261")
+        .setColor(bot.configs.get("core.json")["color"])
         .setThumbnail(bot.cli().user.avatarURL())
         .addField("yt play/p [query]", "Search and play a track, can be a video or playlist url")
         .addField("yt search/s [query]", "Search for a track")

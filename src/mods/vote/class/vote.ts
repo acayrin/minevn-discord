@@ -8,7 +8,7 @@ import { id } from "../../../core/utils/generateid";
  *
  * @class Vote
  */
-export class Vote {
+export abstract class Vote {
 	/**
 	 * The target user ID
 	 *

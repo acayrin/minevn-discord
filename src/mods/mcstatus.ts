@@ -25,7 +25,7 @@ export = {
 					message.channel.send({
 						embeds: [
 							new MessageEmbed()
-								.setColor("#ed2261")
+								.setColor(bot.configs.get("core.json")['color'])
 								.setTimestamp()
 								.setTitle(`${json.host.toUpperCase()}`)
 								.setDescription(`${json.description.descriptionText.replace(/§[a-z0-9]/g, "")}`)

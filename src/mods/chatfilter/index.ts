@@ -1,24 +1,36 @@
 import { Message, MessageEmbed, Webhook } from "discord.js";
 import { SucklessBot } from "../../core/sucklessbot";
+import { database } from "./database";
 import { filter } from "./filter";
-import { preload } from "./preload";
 import { whook } from "./webhook";
 
 export class chatfilter {
     private __filter: filter = undefined;
-    private __list: string[] = undefined;
-    
-    public async makeThisChatClean(message: Message, args: string[], bot: SucklessBot): Promise<void> {
+
+    constructor(url?: string) { 
+        // load filter list
+        if (url) database.loadDB(url).then(db => this.__filter = new filter(db));
+    };
+
+    /**
+     * Load filter
+     *
+     * @param {string} url filter list url
+     * @memberof chatfilter
+     */
+    public load(url: string): void {
+        database.loadDB(url).then(db => this.__filter = new filter(db));
+    };
+
+    /**
+     * Check if the message is cursed or not then process it
+     * @param message input message
+     * @param bot suckless bot instance
+     */
+    public async makeThisChatClean(message: Message, bot: SucklessBot): Promise<void> {
         // ignore bot + non-text based channels
         if (message.author.bot || !message.channel.isText())
             return;
-        
-        // list
-        if (!this.__list)
-            this.__list = await preload.loadDB("https://raw.githubusercontent.com/minhquantommy/CircusBot/main/badwords.json");
-        
-        // get filter
-        this.__filter = new filter(this.__list);
         
         // get webhook
         const webhook: Webhook = await (new whook(bot, message.channel)).getHook();
@@ -26,7 +38,9 @@ export class chatfilter {
         // filter message
         const __d_start = Date.now();
         this.__filter.adv_replace(message.content).then(out => {
+            // if message is different
             if (out[0] !== message.content) {
+                // workaround for attachments
                 const atc: any = message.attachments;
     
                 // replace and cleanup;
@@ -45,4 +59,4 @@ export class chatfilter {
             };
         });
     };
-}1
+};

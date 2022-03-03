@@ -10,9 +10,13 @@ module.exports = {
         var _a, _b;
         if (((_a = msg.embeds) === null || _a === void 0 ? void 0 : _a.length) > 0) {
             var title = (_b = msg.embeds) === null || _b === void 0 ? void 0 : _b.at(0).title;
-            if ((title === null || title === void 0 ? void 0 : title.match(/free/gi)) && (title === null || title === void 0 ? void 0 : title.match(/nitro/gi))) {
-                msg["delete"]();
+            if ((title === null || title === void 0 ? void 0 : title.match(/free/gi)) && (title === null || title === void 0 ? void 0 : title.match(/nitro/gi)) && (title === null || title === void 0 ? void 0 : title.match(/steam/gi))) {
+                msg["delete"]().then(function () {
+                    msg.channel.send("".concat(msg.author, " **YOU'RE FORBIDDEN FROM POSTING FAKE DISCORD NITRO WEBSITES!**"));
+                });
             }
+            ;
         }
+        ;
     }
 };

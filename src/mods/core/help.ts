@@ -27,7 +27,7 @@ export const getHelp = (message: Discord.Message, args: string[], bot: SucklessB
 						`Command: \`\` ${bot.cmdMgr.getCommands(mod).join(", ")} \`\``,
 						`Aliases: \`\` ${bot.cmdMgr.getAliases(mod).join(", ")} \`\``
 					)
-					.addField("Usage", `${mod.usage.replace(/%prefix%+/, bot.config.prefix)}`)
+					.addField("Usage", `${mod.usage.replace(/%prefix%+/, bot.configs.get("core.json")['prefix'])}`)
 					.setFooter(`by ${mod.author ?? "unknown"}`),
 			],
 		});
@@ -48,7 +48,7 @@ export const getHelp = (message: Discord.Message, args: string[], bot: SucklessB
 					.setDescription(`A some-what useful guide on how to use this thing, idk`)
 					.addField("Loaded mods", `${mods.join(", ")}`)
 					.addField("Availabe commands", `${bot.cmdMgr.commands.join(", ")}`)
-					.addField("\u200B", `for command specific help, use \`\` ${bot.config.prefix} help <command> \`\``),
+					.addField("\u200B", `for command specific help, use \`\` ${bot.configs.get("core.json")['prefix']} help <command> \`\``),
 			],
 		});
 	}

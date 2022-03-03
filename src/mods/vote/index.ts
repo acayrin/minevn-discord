@@ -19,10 +19,10 @@ async function VoteSomebody(message: Message, args: string[], bot: SucklessBot, 
 	if (!args) return;
 
 	// channel lock
-	if (bot.config.mute.channel)
-		if (!bot.config.mute.channel.includes(message.channelId)) {
+	if (bot.configs.get("vote.json")['channel'])
+		if (!bot.configs.get("vote.json")['channel'].includes(message.channelId)) {
 			const channel = message.guild.channels.cache
-				.filter((ch) => bot.config.mute.channel.includes(ch.id))
+				.filter((ch) => bot.configs.get("vote.json")['channel'].includes(ch.id))
 				.first();
 			return message.reply(`Buddy, ya can't vote someone outside of ${channel}`);
 		}
@@ -51,7 +51,7 @@ async function VoteSomebody(message: Message, args: string[], bot: SucklessBot, 
 	}
 
 	// try to get muted role
-	const role = await getRole(bot.config.mute.role || "mute", message.member.guild);
+	const role = await getRole(bot.configs.get("vote.json")['role'] || "mute", message.member.guild);
 
 	// check if role exists
 	if (!role) {
@@ -63,7 +63,7 @@ async function VoteSomebody(message: Message, args: string[], bot: SucklessBot, 
 		if (user.roles.cache.has(role.id)) {
 			return new VoteUnmute(user, message.member, message.channel, bot, {
 				reason: reason || undefined,
-				timer: bot.config.mute.timer,
+				timer: bot.configs.get("vote.json")['timer'],
 			}).vote();
 		} else {
 			return message.channel.send(`User **${user.user.tag}** is not muted so ignoring`);
@@ -88,7 +88,7 @@ async function VoteSomebody(message: Message, args: string[], bot: SucklessBot, 
 	// vote mute
 	new VoteMute(user, message.member, message.channel, bot, {
 		reason: reason || undefined,
-		timer: bot.config.mute.timer,
+		timer: bot.configs.get("vote.json")['timer'],
 	}).vote();
 }
 

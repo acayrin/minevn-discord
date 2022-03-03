@@ -11,7 +11,7 @@ This project was made mainly for fun, and for the purpose of learning Typescript
 -   Minecraft status - a simple minecraft server tracker (Hẻo đã hẻo)
 -   Random weeb shit - send random images from nekos.fun/nekos.life
 -   Music player - a simple, suckass youtube audio player but it works out of the box (keep getting hit with rate-limits tho)
--	Chat filtering - a fast chat filtering system (less than 5 seconds on lengthy messages)
+-	Chat filtering - a fast chat filtering system (less than 3 seconds on lengthy messages)
 -   To be added:
     -   basic moderation features? most likely no
     -   full size minecraft server tracker?
@@ -21,7 +21,7 @@ This project was made mainly for fun, and for the purpose of learning Typescript
 
 ## Requirements
 
--   NodeJS `16.x+`
+-   NodeJS `16.x and above`
 -   Knowledge about Typescript/Javascript
 -   Time to rethink about the purpose of this thing that i made
 
@@ -35,13 +35,16 @@ yarn start      // start the bot [or npm start]
 
 ## Configuration
 
-Change `config.json.example` to `config.json`
+Configurations are stored in the `config` folder
 
-Then edit it to suit your needs
+To get a config object (JSON), you'll need to call the `configs` variable from a `SucklessBot` object then get it using a valid config file name
 
-Alternatively you can use `SUCKLESS_CONFIG` env variable with the absolute path to your config file
+as example
+```JS
+Suckless.configs.get(<config_file.json>)['some_json_key']
+```
 
-Currently custom configs are not supported
+Core configuration is stored in ``core.json``, this is where you set your bot token, prefix, embed color, etc.
 
 ## Creating a mod
 
@@ -131,7 +134,7 @@ You may find more "interest" things inside the `mods` folder
 
 ## Todos
 
--   custom configs
+-   ~~custom configs~~
 -   more events
 -   idk, more random mods
 -   make it sucks less

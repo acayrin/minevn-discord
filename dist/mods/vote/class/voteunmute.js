@@ -75,7 +75,7 @@ var VoteUnmute = (function (_super) {
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, (0, utils_1.getRole)(this._bot.config.mute.role || "mute", this.channel.guild)];
+                    case 0: return [4, (0, utils_1.getRole)(this._bot.configs.get("vote.json")['role'] || "mute", this.channel.guild)];
                     case 1:
                         role = _a.sent();
                         this.msg.edit({
