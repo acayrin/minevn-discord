@@ -57,6 +57,7 @@ var chatfilter = (function () {
     chatfilter.prototype.makeThisChatClean = function (message, bot) {
         return __awaiter(this, void 0, void 0, function () {
             var webhook, __d_start;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -66,25 +67,56 @@ var chatfilter = (function () {
                     case 1:
                         webhook = _a.sent();
                         __d_start = Date.now();
-                        this.__filter.adv_replace(message.content).then(function (out) {
-                            var _a, _b;
-                            if (out[0] !== message.content) {
-                                var atc = message.attachments;
-                                webhook.send({
-                                    content: out[0],
-                                    username: ((_a = message.member) === null || _a === void 0 ? void 0 : _a.nickname) || message.author.username,
-                                    avatarURL: ((_b = message.member) === null || _b === void 0 ? void 0 : _b.avatarURL()) || message.author.avatarURL(),
-                                    embeds: [
-                                        new discord_js_1.MessageEmbed()
-                                            .setColor(0xf5f5f5)
+                        this.__filter.adv_replace(message.content).then(function (out) { return __awaiter(_this, void 0, void 0, function () {
+                            var rep_embed, rep, e_1, payload_embeds, payload_attachments, ovf, payload_content;
+                            var _a, _b, _c, _d;
+                            return __generator(this, function (_e) {
+                                switch (_e.label) {
+                                    case 0:
+                                        if (!(out[0] !== message.content)) return [3, 5];
+                                        rep_embed = undefined;
+                                        _e.label = 1;
+                                    case 1:
+                                        _e.trys.push([1, 3, , 4]);
+                                        return [4, message.channel.messages.fetch(message.reference.messageId)];
+                                    case 2:
+                                        rep = _e.sent();
+                                        rep_embed = new discord_js_1.MessageEmbed()
+                                            .setColor(bot.configs.get("core.json")['color'])
+                                            .setAuthor((((_a = rep.member) === null || _a === void 0 ? void 0 : _a.nickname) || rep.author.username) + " (click to move)", ((_b = rep.member) === null || _b === void 0 ? void 0 : _b.avatarURL()) || rep.author.avatarURL(), rep.url)
+                                            .setDescription(rep.content);
+                                        return [3, 4];
+                                    case 3:
+                                        e_1 = _e.sent();
+                                        return [3, 4];
+                                    case 4:
+                                        ;
+                                        payload_embeds = message.embeds;
+                                        if (rep_embed)
+                                            payload_embeds.push(rep_embed);
+                                        payload_embeds.push(new discord_js_1.MessageEmbed()
+                                            .setColor(bot.configs.get("core.json")['color'])
                                             .setDescription("*Lưu ý: Sử dụng từ ngữ không hợp lệ quá nhiều sẽ khiến bạn bị mút!*")
-                                            .setFooter("".concat(bot.cli().user.tag, " :: bad [").concat(out[1], "] - cks [").concat(out[2], "] - time [").concat(Date.now() - __d_start, "ms]"), bot.cli().user.avatarURL())
-                                    ].concat(message.embeds),
-                                    files: atc
-                                })["finally"](function () { return message["delete"](); });
-                            }
-                            ;
-                        });
+                                            .setFooter("".concat(bot.cli().user.tag, " :: bad [").concat(out[1], "] - cks [").concat(out[2], "] - time [").concat(Date.now() - __d_start, "ms]"), bot.cli().user.avatarURL()));
+                                        payload_attachments = Array.from(message.attachments.values());
+                                        ovf = out[0].length > 2000 ? new discord_js_1.MessageAttachment(Buffer.from(out[0], "utf-8"), "out.txt") : undefined;
+                                        if (ovf)
+                                            payload_attachments.push(ovf);
+                                        payload_content = ovf ? "*Tin nhắn đã được chuyển sang dạng file vì quá dài.*" : out[0];
+                                        webhook.send({
+                                            content: payload_content,
+                                            username: ((_c = message.member) === null || _c === void 0 ? void 0 : _c.nickname) || message.author.username,
+                                            avatarURL: ((_d = message.member) === null || _d === void 0 ? void 0 : _d.avatarURL()) || message.author.avatarURL(),
+                                            embeds: payload_embeds,
+                                            files: payload_attachments
+                                        })["finally"](function () { return message["delete"](); });
+                                        _e.label = 5;
+                                    case 5:
+                                        ;
+                                        return [2];
+                                }
+                            });
+                        }); });
                         return [2];
                 }
             });
