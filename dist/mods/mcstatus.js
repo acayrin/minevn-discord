@@ -49,31 +49,55 @@ module.exports = {
     description: "Ping a minecraft server",
     usage: "%prefix%<command/alias> [ip] [port]",
     onMsgCreate: function (message, args, bot) { return __awaiter(void 0, void 0, void 0, function () {
-        var ip, port;
+        var ip, port, url;
         var _a, _b;
         return __generator(this, function (_c) {
             if (!args)
                 return [2];
             ip = (_a = args.shift()) !== null && _a !== void 0 ? _a : "minevn.net";
             port = (_b = args.shift()) !== null && _b !== void 0 ? _b : 25565;
-            (0, node_fetch_1["default"])("https://mcsrv.vercel.app/?ip=".concat(ip, "&port=").concat(port)).then(function (res) {
-                return res
-                    .text()
-                    .then(function (txt) {
-                    var json = JSON.parse(txt);
-                    message.channel.send({
-                        embeds: [
-                            new discord_js_1.MessageEmbed()
-                                .setColor(bot.configs.get("core.json")['color'])
-                                .setTimestamp()
-                                .setTitle("".concat(json.host.toUpperCase()))
-                                .setDescription("".concat(json.description.descriptionText.replace(/§[a-z0-9]/g, "")))
-                                .setThumbnail("".concat(bot.cli().user.avatarURL()))
-                                .addField("Online", "".concat(json.onlinePlayers, "/").concat(json.maxPlayers))
-                                .addField("Version", "".concat(json.version)),
-                        ]
+            url = "https://mcsrv.vercel.app/?ip=".concat(ip, "&port=").concat(port);
+            (0, node_fetch_1["default"])(url).then(function (res) {
+                return res.text().then(function (txt) { return __awaiter(void 0, void 0, void 0, function () {
+                    var json, thumb, fav_url, channel, msg, e_1;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                json = JSON.parse(txt);
+                                thumb = new discord_js_1.MessageAttachment(Buffer.from(json.favicon.replace("data:image/png;base64,", ""), "base64"), "thumb.png");
+                                fav_url = undefined;
+                                _a.label = 1;
+                            case 1:
+                                _a.trys.push([1, 4, , 5]);
+                                return [4, bot.cli().channels.fetch(bot.configs.get("mcstatus.json")['temp_channel'])];
+                            case 2:
+                                channel = _a.sent();
+                                return [4, channel.send({ content: ip, files: [thumb] })];
+                            case 3:
+                                msg = _a.sent();
+                                fav_url = msg.attachments.at(0).url;
+                                return [3, 5];
+                            case 4:
+                                e_1 = _a.sent();
+                                return [3, 5];
+                            case 5:
+                                ;
+                                message.channel.send({
+                                    embeds: [
+                                        new discord_js_1.MessageEmbed()
+                                            .setColor(bot.configs.get("core.json")['color'])
+                                            .setTimestamp()
+                                            .setTitle("".concat(json.host.toUpperCase()))
+                                            .setDescription("".concat(json.description.descriptionText.replace(/§[a-z0-9]/g, "")))
+                                            .setThumbnail(url + "&favicon=1")
+                                            .addField("Online", "".concat(json.onlinePlayers, "/").concat(json.maxPlayers))
+                                            .addField("Version", "".concat(json.version)),
+                                    ]
+                                });
+                                return [2];
+                        }
                     });
-                })["catch"](function () {
+                }); })["catch"](function () {
                     message.channel.send("I wasn't able to sneak up onto **".concat(ip, ":").concat(port, "** and steal their goodies"));
                 });
             });
