@@ -1,6 +1,6 @@
 import * as Discord from "discord.js";
-import { SucklessBot } from "../../core/sucklessbot";
-import { __all, __random } from "./functions";
+import { SucklessBot } from "../../core/SucklessBot";
+import { __all, __random } from "./Functions";
 
 /**
  * Send an anime pic, from nekos.life and nekos.fun

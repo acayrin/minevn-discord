@@ -1,5 +1,5 @@
-import { MusicManager } from "./musicmanager";
-import { MusicPlayer } from "./musicplayer";
-import { MusicTrack } from "./musictrack";
+import { MusicManager } from "./MusicManager";
+import { MusicPlayer } from "./MusicPlayer";
+import { MusicTrack } from "./MusicTrack";
 
 export { MusicManager as MusicManager, MusicPlayer as MusicPlayer, MusicTrack as MusicTrack };

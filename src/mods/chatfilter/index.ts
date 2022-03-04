@@ -1,8 +1,8 @@
 import { Message, MessageAttachment, MessageEmbed, Webhook } from "discord.js";
-import { SucklessBot } from "../../core/sucklessbot";
-import { database } from "./database";
-import { filter } from "./filter";
-import { whook } from "./webhook";
+import { SucklessBot } from "../../core/SucklessBot";
+import { database } from "./Database";
+import { filter } from "./Filter";
+import { whook } from "./Webhook";
 
 export class chatfilter {
     private __filter: filter = undefined;
@@ -47,7 +47,8 @@ export class chatfilter {
                     rep_embed = new MessageEmbed()
                         .setColor(bot.configs.get("core.json")['color'])
                         .setAuthor((rep.member?.nickname || rep.author.username) + " (click to move)", rep.member?.avatarURL() || rep.author.avatarURL(), rep.url)
-                        .setDescription(rep.content);
+                        .setDescription(rep.content)
+                        .setFooter(`Lưu ý: Sử dụng từ ngữ không hợp lệ quá nhiều sẽ khiến bạn bị mút! [${out[1]} - ${Date.now() - __d_start}ms]`);
                 } catch (e) {
                     // ignored cuz of unable to fetch reply
                 };
@@ -55,14 +56,16 @@ export class chatfilter {
                 // payload: embeds
                 const payload_embeds = message.embeds;
                 // reply embeds
-                if (rep_embed) payload_embeds.push(rep_embed);
-                // warning embed
-                payload_embeds.push(
-                    new MessageEmbed()
-                        .setColor(bot.configs.get("core.json")['color'])
-                        .setDescription("*Lưu ý: Sử dụng từ ngữ không hợp lệ quá nhiều sẽ khiến bạn bị mút!*")
-                        .setFooter(`${bot.cli().user.tag} :: bad [${out[1]}] - cks [${out[2]}] - time [${Date.now() - __d_start}ms]`, bot.cli().user.avatarURL())
-                );
+                if (rep_embed) {
+                    payload_embeds.push(rep_embed);
+                } else {
+                    // warning embed
+                    payload_embeds.push(
+                        new MessageEmbed()
+                            .setColor(bot.configs.get("core.json")['color'])
+                            .setFooter(`Lưu ý: Sử dụng từ ngữ không hợp lệ quá nhiều sẽ khiến bạn bị mút! [${out[1]} - ${Date.now() - __d_start}ms]`)
+                    );
+                }
 
                 // payload: attachments
                 const payload_attachments: MessageAttachment[] = Array.from(message.attachments.values());

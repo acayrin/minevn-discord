@@ -38,20 +38,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.chatfilter = void 0;
 var discord_js_1 = require("discord.js");
-var database_1 = require("./database");
-var filter_1 = require("./filter");
-var webhook_1 = require("./webhook");
+var Database_1 = require("./Database");
+var Filter_1 = require("./Filter");
+var Webhook_1 = require("./Webhook");
 var chatfilter = (function () {
     function chatfilter(url) {
         var _this = this;
         this.__filter = undefined;
         if (url)
-            database_1.database.loadDB(url).then(function (db) { return _this.__filter = new filter_1.filter(db); });
+            Database_1.database.loadDB(url).then(function (db) { return _this.__filter = new Filter_1.filter(db); });
     }
     ;
     chatfilter.prototype.load = function (url) {
         var _this = this;
-        database_1.database.loadDB(url).then(function (db) { return _this.__filter = new filter_1.filter(db); });
+        Database_1.database.loadDB(url).then(function (db) { return _this.__filter = new Filter_1.filter(db); });
     };
     ;
     chatfilter.prototype.makeThisChatClean = function (message, bot) {
@@ -63,7 +63,7 @@ var chatfilter = (function () {
                     case 0:
                         if (message.author.bot || !message.channel.isText())
                             return [2];
-                        return [4, (new webhook_1.whook(bot, message.channel)).getHook()];
+                        return [4, (new Webhook_1.whook(bot, message.channel)).getHook()];
                     case 1:
                         webhook = _a.sent();
                         __d_start = Date.now();
@@ -84,7 +84,8 @@ var chatfilter = (function () {
                                         rep_embed = new discord_js_1.MessageEmbed()
                                             .setColor(bot.configs.get("core.json")['color'])
                                             .setAuthor((((_a = rep.member) === null || _a === void 0 ? void 0 : _a.nickname) || rep.author.username) + " (click to move)", ((_b = rep.member) === null || _b === void 0 ? void 0 : _b.avatarURL()) || rep.author.avatarURL(), rep.url)
-                                            .setDescription(rep.content);
+                                            .setDescription(rep.content)
+                                            .setFooter("L\u01B0u \u00FD: S\u1EED d\u1EE5ng t\u1EEB ng\u1EEF kh\u00F4ng h\u1EE3p l\u1EC7 qu\u00E1 nhi\u1EC1u s\u1EBD khi\u1EBFn b\u1EA1n b\u1ECB m\u00FAt! [".concat(out[1], " - ").concat(Date.now() - __d_start, "ms]"));
                                         return [3, 4];
                                     case 3:
                                         e_1 = _e.sent();
@@ -92,12 +93,14 @@ var chatfilter = (function () {
                                     case 4:
                                         ;
                                         payload_embeds = message.embeds;
-                                        if (rep_embed)
+                                        if (rep_embed) {
                                             payload_embeds.push(rep_embed);
-                                        payload_embeds.push(new discord_js_1.MessageEmbed()
-                                            .setColor(bot.configs.get("core.json")['color'])
-                                            .setDescription("*Lưu ý: Sử dụng từ ngữ không hợp lệ quá nhiều sẽ khiến bạn bị mút!*")
-                                            .setFooter("".concat(bot.cli().user.tag, " :: bad [").concat(out[1], "] - cks [").concat(out[2], "] - time [").concat(Date.now() - __d_start, "ms]"), bot.cli().user.avatarURL()));
+                                        }
+                                        else {
+                                            payload_embeds.push(new discord_js_1.MessageEmbed()
+                                                .setColor(bot.configs.get("core.json")['color'])
+                                                .setFooter("L\u01B0u \u00FD: S\u1EED d\u1EE5ng t\u1EEB ng\u1EEF kh\u00F4ng h\u1EE3p l\u1EC7 qu\u00E1 nhi\u1EC1u s\u1EBD khi\u1EBFn b\u1EA1n b\u1ECB m\u00FAt! [".concat(out[1], " - ").concat(Date.now() - __d_start, "ms]")));
+                                        }
                                         payload_attachments = Array.from(message.attachments.values());
                                         ovf = out[0].length > 2000 ? new discord_js_1.MessageAttachment(Buffer.from(out[0], "utf-8"), "out.txt") : undefined;
                                         if (ovf)

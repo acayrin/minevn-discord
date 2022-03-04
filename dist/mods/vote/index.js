@@ -58,7 +58,7 @@ exports.__esModule = true;
 exports.VUM = exports.VM = exports.voteMgr = void 0;
 var utils_1 = require("../../core/utils");
 var class_1 = require("./class/");
-var recentmutes = __importStar(require("./recentmute"));
+var recentmutes = __importStar(require("./RecentMute"));
 exports.voteMgr = new class_1.VoteManager();
 function VoteSomebody(message, args, bot, unmute) {
     return __awaiter(this, void 0, void 0, function () {

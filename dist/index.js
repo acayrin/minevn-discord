@@ -1,14 +1,14 @@
 "use strict";
 exports.__esModule = true;
-var sucklessbot_1 = require("./core/sucklessbot");
-new sucklessbot_1.SucklessBot({
+var SucklessBot_1 = require("./core/SucklessBot");
+new SucklessBot_1.SucklessBot({
     debug: true,
     clientOptions: {
         intents: [],
         presence: {
             activities: [
                 {
-                    name: "over the people",
+                    name: "over the monkeys",
                     type: "WATCHING"
                 },
             ]

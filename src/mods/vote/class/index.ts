@@ -1,6 +1,6 @@
-import { Vote } from "./vote";
-import { VoteManager } from "./votemanager";
-import { VoteMute } from "./votemute";
-import { VoteUnmute } from "./voteunmute";
+import { Vote } from "./Vote";
+import { VoteManager } from "./VoteManager";
+import { VoteMute } from "./VoteMute";
+import { VoteUnmute } from "./VoteUnmute";
 
 export { Vote as Vote, VoteManager as VoteManager, VoteMute as VoteMute, VoteUnmute as VoteUnmute };

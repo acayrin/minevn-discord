@@ -1,8 +1,8 @@
 import * as Discord from "discord.js";
-import { SucklessBot } from "../../core/sucklessbot";
+import { SucklessBot } from "../../core/SucklessBot";
 import { MusicManager, MusicPlayer, MusicTrack } from "./class/";
-import * as func from "./functions";
-import { help, MusicPlayerLang } from "./lang";
+import * as func from "./Functions";
+import { help, MusicPlayerLang } from "./Language";
 
 let musicMgr: MusicManager;
 export async function CreatePlayer(message: Discord.Message, args: string[], bot: SucklessBot) {

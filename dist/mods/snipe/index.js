@@ -58,12 +58,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.SnipeUpdate = exports.SnipeDelete = exports.Snipe = void 0;
+exports.SnipeUpdate = exports.SnipeDelete = exports.SnipeCreate = void 0;
 var Discord = __importStar(require("discord.js"));
 var node_fetch_1 = __importDefault(require("node-fetch"));
 var record_D = {};
 var record_U = {};
-var Snipe = function (message, args, bot) {
+var SnipeCreate = function (message, args, bot) {
     var _a, _b;
     record_D[_a = message.channelId] || (record_D[_a] = []);
     record_U[_b = message.channelId] || (record_U[_b] = []);
@@ -108,7 +108,7 @@ var Snipe = function (message, args, bot) {
         }
     }
 };
-exports.Snipe = Snipe;
+exports.SnipeCreate = SnipeCreate;
 var SnipeDelete = function (message, args, bot) {
     var _a, _b;
     record_D[_a = message.channelId] || (record_D[_a] = []);

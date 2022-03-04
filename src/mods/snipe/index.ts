@@ -1,7 +1,7 @@
 import * as Discord from "discord.js";
 import fetch from "node-fetch";
-import { SucklessBot } from "../../core/sucklessbot";
-import { DSChatRecord } from "./interface/DSChatRecord";
+import { SucklessBot } from "../../core/SucklessBot";
+import { SnipeChatRecord } from "./interface/SnipeChatRecord";
 
 const record_D: any = {};
 const record_U: any = {};
@@ -13,7 +13,7 @@ const record_U: any = {};
  * @param {string[]} args Arguments from message
  * @param {SucklessBot} bot The bot instance
  */
-export const Snipe = (message: Discord.Message, args: string[], bot: SucklessBot) => {
+export const SnipeCreate = (message: Discord.Message, args: string[], bot: SucklessBot) => {
 	// check
 	record_D[message.channelId] ||= [];
 	record_U[message.channelId] ||= [];
@@ -151,11 +151,11 @@ export const SnipeUpdate = (oldMsg: Discord.Message, newMsg: Discord.Message, bo
 /**
  * Generates a new embed, for snipe responses
  *
- * @param {DSChatRecord} a Chat record
+ * @param {SnipeChatRecord} a Chat record
  * @param {SucklessBot} b SucklessBot instance, for embed color
  * @return {MessageEmbed} Discord embed
  */
-const _e = (a: DSChatRecord, b: SucklessBot): Discord.MessageEmbed => {
+const _e = (a: SnipeChatRecord, b: SucklessBot): Discord.MessageEmbed => {
 	return new Discord.MessageEmbed()
 		.setColor(b.configs.get("core.json")['color'])
 		.setAuthor(a.owner, a.avatar)

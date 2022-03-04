@@ -1,4 +1,4 @@
-import { SucklessBot } from "./core/sucklessbot";
+import { SucklessBot } from "./core/SucklessBot";
 
 new SucklessBot({
 	debug: true, // may set to "full" for DJS's debug as well
@@ -7,7 +7,7 @@ new SucklessBot({
 		presence: {
 			activities: [
 				{
-					name: "over the people",
+					name: "over the monkeys",
 					type: "WATCHING",
 				},
 			],

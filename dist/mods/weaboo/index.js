@@ -57,7 +57,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.SendImg = void 0;
 var Discord = __importStar(require("discord.js"));
-var functions_1 = require("./functions");
+var Functions_1 = require("./Functions");
 function SendImg(message, args, bot) {
     return __awaiter(this, void 0, void 0, function () {
         var tag;
@@ -67,9 +67,9 @@ function SendImg(message, args, bot) {
                 return [2];
             }
             else if (tag === null || tag === void 0 ? void 0 : tag.toLowerCase().match(/list/)) {
-                return [2, message.reply("**Available tags:** ".concat(functions_1.__all.join(", ")))];
+                return [2, message.reply("**Available tags:** ".concat(Functions_1.__all.join(", ")))];
             }
-            (0, functions_1.__random)(tag).then(function (img) {
+            (0, Functions_1.__random)(tag).then(function (img) {
                 return img
                     ? message.channel.send({
                         embeds: [
