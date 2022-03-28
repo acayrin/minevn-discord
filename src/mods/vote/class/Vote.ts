@@ -110,7 +110,7 @@ export abstract class Vote {
 	protected _embed(): Discord.MessageEmbed {
 		return new Discord.MessageEmbed()
 			.setTimestamp()
-			.setColor("#ed2261")
+			.setColor(this._bot.configs.get("core.json")["color"])
 			.setTitle(`Vote`)
 			.setDescription(`Voting ends in ${this.timer}s`)
 			.setFooter("i love democracy");
@@ -220,9 +220,9 @@ export abstract class Vote {
 				time: this.timer * 1000,
 				dispose: true,
 			})
-			.on("collect", this.__onCollect.bind(this))
-			.on("remove", this.__onRemove.bind(this))
-			.on("end", this.__onEnd.bind(this));
+			.on("collect", await this.__onCollect.bind(this))
+			.on("remove", await this.__onRemove.bind(this))
+			.on("end", await this.__onEnd.bind(this));
 	}
 
 	/**

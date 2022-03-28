@@ -88,7 +88,7 @@ var Vote = (function () {
     Vote.prototype._embed = function () {
         return new Discord.MessageEmbed()
             .setTimestamp()
-            .setColor("#ed2261")
+            .setColor(this._bot.configs.get("core.json")["color"])
             .setTitle("Vote")
             .setDescription("Voting ends in ".concat(this.timer, "s"))
             .setFooter("i love democracy");
@@ -118,12 +118,12 @@ var Vote = (function () {
     };
     Vote.prototype._run = function (options) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+            return __generator(this, function (_l) {
+                switch (_l.label) {
                     case 0: return [4, this._preload()];
                     case 1:
-                        if (_b.sent())
+                        if (_l.sent())
                             return [2];
                         this._bot.emit("debug", "[Vote - ".concat(this.id, "] A vote has started, target: ").concat(this.target.id));
                         _a = this;
@@ -131,22 +131,34 @@ var Vote = (function () {
                                 embeds: [options.embed || this._embed()]
                             })];
                     case 2:
-                        _a.msg = _b.sent();
+                        _a.msg = _l.sent();
                         return [4, this.msg.react("👍")];
                     case 3:
-                        _b.sent();
+                        _l.sent();
                         return [4, this.msg.react("👎")];
                     case 4:
-                        _b.sent();
-                        this.msg
+                        _l.sent();
+                        _e = (_d = this.msg
                             .createReactionCollector({
                             filter: function (r, u) { return ["👍", "👎"].includes(r.emoji.name) && !u.bot; },
                             time: this.timer * 1000,
                             dispose: true
-                        })
-                            .on("collect", this.__onCollect.bind(this))
-                            .on("remove", this.__onRemove.bind(this))
-                            .on("end", this.__onEnd.bind(this));
+                        }))
+                            .on;
+                        _f = ["collect"];
+                        return [4, this.__onCollect.bind(this)];
+                    case 5:
+                        _g = (_c = _e.apply(_d, _f.concat([_l.sent()])))
+                            .on;
+                        _h = ["remove"];
+                        return [4, this.__onRemove.bind(this)];
+                    case 6:
+                        _j = (_b = _g.apply(_c, _h.concat([_l.sent()])))
+                            .on;
+                        _k = ["end"];
+                        return [4, this.__onEnd.bind(this)];
+                    case 7:
+                        _j.apply(_b, _k.concat([_l.sent()]));
                         return [2];
                 }
             });
