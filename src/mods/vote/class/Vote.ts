@@ -274,11 +274,6 @@ export abstract class Vote {
 	 * @memberof Vote
 	 */
 	protected async _onEnd(): Promise<void> {
-		this._bot.emit(
-			"debug",
-			`[Vote - ${this.id}] Vote ended with ${this._vote_Y}:${this._vote_N} (total ${this._vote_Y + this._vote_N})`
-		);
-
 		this.msg.reactions.cache.forEach((react) => {
 			if ("👍".includes(react.emoji.name)) {
 				react.users.cache.forEach((user) => {
@@ -291,6 +286,11 @@ export abstract class Vote {
 				});
 			}
 		});
+
+		this._bot.emit(
+			"debug",
+			`[Vote - ${this.id}] Vote ended with ${this._vote_Y}:${this._vote_N} (total ${this._vote_Y + this._vote_N})`
+		);
 
 		if (this._vote_Y > this._vote_N) this._onWin();
 		else this._onLose();

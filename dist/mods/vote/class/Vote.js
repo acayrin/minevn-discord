@@ -199,7 +199,6 @@ var Vote = (function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
-                this._bot.emit("debug", "[Vote - ".concat(this.id, "] Vote ended with ").concat(this._vote_Y, ":").concat(this._vote_N, " (total ").concat(this._vote_Y + this._vote_N, ")"));
                 this.msg.reactions.cache.forEach(function (react) {
                     if ("👍".includes(react.emoji.name)) {
                         react.users.cache.forEach(function (user) {
@@ -214,6 +213,7 @@ var Vote = (function () {
                         });
                     }
                 });
+                this._bot.emit("debug", "[Vote - ".concat(this.id, "] Vote ended with ").concat(this._vote_Y, ":").concat(this._vote_N, " (total ").concat(this._vote_Y + this._vote_N, ")"));
                 if (this._vote_Y > this._vote_N)
                     this._onWin();
                 else
