@@ -58,7 +58,7 @@ exports.__esModule = true;
 exports.SendImg = void 0;
 var Discord = __importStar(require("discord.js"));
 var Functions_1 = require("./Functions");
-function SendImg(message, args, bot) {
+function SendImg(message, args) {
     return __awaiter(this, void 0, void 0, function () {
         var tag;
         return __generator(this, function (_a) {
@@ -69,20 +69,19 @@ function SendImg(message, args, bot) {
             else if (tag === null || tag === void 0 ? void 0 : tag.toLowerCase().match(/list/)) {
                 return [2, message.reply("**Available tags:** ".concat(Functions_1.__all.join(", ")))];
             }
-            (0, Functions_1.__random)(tag).then(function (img) {
-                return img
-                    ? message.channel.send({
-                        embeds: [
-                            new Discord.MessageEmbed()
-                                .setTitle("Here ya go")
-                                .setImage(img)
-                                .setAuthor(message.author.tag)
-                                .setTimestamp(),
-                        ]
-                    })
-                    : message.reply("I couldn't find any image with the tag **".concat(tag, "**"));
-            });
-            return [2];
+            return [2, (0, Functions_1.__random)(tag).then(function (img) {
+                    return img
+                        ? message.channel.send({
+                            embeds: [
+                                new Discord.MessageEmbed()
+                                    .setTitle("Here ya go")
+                                    .setImage(img)
+                                    .setAuthor(message.author.tag)
+                                    .setTimestamp(),
+                            ]
+                        })
+                        : message.reply("I couldn't find any image with the tag **".concat(tag, "**"));
+                })];
         });
     });
 }

@@ -48,14 +48,16 @@ export class filter {
 			split,
 			Math.ceil(
 				split.length /
-					(split.length >= 1500
-						? 64 // if length >= 1500, split 64 chunks
-						: split.length >= 1000
-						? 32 // if length >= 1000, split 32 chunks
-						: split.length >= 500
-						? 16 // if length >= 500,  split 16 chunks
-						: split.length >= 250
-						? 8 // if length >= 250,  split 8 chunks
+					(split.length >= 1600
+						? 64 // if length >= 1600, split 64 chunks
+						: split.length >= 800
+						? 32 // if length >= 800, split 32 chunks
+						: split.length >= 400
+						? 16 // if length >= 400, split 16 chunks
+						: split.length >= 200
+						? 8 // if length >= 200, split 8 chunks
+						: split.length >= 100
+						? 8 // if length >= 100, split 4 chunks
 						: 0)
 			)
 		);

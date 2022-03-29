@@ -243,4 +243,7 @@ export async function CreatePlayer(message: Discord.Message, args: string[], bot
 			});
 		}
 	}
+
+	// nothing here
+	return true;
 }

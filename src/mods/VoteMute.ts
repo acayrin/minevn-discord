@@ -18,8 +18,8 @@ export default class VoteMute extends SucklessMod {
 			description: "Vote mute somebody cuz democracy is kul",
 			usage: "%prefix%<command/alias> <mention>[/<user id>/<username>] [reason]",
 			events: {
-				onMsgCreate: VM
-			}
+				onMsgCreate: VM,
+			},
 		});
-	};
-};
+	}
+}

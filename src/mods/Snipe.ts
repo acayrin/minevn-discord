@@ -15,8 +15,8 @@ export default class Snipe extends SucklessMod {
 			events: {
 				onMsgCreate: SnipeCreate,
 				onMsgDelete: SnipeDelete,
-				onMsgUpdate: SnipeUpdate
-			}
+				onMsgUpdate: SnipeUpdate,
+			},
 		});
-	};
-};
+	}
+}

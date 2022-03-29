@@ -80,14 +80,16 @@ var McStatus = (function (_super) {
                 port = (_b = args.shift()) !== null && _b !== void 0 ? _b : 25565;
                 url = "https://mcsrv.vercel.app/?ip=".concat(ip, "&port=").concat(port);
                 (0, node_fetch_1["default"])(url).then(function (res) {
-                    return res.text().then(function (txt) { return __awaiter(_this, void 0, void 0, function () {
+                    return res
+                        .text()
+                        .then(function (txt) { return __awaiter(_this, void 0, void 0, function () {
                         var json;
                         return __generator(this, function (_a) {
                             json = JSON.parse(txt);
                             message.channel.send({
                                 embeds: [
                                     new discord_js_1.MessageEmbed()
-                                        .setColor(bot.configs.get("core.json")['color'])
+                                        .setColor(bot.configs.get("core.json")["color"])
                                         .setTimestamp()
                                         .setTitle("".concat(json.host.toUpperCase()))
                                         .setDescription("".concat(json.description.descriptionText.replace(/§[a-z0-9]/g, "")))
@@ -108,8 +110,6 @@ var McStatus = (function (_super) {
         _this.onMsgCreate = _this.check;
         return _this;
     }
-    ;
     return McStatus;
 }(SucklessMod_1.SucklessMod));
 exports["default"] = McStatus;
-;

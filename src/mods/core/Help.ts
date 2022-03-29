@@ -8,17 +8,17 @@ import { SucklessBot } from "../../core/SucklessBot";
  * @param {string[]} args
  * @param {SucklessBot} bot
  */
-export const getHelp = (message: Discord.Message, args: string[], bot: SucklessBot) => {
+export const getHelp = async (message: Discord.Message, args: string[], bot: SucklessBot) => {
 	if (args?.[0]) {
 		// get the mod associated with the command
 		const mod = bot.cmdMgr.getMod(args[0]);
 		if (!mod) return;
 
 		// send the help page
-		message.channel.send({
+		await message.channel.send({
 			embeds: [
 				new Discord.MessageEmbed()
-					.setColor("#ed2261")
+					.setColor(bot.configs.get("core.json")["color"])
 					.setTimestamp()
 					.setThumbnail(bot.cli().user.avatarURL())
 					.setTitle(`[Mod] ${mod.name}`)
@@ -27,7 +27,7 @@ export const getHelp = (message: Discord.Message, args: string[], bot: SucklessB
 						`Command: \`\` ${bot.cmdMgr.getCommands(mod).join(", ")} \`\``,
 						`Aliases: \`\` ${bot.cmdMgr.getAliases(mod).join(", ")} \`\``
 					)
-					.addField("Usage", `${mod.usage.replace(/%prefix%+/, bot.configs.get("core.json")['prefix'])}`)
+					.addField("Usage", `${mod.usage.replace(/%prefix%+/, bot.configs.get("core.json")["prefix"])}`)
 					.setFooter(`by ${mod.author ?? "unknown"}`),
 			],
 		});
@@ -38,17 +38,22 @@ export const getHelp = (message: Discord.Message, args: string[], bot: SucklessB
 		bot.mods.forEach((mod) => mods.push(mod.name));
 
 		// send the help page
-		message.channel.send({
+		await message.channel.send({
 			embeds: [
 				new Discord.MessageEmbed()
-					.setColor("#ed2261")
+					.setColor(bot.configs.get("core.json")["color"])
 					.setTimestamp()
 					.setThumbnail(bot.cli().user.avatarURL())
 					.setTitle(`Guide on How to use this thing`)
 					.setDescription(`A some-what useful guide on how to use this thing, idk`)
 					.addField("Loaded mods", `${mods.join(", ")}`)
 					.addField("Availabe commands", `${bot.cmdMgr.commands.join(", ")}`)
-					.addField("\u200B", `for command specific help, use \`\` ${bot.configs.get("core.json")['prefix']} help <command> \`\``),
+					.addField(
+						"\u200B",
+						`for command specific help, use \`\` ${
+							bot.configs.get("core.json")["prefix"]
+						} help <command> \`\``
+					),
 			],
 		});
 	}

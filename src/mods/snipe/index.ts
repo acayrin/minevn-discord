@@ -13,7 +13,7 @@ const record_U: any = {};
  * @param {string[]} args Arguments from message
  * @param {SucklessBot} bot The bot instance
  */
-export const SnipeCreate = (message: Discord.Message, args: string[], bot: SucklessBot) => {
+export const SnipeCreate = async (message: Discord.Message, args: string[], bot: SucklessBot) => {
 	// check
 	record_D[message.channelId] ||= [];
 	record_U[message.channelId] ||= [];
@@ -72,7 +72,7 @@ export const SnipeCreate = (message: Discord.Message, args: string[], bot: Suckl
  * @param {*} args empty
  * @param {SucklessBot} bot The bot instance
  */
-export const SnipeDelete = (message: Discord.Message, args: any, bot: SucklessBot) => {
+export const SnipeDelete = async (message: Discord.Message, args: any, bot: SucklessBot) => {
 	// check
 	record_D[message.channelId] ||= [];
 	record_U[message.channelId] ||= [];
@@ -115,7 +115,7 @@ export const SnipeDelete = (message: Discord.Message, args: any, bot: SucklessBo
  * @param {*} args empty
  * @param {SucklessBot} bot The bot instance
  */
-export const SnipeUpdate = (oldMsg: Discord.Message, newMsg: Discord.Message, bot: SucklessBot) => {
+export const SnipeUpdate = async (oldMsg: Discord.Message, newMsg: Discord.Message, bot: SucklessBot) => {
 	// check
 	record_D[oldMsg.channelId] ||= [];
 	record_U[oldMsg.channelId] ||= [];

@@ -28,7 +28,7 @@ export class SucklessBot extends EventEmitter {
 
 		// debugging
 		this.on("debug", (m: string) => (this.debug ? this.logger.debug(m) : undefined));
-	};
+	}
 
 	/**
 	 * SucklessBot's debug mode (default off)
@@ -76,7 +76,7 @@ export class SucklessBot extends EventEmitter {
 	/**
 	 * SucklessBot's configuration files, including core config and mod configs
 	 * You can get a config file using the "configs" variable from a SucklessBot instance
-	 * 
+	 *
 	 * filename:json_object
 	 *
 	 * @type {Discord.Collection<String, any>}
@@ -124,7 +124,7 @@ export class SucklessBot extends EventEmitter {
 			// logger
 			this.logger.log(`[CONFIGURATION] Loaded config file "${name}"`);
 		});
-		
+
 		// bot's intents
 		let intents: any = [];
 
@@ -140,7 +140,7 @@ export class SucklessBot extends EventEmitter {
 			} catch (e) {
 				this.logger.error(`[LOADER] Failed to load mod "${item}"\n${e}`);
 				return;
-			};
+			}
 			//if (!mod.command || mod.command.length === 0)
 			//	return this.logger.warn(`File mods/${item} is not a valid mod`);
 
@@ -182,6 +182,13 @@ export class SucklessBot extends EventEmitter {
 			}`
 		);
 		this.__client = new Discord.Client(Object.assign({}, this.__clientOptions, { intents: intents }));
+
+		// re-order mods based on priorty
+		this.mods.sort((m1, m2) => {
+			return m2.priority - m1.priority;
+		});
+		this.logger.log("Mods priority (execution order):");
+		this.mods.forEach((m) => this.logger.log(`[${m.priority}] ${m.name}`));
 	};
 
 	/**
@@ -191,13 +198,13 @@ export class SucklessBot extends EventEmitter {
 	 */
 	public start() {
 		this.__init();
-		this.__client.login(this.configs.get("core.json")['token']);
+		this.__client.login(this.configs.get("core.json")["token"]);
 		this.__client.on("ready", this.__onConnect.bind(this));
 		this.__client.on("messageCreate", this.__onMessage.bind(this));
 		this.__client.on("messageDelete", this.__onDelete.bind(this));
 		this.__client.on("messageUpdate", this.__onUpdate.bind(this));
 		if (this.debug === "full") this.__client.on("debug", (e) => this.logger.debug(e));
-	};
+	}
 
 	/**
 	 * Triggers when SucklessBot successfully connects to Discord
@@ -216,30 +223,31 @@ export class SucklessBot extends EventEmitter {
 	 * @param {Discord.Message} message Chat message
 	 * @memberof SucklessBot
 	 */
-	private __onMessage = (message: Discord.Message) => {
-		const msg = message.content.replace(this.configs.get("core.json")['prefix'], "").trim();
+	private __onMessage = async (message: Discord.Message) => {
+		const msg = message.content.replace(this.configs.get("core.json")["prefix"], "").trim();
 		const arg = msg.split(/ +/);
 		const cmd = arg.shift().toLocaleLowerCase(); // command
 
 		// if doesn't start with prefix
 		// or
 		// if command not found, process it as a normal message
-		if (!message.content.startsWith(this.configs.get("core.json")['prefix']) || !this.cmdMgr.getMod(cmd))
-			return this.mods.forEach((mod) => {
-				try {
-					if (mod.onMsgCreate) mod.onMsgCreate(message, undefined, this);
-				} catch (e) {
-					this.logger.error(`[${mod.name}] ${e}\n${e.stack}`);
-				};
-			});
-
-		const mod = this.cmdMgr.getMod(cmd);
-		if (mod.onMsgCreate)
-			try {
-				mod.onMsgCreate(message, arg, this);
-			} catch (e) {
-				this.logger.error(`[${mod.name}] ${e}\n${e.stack}`);
-			};
+		if (message.content.startsWith(this.configs.get("core.json")["prefix"]) && this.cmdMgr.getMod(cmd)) {
+			const mod = this.cmdMgr.getMod(cmd);
+			if (mod.onMsgCreate)
+				mod.onMsgCreate(message, arg, this).catch((e) => this.logger.error(`[${mod.name}] ${e}\n${e.stack}`));
+		} else {
+			let i = -1;
+			while (++i < this.mods.length) {
+				if (this.mods[i].onMsgCreate) {
+					// get promise reponse
+					const x = await this.mods[i]
+						.onMsgCreate(message, undefined, this)
+						.catch((e) => this.logger.error(`[${this.mods[i].name}] ${e}\n${e.stack}`));
+					// if promise response is valid and command is single, break the loop
+					if (x && this.mods[i].single) break;
+				}
+			}
+		}
 	};
 
 	/**
@@ -249,15 +257,18 @@ export class SucklessBot extends EventEmitter {
 	 * @param {Discord.Message} message
 	 * @memberof SucklessBot
 	 */
-	private __onDelete = (message: Discord.Message) => {
-		this.mods.forEach((mod) => {
-			if (mod.onMsgDelete)
-				try {
-					mod.onMsgDelete(message, message.content.split(/ +/), this);
-				} catch (e) {
-					this.logger.error(`[${mod.name}] ${e}\n${e.stack}`);
-				};
-		});
+	private __onDelete = async (message: Discord.Message) => {
+		let i = -1;
+		while (++i < this.mods.length) {
+			if (this.mods[i].onMsgDelete) {
+				// get promise reponse
+				const x = await this.mods[i]
+					.onMsgDelete(message, undefined, this)
+					.catch((e) => this.logger.error(`[${this.mods[i].name}] ${e}\n${e.stack}`));
+				// if promise response is valid and command is single, break the loop
+				if (x && this.mods[i].single) break;
+			}
+		}
 	};
 
 	/**
@@ -268,14 +279,17 @@ export class SucklessBot extends EventEmitter {
 	 * @param {Discord.Message} new message
 	 * @memberof SucklessBot
 	 */
-	private __onUpdate = (oldMessage: Discord.Message, newMessage: Discord.Message) => {
-		this.mods.forEach((mod) => {
-			if (mod.onMsgUpdate)
-				try {
-					mod.onMsgUpdate(oldMessage, newMessage, this);
-				} catch (e) {
-					this.logger.error(`[${mod.name}] ${e}\n${e.stack}`);
-				};
-		});
+	private __onUpdate = async (oldMessage: Discord.Message, newMessage: Discord.Message) => {
+		let i = -1;
+		while (++i < this.mods.length) {
+			if (this.mods[i].onMsgUpdate) {
+				// get promise reponse
+				const x = await this.mods[i]
+					.onMsgUpdate(oldMessage, newMessage, this)
+					.catch((e) => this.logger.error(`[${this.mods[i].name}] ${e}\n${e.stack}`));
+				// if promise response is valid and command is single, break the loop
+				if (x && this.mods[i].single) break;
+			}
+		}
 	};
 }

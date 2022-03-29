@@ -13,8 +13,8 @@ export default class Weaboo extends SucklessMod {
 			aliases: ["wb"],
 			intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 			events: {
-				onMsgCreate: SendImg
-			}
+				onMsgCreate: SendImg,
+			},
 		});
-	};
-};
+	}
+}

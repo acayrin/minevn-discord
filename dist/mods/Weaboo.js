@@ -33,8 +33,6 @@ var Weaboo = (function (_super) {
             }
         }) || this;
     }
-    ;
     return Weaboo;
 }(SucklessMod_1.SucklessMod));
 exports["default"] = Weaboo;
-;

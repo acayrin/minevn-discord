@@ -63,113 +63,123 @@ var Discord = __importStar(require("discord.js"));
 var node_fetch_1 = __importDefault(require("node-fetch"));
 var record_D = {};
 var record_U = {};
-var SnipeCreate = function (message, args, bot) {
+var SnipeCreate = function (message, args, bot) { return __awaiter(void 0, void 0, void 0, function () {
+    var arg, cmd, num, rep, rep;
     var _a, _b;
-    record_D[_a = message.channelId] || (record_D[_a] = []);
-    record_U[_b = message.channelId] || (record_U[_b] = []);
-    if (!args)
-        return;
-    var arg = message.content.replace(bot.configs.get("core.json")["prefix"], "").trim().split(/ +/);
-    var cmd = arg.shift().toLocaleLowerCase();
-    var num = 0 - Math.abs(Number(arg.shift()));
-    switch (cmd) {
-        case "s":
-        case "snipe": {
-            var rep = record_D[message.channelId].at(num || -1);
-            if (!rep)
-                return;
-            message.reply({
-                embeds: [_e(rep, bot)],
-                files: rep.files || null
-            });
-            break;
-        }
-        case "es":
-        case "editsnipe": {
-            var rep = record_U[message.channelId].at(num || -1);
-            if (!rep)
-                return;
-            message.reply({
-                embeds: [_e(rep, bot)],
-                files: rep.files || null
-            });
-            break;
-        }
-        case "clear": {
-            if (message.member.permissions.has("MANAGE_MESSAGES")) {
-                record_U[message.channelId].length = 0;
-                record_D[message.channelId].length = 0;
-                if (bot.debug)
-                    bot.logger.debug("[Snipe - ".concat(message.channelId, "] Cleared local cache"));
+    return __generator(this, function (_c) {
+        record_D[_a = message.channelId] || (record_D[_a] = []);
+        record_U[_b = message.channelId] || (record_U[_b] = []);
+        if (!args)
+            return [2];
+        arg = message.content.replace(bot.configs.get("core.json")["prefix"], "").trim().split(/ +/);
+        cmd = arg.shift().toLocaleLowerCase();
+        num = 0 - Math.abs(Number(arg.shift()));
+        switch (cmd) {
+            case "s":
+            case "snipe": {
+                rep = record_D[message.channelId].at(num || -1);
+                if (!rep)
+                    return [2];
+                message.reply({
+                    embeds: [_e(rep, bot)],
+                    files: rep.files || null
+                });
+                break;
             }
-            break;
+            case "es":
+            case "editsnipe": {
+                rep = record_U[message.channelId].at(num || -1);
+                if (!rep)
+                    return [2];
+                message.reply({
+                    embeds: [_e(rep, bot)],
+                    files: rep.files || null
+                });
+                break;
+            }
+            case "clear": {
+                if (message.member.permissions.has("MANAGE_MESSAGES")) {
+                    record_U[message.channelId].length = 0;
+                    record_D[message.channelId].length = 0;
+                    if (bot.debug)
+                        bot.logger.debug("[Snipe - ".concat(message.channelId, "] Cleared local cache"));
+                }
+                break;
+            }
+            default: {
+            }
         }
-        default: {
-        }
-    }
-};
+        return [2];
+    });
+}); };
 exports.SnipeCreate = SnipeCreate;
-var SnipeDelete = function (message, args, bot) {
+var SnipeDelete = function (message, args, bot) { return __awaiter(void 0, void 0, void 0, function () {
+    var files;
     var _a, _b;
-    record_D[_a = message.channelId] || (record_D[_a] = []);
-    record_U[_b = message.channelId] || (record_U[_b] = []);
-    if (record_D[message.channelId].length > bot.configs.get("snipe.json")["limit"])
-        record_D[message.channelId].shift();
-    bot === null || bot === void 0 ? void 0 : bot.emit("debug", "[Snipe - ".concat(message.channelId, "] Deleted +").concat(message.id, " (").concat(record_D[message.channelId].length, "/").concat(bot.configs.get("snipe.json")["limit"], ")"));
-    var files = [];
-    message.attachments.forEach(function (file) { return __awaiter(void 0, void 0, void 0, function () {
-        var buffer;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4, (0, node_fetch_1["default"])(file.attachment.toString())];
-                case 1: return [4, (_a.sent()).buffer()];
-                case 2:
-                    buffer = _a.sent();
-                    files.push({ attachment: buffer, name: file.name });
-                    return [2];
-            }
-        });
-    }); });
-    return record_D[message.channelId].push({
-        id: message.id,
-        content: message.content,
-        files: files,
-        owner: message.author.tag,
-        avatar: message.author.avatarURL(),
-        timestamp: message.createdTimestamp
+    return __generator(this, function (_c) {
+        record_D[_a = message.channelId] || (record_D[_a] = []);
+        record_U[_b = message.channelId] || (record_U[_b] = []);
+        if (record_D[message.channelId].length > bot.configs.get("snipe.json")["limit"])
+            record_D[message.channelId].shift();
+        bot === null || bot === void 0 ? void 0 : bot.emit("debug", "[Snipe - ".concat(message.channelId, "] Deleted +").concat(message.id, " (").concat(record_D[message.channelId].length, "/").concat(bot.configs.get("snipe.json")["limit"], ")"));
+        files = [];
+        message.attachments.forEach(function (file) { return __awaiter(void 0, void 0, void 0, function () {
+            var buffer;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, (0, node_fetch_1["default"])(file.attachment.toString())];
+                    case 1: return [4, (_a.sent()).buffer()];
+                    case 2:
+                        buffer = _a.sent();
+                        files.push({ attachment: buffer, name: file.name });
+                        return [2];
+                }
+            });
+        }); });
+        return [2, record_D[message.channelId].push({
+                id: message.id,
+                content: message.content,
+                files: files,
+                owner: message.author.tag,
+                avatar: message.author.avatarURL(),
+                timestamp: message.createdTimestamp
+            })];
     });
-};
+}); };
 exports.SnipeDelete = SnipeDelete;
-var SnipeUpdate = function (oldMsg, newMsg, bot) {
+var SnipeUpdate = function (oldMsg, newMsg, bot) { return __awaiter(void 0, void 0, void 0, function () {
+    var files;
     var _a, _b;
-    record_D[_a = oldMsg.channelId] || (record_D[_a] = []);
-    record_U[_b = oldMsg.channelId] || (record_U[_b] = []);
-    if (record_U[oldMsg.channelId].length > bot.configs.get("snipe.json")["limit"])
-        record_U[oldMsg.channelId].shift();
-    bot.emit("debug", "[Snipe - ".concat(oldMsg.channelId, "] Updated +").concat(oldMsg.id, " (").concat(record_U[oldMsg.channelId].length, "/").concat(bot.configs.get("snipe.json")["limit"], ")"));
-    var files = [];
-    oldMsg.attachments.forEach(function (file) { return __awaiter(void 0, void 0, void 0, function () {
-        var buffer;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4, (0, node_fetch_1["default"])(file.attachment.toString())];
-                case 1: return [4, (_a.sent()).buffer()];
-                case 2:
-                    buffer = _a.sent();
-                    files.push({ attachment: buffer, name: file.name });
-                    return [2];
-            }
-        });
-    }); });
-    return record_U[oldMsg.channelId].push({
-        id: oldMsg.id,
-        content: oldMsg.content,
-        files: files,
-        owner: oldMsg.author.tag,
-        avatar: oldMsg.author.avatarURL(),
-        timestamp: oldMsg.createdTimestamp
+    return __generator(this, function (_c) {
+        record_D[_a = oldMsg.channelId] || (record_D[_a] = []);
+        record_U[_b = oldMsg.channelId] || (record_U[_b] = []);
+        if (record_U[oldMsg.channelId].length > bot.configs.get("snipe.json")["limit"])
+            record_U[oldMsg.channelId].shift();
+        bot.emit("debug", "[Snipe - ".concat(oldMsg.channelId, "] Updated +").concat(oldMsg.id, " (").concat(record_U[oldMsg.channelId].length, "/").concat(bot.configs.get("snipe.json")["limit"], ")"));
+        files = [];
+        oldMsg.attachments.forEach(function (file) { return __awaiter(void 0, void 0, void 0, function () {
+            var buffer;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, (0, node_fetch_1["default"])(file.attachment.toString())];
+                    case 1: return [4, (_a.sent()).buffer()];
+                    case 2:
+                        buffer = _a.sent();
+                        files.push({ attachment: buffer, name: file.name });
+                        return [2];
+                }
+            });
+        }); });
+        return [2, record_U[oldMsg.channelId].push({
+                id: oldMsg.id,
+                content: oldMsg.content,
+                files: files,
+                owner: oldMsg.author.tag,
+                avatar: oldMsg.author.avatarURL(),
+                timestamp: oldMsg.createdTimestamp
+            })];
     });
-};
+}); };
 exports.SnipeUpdate = SnipeUpdate;
 var _e = function (a, b) {
     return new Discord.MessageEmbed()

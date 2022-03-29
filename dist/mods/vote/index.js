@@ -68,10 +68,10 @@ function VoteSomebody(message, args, bot, unmute) {
                 case 0:
                     if (!args)
                         return [2];
-                    if (bot.configs.get("vote.json")['channel'])
-                        if (!bot.configs.get("vote.json")['channel'].includes(message.channelId)) {
+                    if (bot.configs.get("vote.json")["channel"])
+                        if (!bot.configs.get("vote.json")["channel"].includes(message.channelId)) {
                             channel = message.guild.channels.cache
-                                .filter(function (ch) { return bot.configs.get("vote.json")['channel'].includes(ch.id); })
+                                .filter(function (ch) { return bot.configs.get("vote.json")["channel"].includes(ch.id); })
                                 .first();
                             return [2, message.reply("Buddy, ya can't vote someone outside of ".concat(channel))];
                         }
@@ -94,7 +94,7 @@ function VoteSomebody(message, args, bot, unmute) {
                     if (session) {
                         return [2, (session.msg || message).reply("There is an ongoing vote for **".concat(user.user.tag, "** so stopping now"))];
                     }
-                    return [4, (0, utils_1.getRole)(bot.configs.get("vote.json")['role'] || "mute", message.member.guild)];
+                    return [4, (0, utils_1.getRole)(bot.configs.get("vote.json")["role"] || "mute", message.member.guild)];
                 case 3:
                     role = _a.sent();
                     if (!role) {
@@ -104,7 +104,7 @@ function VoteSomebody(message, args, bot, unmute) {
                         if (user.roles.cache.has(role.id)) {
                             return [2, new class_1.VoteUnmute(user, message.member, message.channel, bot, {
                                     reason: reason || undefined,
-                                    timer: bot.configs.get("vote.json")['timer']
+                                    timer: bot.configs.get("vote.json")["timer"]
                                 }).vote()];
                         }
                         else {
@@ -122,7 +122,7 @@ function VoteSomebody(message, args, bot, unmute) {
                     }
                     new class_1.VoteMute(user, message.member, message.channel, bot, {
                         reason: reason || undefined,
-                        timer: bot.configs.get("vote.json")['timer']
+                        timer: bot.configs.get("vote.json")["timer"]
                     }).vote();
                     return [2];
             }
@@ -130,10 +130,28 @@ function VoteSomebody(message, args, bot, unmute) {
     });
 }
 function VM(message, args, bot) {
-    VoteSomebody(message, args, bot);
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4, VoteSomebody(message, args, bot)];
+                case 1:
+                    _a.sent();
+                    return [2];
+            }
+        });
+    });
 }
 exports.VM = VM;
 function VUM(message, args, bot) {
-    VoteSomebody(message, args, bot, true);
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4, VoteSomebody(message, args, bot, true)];
+                case 1:
+                    _a.sent();
+                    return [2];
+            }
+        });
+    });
 }
 exports.VUM = VUM;

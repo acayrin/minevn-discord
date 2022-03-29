@@ -28,15 +28,14 @@ var ChatFilter = (function (_super) {
             intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MEMBERS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES],
             description: "Filter bad words",
             usage: "%prefix%<command/alias> [args]",
+            priority: -1,
             events: {
-                onInit: function (bot) { return cf.load(bot.configs.get("chatfilter.json")['url']); },
+                onInit: function (bot) { return cf.load(bot.configs.get("chatfilter.json")["url"]); },
                 onMsgCreate: function (message, args, bot) { return cf.makeThisChatClean(message, bot); },
                 onMsgUpdate: function (oldMsg, newMsg, bot) { return cf.makeThisChatClean(newMsg, bot); }
             }
         }) || this;
     }
-    ;
     return ChatFilter;
 }(SucklessMod_1.SucklessMod));
 exports["default"] = ChatFilter;
-;

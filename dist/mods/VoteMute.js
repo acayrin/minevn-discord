@@ -39,8 +39,6 @@ var VoteMute = (function (_super) {
             }
         }) || this;
     }
-    ;
     return VoteMute;
 }(SucklessMod_1.SucklessMod));
 exports["default"] = VoteMute;
-;

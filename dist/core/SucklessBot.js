@@ -111,7 +111,6 @@ var SucklessBot = (function (_super) {
                     _this.logger.error("[LOADER] Failed to load mod \"".concat(item, "\"\n").concat(e));
                     return;
                 }
-                ;
                 if (mod.disabled)
                     return;
                 mod.intents.forEach(function (intent) {
@@ -138,6 +137,11 @@ var SucklessBot = (function (_super) {
             _this.logger.log("Requested Intents: ".concat(intents));
             _this.logger.log("Allowed Intents: ".concat(intents, " ").concat(_this.__clientOptions.intents.toString() !== "" ? "(as in SucklessBot options)" : "(from mods)"));
             _this.__client = new Discord.Client(Object.assign({}, _this.__clientOptions, { intents: intents }));
+            _this.mods.sort(function (m1, m2) {
+                return m2.priority - m1.priority;
+            });
+            _this.logger.log("Mods priority (execution order):");
+            _this.mods.forEach(function (m) { return _this.logger.log("[".concat(m.priority, "] ").concat(m.name)); });
         };
         _this.__onConnect = function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -145,65 +149,93 @@ var SucklessBot = (function (_super) {
                 return [2];
             });
         }); };
-        _this.__onMessage = function (message) {
-            var msg = message.content.replace(_this.configs.get("core.json")['prefix'], "").trim();
-            var arg = msg.split(/ +/);
-            var cmd = arg.shift().toLocaleLowerCase();
-            if (!message.content.startsWith(_this.configs.get("core.json")['prefix']) || !_this.cmdMgr.getMod(cmd))
-                return _this.mods.forEach(function (mod) {
-                    try {
-                        if (mod.onMsgCreate)
-                            mod.onMsgCreate(message, undefined, _this);
-                    }
-                    catch (e) {
-                        _this.logger.error("[".concat(mod.name, "] ").concat(e, "\n").concat(e.stack));
-                    }
-                    ;
-                });
-            var mod = _this.cmdMgr.getMod(cmd);
-            if (mod.onMsgCreate)
-                try {
-                    mod.onMsgCreate(message, arg, _this);
+        _this.__onMessage = function (message) { return __awaiter(_this, void 0, void 0, function () {
+            var msg, arg, cmd, mod_1, i_1, x;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        msg = message.content.replace(this.configs.get("core.json")["prefix"], "").trim();
+                        arg = msg.split(/ +/);
+                        cmd = arg.shift().toLocaleLowerCase();
+                        if (!(message.content.startsWith(this.configs.get("core.json")["prefix"]) && this.cmdMgr.getMod(cmd))) return [3, 1];
+                        mod_1 = this.cmdMgr.getMod(cmd);
+                        if (mod_1.onMsgCreate)
+                            mod_1.onMsgCreate(message, arg, this)["catch"](function (e) { return _this.logger.error("[".concat(mod_1.name, "] ").concat(e, "\n").concat(e.stack)); });
+                        return [3, 5];
+                    case 1:
+                        i_1 = -1;
+                        _a.label = 2;
+                    case 2:
+                        if (!(++i_1 < this.mods.length)) return [3, 5];
+                        if (!this.mods[i_1].onMsgCreate) return [3, 4];
+                        return [4, this.mods[i_1]
+                                .onMsgCreate(message, undefined, this)["catch"](function (e) { return _this.logger.error("[".concat(_this.mods[i_1].name, "] ").concat(e, "\n").concat(e.stack)); })];
+                    case 3:
+                        x = _a.sent();
+                        if (x && this.mods[i_1].single)
+                            return [3, 5];
+                        _a.label = 4;
+                    case 4: return [3, 2];
+                    case 5: return [2];
                 }
-                catch (e) {
-                    _this.logger.error("[".concat(mod.name, "] ").concat(e, "\n").concat(e.stack));
+            });
+        }); };
+        _this.__onDelete = function (message) { return __awaiter(_this, void 0, void 0, function () {
+            var i, x;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        i = -1;
+                        _a.label = 1;
+                    case 1:
+                        if (!(++i < this.mods.length)) return [3, 4];
+                        if (!this.mods[i].onMsgDelete) return [3, 3];
+                        return [4, this.mods[i]
+                                .onMsgDelete(message, undefined, this)["catch"](function (e) { return _this.logger.error("[".concat(_this.mods[i].name, "] ").concat(e, "\n").concat(e.stack)); })];
+                    case 2:
+                        x = _a.sent();
+                        if (x && this.mods[i].single)
+                            return [3, 4];
+                        _a.label = 3;
+                    case 3: return [3, 1];
+                    case 4: return [2];
                 }
-            ;
-        };
-        _this.__onDelete = function (message) {
-            _this.mods.forEach(function (mod) {
-                if (mod.onMsgDelete)
-                    try {
-                        mod.onMsgDelete(message, message.content.split(/ +/), _this);
-                    }
-                    catch (e) {
-                        _this.logger.error("[".concat(mod.name, "] ").concat(e, "\n").concat(e.stack));
-                    }
-                ;
             });
-        };
-        _this.__onUpdate = function (oldMessage, newMessage) {
-            _this.mods.forEach(function (mod) {
-                if (mod.onMsgUpdate)
-                    try {
-                        mod.onMsgUpdate(oldMessage, newMessage, _this);
-                    }
-                    catch (e) {
-                        _this.logger.error("[".concat(mod.name, "] ").concat(e, "\n").concat(e.stack));
-                    }
-                ;
+        }); };
+        _this.__onUpdate = function (oldMessage, newMessage) { return __awaiter(_this, void 0, void 0, function () {
+            var i, x;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        i = -1;
+                        _a.label = 1;
+                    case 1:
+                        if (!(++i < this.mods.length)) return [3, 4];
+                        if (!this.mods[i].onMsgUpdate) return [3, 3];
+                        return [4, this.mods[i]
+                                .onMsgUpdate(oldMessage, newMessage, this)["catch"](function (e) { return _this.logger.error("[".concat(_this.mods[i].name, "] ").concat(e, "\n").concat(e.stack)); })];
+                    case 2:
+                        x = _a.sent();
+                        if (x && this.mods[i].single)
+                            return [3, 4];
+                        _a.label = 3;
+                    case 3: return [3, 1];
+                    case 4: return [2];
+                }
             });
-        };
+        }); };
         _this.debug = options.debug;
         _this.__clientOptions = options.clientOptions;
         _this.on("debug", function (m) { return (_this.debug ? _this.logger.debug(m) : undefined); });
         return _this;
     }
-    ;
     SucklessBot.prototype.start = function () {
         var _this = this;
         this.__init();
-        this.__client.login(this.configs.get("core.json")['token']);
+        this.__client.login(this.configs.get("core.json")["token"]);
         this.__client.on("ready", this.__onConnect.bind(this));
         this.__client.on("messageCreate", this.__onMessage.bind(this));
         this.__client.on("messageDelete", this.__onDelete.bind(this));
@@ -211,7 +243,6 @@ var SucklessBot = (function (_super) {
         if (this.debug === "full")
             this.__client.on("debug", function (e) { return _this.logger.debug(e); });
     };
-    ;
     return SucklessBot;
 }(events_1.EventEmitter));
 exports.SucklessBot = SucklessBot;

@@ -36,8 +36,6 @@ var Snipe = (function (_super) {
             }
         }) || this;
     }
-    ;
     return Snipe;
 }(SucklessMod_1.SucklessMod));
 exports["default"] = Snipe;
-;

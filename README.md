@@ -11,7 +11,8 @@ This project was made mainly for fun, and for the purpose of learning Typescript
 -   Minecraft status - a simple minecraft server tracker (Hẻo đã hẻo)
 -   Random weeb shit - send random images from nekos.fun/nekos.life
 -   Music player - a simple, suckass youtube audio player but it works out of the box (keep getting hit with rate-limits tho)
--	Chat filtering - a fast chat filtering system (less than 3 seconds on lengthy messages)
+-   Chat filtering - a fast chat filtering system (less than 1 seconds on lengthy messages - around 1.5 for nitro users)
+-   [Testing] Ticket - a dead simple ticket support system
 -   To be added:
     -   basic moderation features? most likely no
     -   full size minecraft server tracker?
@@ -40,11 +41,12 @@ Configurations are stored in the `config` folder
 To get a config object (JSON), you'll need to call the `configs` variable from a `SucklessBot` object then get it using a valid config file name
 
 as example
+
 ```JS
 Suckless.configs.get(<config_file.json>)['some_json_key']
 ```
 
-Core configuration is stored in ``core.json``, this is where you set your bot token, prefix, embed color, etc.
+Core configuration is stored in `core.json`, this is where you set your bot token, prefix, embed color, etc.
 
 ## Creating a mod
 
@@ -69,19 +71,20 @@ export default class Ping extends SucklessMod {
 			aliases: ["p"],
 			description: "Simple ping pong!",
 			usage: "%prefix%<command/alias>",
+			priority: 69,
+			single: false,
 			events: {
 				onMsgCreate: (msg: Message, args: string[], bot: SucklessBot) => {
 					if (msg.content === "Ping") {
 						msg.reply({
-							content: "Pong!"
+							content: "Pong!",
 						});
-					};
-				}
-			}
+					}
+				},
+			},
 		});
-	};
-};
-
+	}
+}
 ```
 
 You may find more "interest" things inside the `mods` folder

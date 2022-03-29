@@ -12,11 +12,11 @@ export default class McStatus extends SucklessMod {
 			command: ["mcstatus"],
 			aliases: ["mc"],
 			description: "Ping a minecraft server",
-			usage: "%prefix%<command/alias> [ip] [port]"
+			usage: "%prefix%<command/alias> [ip] [port]",
 		});
 
 		this.onMsgCreate = this.check;
-	};
+	}
 
 	private check = async (message: Message, args: string[], bot: SucklessBot): Promise<void> => {
 		if (!args) return;
@@ -27,25 +27,27 @@ export default class McStatus extends SucklessMod {
 		const url = `https://mcsrv.vercel.app/?ip=${ip}&port=${port}`;
 
 		fetch(url).then((res) =>
-			res.text().then(async (txt) => {
-				const json = JSON.parse(txt);
+			res
+				.text()
+				.then(async (txt) => {
+					const json = JSON.parse(txt);
 
-				message.channel.send({
-					embeds: [
-						new MessageEmbed()
-							.setColor(bot.configs.get("core.json")['color'])
-							.setTimestamp()
-							.setTitle(`${json.host.toUpperCase()}`)
-							.setDescription(`${json.description.descriptionText.replace(/§[a-z0-9]/g, "")}`)
-							.setThumbnail(url + "&favicon=1")
-							.addField(`Online`, `${json.onlinePlayers}/${json.maxPlayers}`)
-							.addField(`Version`, `${json.version}`),
-					]
-				});
-			})
-			.catch(() => {
-				message.channel.send(`I wasn't able to sneak up onto **${ip}:${port}** and steal their goodies`);
-			})
+					message.channel.send({
+						embeds: [
+							new MessageEmbed()
+								.setColor(bot.configs.get("core.json")["color"])
+								.setTimestamp()
+								.setTitle(`${json.host.toUpperCase()}`)
+								.setDescription(`${json.description.descriptionText.replace(/§[a-z0-9]/g, "")}`)
+								.setThumbnail(url + "&favicon=1")
+								.addField(`Online`, `${json.onlinePlayers}/${json.maxPlayers}`)
+								.addField(`Version`, `${json.version}`),
+						],
+					});
+				})
+				.catch(() => {
+					message.channel.send(`I wasn't able to sneak up onto **${ip}:${port}** and steal their goodies`);
+				})
 		);
 	};
-};
+}

@@ -12,7 +12,7 @@ export default class Kiwi extends SucklessMod {
 			intents: [Discord.Intents.FLAGS.GUILDS],
 			usage: "%prefix%kiwi",
 			events: {
-				onMsgCreate: (message: Discord.Message, args: string[], bot: SucklessBot): void => {
+				onMsgCreate: async (message: Discord.Message, args: string[], bot: SucklessBot): Promise<any> => {
 					if (!args) return;
 					message.channel.send({
 						embeds: [
@@ -23,11 +23,11 @@ export default class Kiwi extends SucklessMod {
 								.setAuthor("Kiwi"),
 						],
 					});
-				}
-			}
+				},
+			},
 		});
-	};
-};
+	}
+}
 
 const kiwis = [
 	"https://i.kym-cdn.com/photos/images/original/001/263/042/cab.jpg",

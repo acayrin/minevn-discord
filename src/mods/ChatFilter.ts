@@ -12,11 +12,12 @@ export default class ChatFilter extends SucklessMod {
 			intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES],
 			description: "Filter bad words",
 			usage: "%prefix%<command/alias> [args]",
+			priority: -1,
 			events: {
-				onInit: (bot: SucklessBot) => cf.load(bot.configs.get("chatfilter.json")['url']),
+				onInit: (bot: SucklessBot) => cf.load(bot.configs.get("chatfilter.json")["url"]),
 				onMsgCreate: (message: Message, args: string[], bot: SucklessBot) => cf.makeThisChatClean(message, bot),
-				onMsgUpdate: (oldMsg: Message, newMsg: Message, bot: SucklessBot) => cf.makeThisChatClean(newMsg, bot)
-			}
+				onMsgUpdate: (oldMsg: Message, newMsg: Message, bot: SucklessBot) => cf.makeThisChatClean(newMsg, bot),
+			},
 		});
-	};
-};
+	}
+}

@@ -14,7 +14,7 @@ export default class CoreHelp extends SucklessMod {
 			usage: "%prefix%<command/alias> [args]",
 			events: {
 				onMsgCreate: getHelp,
-			}
+			},
 		});
-	};
-};
+	}
+}

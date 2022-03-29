@@ -306,7 +306,7 @@ function CreatePlayer(message, args, bot) {
                         });
                     }
                     _j.label = 25;
-                case 25: return [2];
+                case 25: return [2, true];
             }
         });
     });

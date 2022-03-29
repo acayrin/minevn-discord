@@ -72,15 +72,17 @@ var filter = (function () {
                     case 0:
                         split = msg.split("");
                         chunks = this.to_chunk(split, Math.ceil(split.length /
-                            (split.length >= 1500
+                            (split.length >= 1600
                                 ? 64
-                                : split.length >= 1000
+                                : split.length >= 800
                                     ? 32
-                                    : split.length >= 500
+                                    : split.length >= 400
                                         ? 16
-                                        : split.length >= 250
+                                        : split.length >= 200
                                             ? 8
-                                            : 0)));
+                                            : split.length >= 100
+                                                ? 8
+                                                : 0)));
                         indexes = [];
                         return [4, bluebird_1["default"].Promise.map(chunks, function (chunk, ck_index) { return __awaiter(_this, void 0, void 0, function () {
                                 var ck_base_index;

@@ -34,8 +34,6 @@ var CoreHelp = (function (_super) {
             }
         }) || this;
     }
-    ;
     return CoreHelp;
 }(SucklessMod_1.SucklessMod));
 exports["default"] = CoreHelp;
-;

@@ -10,7 +10,7 @@ import { __all, __random } from "./Functions";
  * @param {SucklessBot} bot
  * @return {*}
  */
-export async function SendImg(message: Discord.Message, args: string[], bot: SucklessBot): Promise<any> {
+export async function SendImg(message: Discord.Message, args: string[]): Promise<any> {
 	const tag = args && args.length > 0 ? args.join() : undefined;
 
 	if (!args) {
@@ -21,7 +21,7 @@ export async function SendImg(message: Discord.Message, args: string[], bot: Suc
 	}
 
 	// get a random image
-	__random(tag).then((img) =>
+	return __random(tag).then((img) =>
 		img
 			? message.channel.send({
 					embeds: [
