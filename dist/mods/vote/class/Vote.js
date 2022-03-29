@@ -118,12 +118,12 @@ var Vote = (function () {
     };
     Vote.prototype._run = function (options) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
-            return __generator(this, function (_l) {
-                switch (_l.label) {
+            var _a, _b, _c, _d;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
                     case 0: return [4, this._preload()];
                     case 1:
-                        if (_l.sent())
+                        if (_e.sent())
                             return [2];
                         this._bot.emit("debug", "[Vote - ".concat(this.id, "] A vote has started, target: ").concat(this.target.id));
                         _a = this;
@@ -131,34 +131,24 @@ var Vote = (function () {
                                 embeds: [options.embed || this._embed()]
                             })];
                     case 2:
-                        _a.msg = _l.sent();
+                        _a.msg = _e.sent();
                         return [4, this.msg.react("👍")];
                     case 3:
-                        _l.sent();
+                        _e.sent();
                         return [4, this.msg.react("👎")];
                     case 4:
-                        _l.sent();
-                        _e = (_d = this.msg
+                        _e.sent();
+                        _c = (_b = this.msg
                             .createReactionCollector({
                             filter: function (r, u) { return ["👍", "👎"].includes(r.emoji.name) && !u.bot; },
                             time: this.timer * 1000,
                             dispose: true
                         }))
                             .on;
-                        _f = ["collect"];
-                        return [4, this.__onCollect.bind(this)];
-                    case 5:
-                        _g = (_c = _e.apply(_d, _f.concat([_l.sent()])))
-                            .on;
-                        _h = ["remove"];
-                        return [4, this.__onRemove.bind(this)];
-                    case 6:
-                        _j = (_b = _g.apply(_c, _h.concat([_l.sent()])))
-                            .on;
-                        _k = ["end"];
+                        _d = ["end"];
                         return [4, this.__onEnd.bind(this)];
-                    case 7:
-                        _j.apply(_b, _k.concat([_l.sent()]));
+                    case 5:
+                        _c.apply(_b, _d.concat([_e.sent()]));
                         return [2];
                 }
             });
@@ -207,8 +197,23 @@ var Vote = (function () {
     };
     Vote.prototype._onEnd = function () {
         return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
             return __generator(this, function (_a) {
                 this._bot.emit("debug", "[Vote - ".concat(this.id, "] Vote ended with ").concat(this._vote_Y, ":").concat(this._vote_N, " (total ").concat(this._vote_Y + this._vote_N, ")"));
+                this.msg.reactions.cache.forEach(function (react) {
+                    if ("👍".includes(react.emoji.name)) {
+                        react.users.cache.forEach(function (user) {
+                            if (!user.bot && user.id !== _this.owner.id)
+                                _this._vote_Y++;
+                        });
+                    }
+                    if ("👎".includes(react.emoji.name)) {
+                        react.users.cache.forEach(function (user) {
+                            if (!user.bot && user.id !== _this.owner.id)
+                                _this._vote_N++;
+                        });
+                    }
+                });
                 if (this._vote_Y > this._vote_N)
                     this._onWin();
                 else

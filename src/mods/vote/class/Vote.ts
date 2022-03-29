@@ -220,9 +220,9 @@ export abstract class Vote {
 				time: this.timer * 1000,
 				dispose: true,
 			})
-			.on("collect", await this.__onCollect.bind(this))
-			.on("remove", await this.__onRemove.bind(this))
 			.on("end", await this.__onEnd.bind(this));
+		//.on("collect", await this.__onCollect.bind(this))
+		//.on("remove", await this.__onRemove.bind(this))
 	}
 
 	/**
@@ -237,6 +237,7 @@ export abstract class Vote {
 	}
 
 	/**
+	 * DEPRECATED
 	 * Triggers when a user casts their vote
 	 *
 	 * @protected
@@ -251,6 +252,7 @@ export abstract class Vote {
 	}
 
 	/**
+	 * DEPRECATED
 	 * Triggers when a user retracts their vote
 	 *
 	 * @protected
@@ -276,6 +278,19 @@ export abstract class Vote {
 			"debug",
 			`[Vote - ${this.id}] Vote ended with ${this._vote_Y}:${this._vote_N} (total ${this._vote_Y + this._vote_N})`
 		);
+
+		this.msg.reactions.cache.forEach((react) => {
+			if ("👍".includes(react.emoji.name)) {
+				react.users.cache.forEach((user) => {
+					if (!user.bot && user.id !== this.owner.id) this._vote_Y++;
+				});
+			}
+			if ("👎".includes(react.emoji.name)) {
+				react.users.cache.forEach((user) => {
+					if (!user.bot && user.id !== this.owner.id) this._vote_N++;
+				});
+			}
+		});
 
 		if (this._vote_Y > this._vote_N) this._onWin();
 		else this._onLose();

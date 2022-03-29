@@ -69,9 +69,9 @@ var SnipeCreate = function (message, args, bot) {
     record_U[_b = message.channelId] || (record_U[_b] = []);
     if (!args)
         return;
-    var arg = message.content.replace(bot.configs.get("core.json")['prefix'], "").trim().split(/ +/);
+    var arg = message.content.replace(bot.configs.get("core.json")["prefix"], "").trim().split(/ +/);
     var cmd = arg.shift().toLocaleLowerCase();
-    var num = -1 - Math.abs(Number(arg.shift()));
+    var num = 0 - Math.abs(Number(arg.shift()));
     switch (cmd) {
         case "s":
         case "snipe": {
@@ -113,9 +113,9 @@ var SnipeDelete = function (message, args, bot) {
     var _a, _b;
     record_D[_a = message.channelId] || (record_D[_a] = []);
     record_U[_b = message.channelId] || (record_U[_b] = []);
-    if (record_D[message.channelId].length > bot.configs.get("snipe.json")['limit'])
+    if (record_D[message.channelId].length > bot.configs.get("snipe.json")["limit"])
         record_D[message.channelId].shift();
-    bot === null || bot === void 0 ? void 0 : bot.emit("debug", "[Snipe - ".concat(message.channelId, "] Deleted +").concat(message.id, " (").concat(record_D[message.channelId].length, "/").concat(bot.configs.get("snipe.json")['limit'], ")"));
+    bot === null || bot === void 0 ? void 0 : bot.emit("debug", "[Snipe - ".concat(message.channelId, "] Deleted +").concat(message.id, " (").concat(record_D[message.channelId].length, "/").concat(bot.configs.get("snipe.json")["limit"], ")"));
     var files = [];
     message.attachments.forEach(function (file) { return __awaiter(void 0, void 0, void 0, function () {
         var buffer;
@@ -144,9 +144,9 @@ var SnipeUpdate = function (oldMsg, newMsg, bot) {
     var _a, _b;
     record_D[_a = oldMsg.channelId] || (record_D[_a] = []);
     record_U[_b = oldMsg.channelId] || (record_U[_b] = []);
-    if (record_U[oldMsg.channelId].length > bot.configs.get("snipe.json")['limit'])
+    if (record_U[oldMsg.channelId].length > bot.configs.get("snipe.json")["limit"])
         record_U[oldMsg.channelId].shift();
-    bot.emit("debug", "[Snipe - ".concat(oldMsg.channelId, "] Updated +").concat(oldMsg.id, " (").concat(record_U[oldMsg.channelId].length, "/").concat(bot.configs.get("snipe.json")['limit'], ")"));
+    bot.emit("debug", "[Snipe - ".concat(oldMsg.channelId, "] Updated +").concat(oldMsg.id, " (").concat(record_U[oldMsg.channelId].length, "/").concat(bot.configs.get("snipe.json")["limit"], ")"));
     var files = [];
     oldMsg.attachments.forEach(function (file) { return __awaiter(void 0, void 0, void 0, function () {
         var buffer;
@@ -173,7 +173,7 @@ var SnipeUpdate = function (oldMsg, newMsg, bot) {
 exports.SnipeUpdate = SnipeUpdate;
 var _e = function (a, b) {
     return new Discord.MessageEmbed()
-        .setColor(b.configs.get("core.json")['color'])
+        .setColor(b.configs.get("core.json")["color"])
         .setAuthor(a.owner, a.avatar)
         .setDescription(a.content)
         .setTimestamp(a.timestamp);
