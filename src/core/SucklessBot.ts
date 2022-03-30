@@ -5,6 +5,7 @@ import { dirname } from "path";
 import { SucklessMod } from "./interface/SucklessMod";
 import { CommandManager } from "./manager/CommandManager";
 import { Logger } from "./utils/Logger";
+import promise from "bluebird";
 const path = dirname(require.main.filename);
 
 /**
@@ -138,7 +139,7 @@ export class SucklessBot extends EventEmitter {
 			try {
 				mod = new (require(`${path}/mods/${item}`).default)();
 			} catch (e) {
-				this.logger.error(`[LOADER] Failed to load mod "${item}"\n${e}`);
+				this.logger.error(`[CORE] Failed to load mod "${item}"\n${e}`);
 				return;
 			}
 			//if (!mod.command || mod.command.length === 0)
@@ -166,7 +167,7 @@ export class SucklessBot extends EventEmitter {
 				}
 
 			// logger
-			this.logger.log(`[LOADER] Loaded mod: ${mod.name} (${item})`);
+			this.logger.log(`[CORE] Loaded mod: ${mod.name} (${item})`);
 			if (mod.aliases) this.logger.log(`- ${mod.name} registered Aliases: ${mod.aliases?.toString()}`);
 			this.logger.log(`- ${mod.name} registered Commands: ${mod.command?.toString()}`);
 			this.logger.log(`- ${mod.name} requested Intents: ${mod.intents}`);
@@ -175,9 +176,9 @@ export class SucklessBot extends EventEmitter {
 		// if bot is configured with intents, use those instead
 		if (this.__clientOptions.intents.toString() !== "") intents = this.__clientOptions.intents;
 
-		this.logger.log(`Requested Intents: ${intents}`);
+		this.logger.log(`[CORE] Requested Intents: ${intents}`);
 		this.logger.log(
-			`Allowed Intents: ${intents} ${
+			`[CORE] Allowed Intents: ${intents} ${
 				this.__clientOptions.intents.toString() !== "" ? `(as in SucklessBot options)` : `(from mods)`
 			}`
 		);
@@ -187,8 +188,8 @@ export class SucklessBot extends EventEmitter {
 		this.mods.sort((m1, m2) => {
 			return m2.priority - m1.priority;
 		});
-		this.logger.log("Mods priority (execution order):");
-		this.mods.forEach((m) => this.logger.log(`[${m.priority}] ${m.name}`));
+		this.logger.log("[CORE] Mods priority (execution order):");
+		this.mods.forEach((m) => this.logger.log(`- [${m.priority}] ${m.name}`));
 	};
 
 	/**
@@ -200,9 +201,65 @@ export class SucklessBot extends EventEmitter {
 		this.__init();
 		this.__client.login(this.configs.get("core.json")["token"]);
 		this.__client.on("ready", this.__onConnect.bind(this));
-		this.__client.on("messageCreate", this.__onMessage.bind(this));
-		this.__client.on("messageDelete", this.__onDelete.bind(this));
-		this.__client.on("messageUpdate", this.__onUpdate.bind(this));
+
+		// process at most 20 messages per 1 second (default, if no config was given)
+		// due to one mod can slowdown the bot so process a batch of them at a fixed interval would be more... stable
+		const p_a: number = this.configs.get("core.json")["process"]["amount"] || 5;
+		const p_b: number = this.configs.get("core.json")["process"]["interval"] || 250;
+		this.logger.log(`[CORE] Processing messages at a rate of ${p_a} / ${p_b}ms`);
+
+		const s_1: (Discord.Message | Discord.PartialMessage)[] = [];
+		this.__client.on("messageCreate", (msg) => {
+			s_1.push(msg);
+		});
+		setInterval(() => {
+			promise.map(
+				s_1.splice(1, p_a),
+				(m) => {
+					this.__onMessage(m);
+				},
+				{
+					concurrency: p_a,
+				}
+			);
+		}, p_b);
+
+		// process at most 12 messages per 1 second
+		const s_2: (Discord.Message | Discord.PartialMessage)[] = [];
+		this.__client.on("messageDelete", (msg) => {
+			s_2.push(msg);
+		});
+		setInterval(() => {
+			promise.map(
+				s_2.splice(1, p_a),
+				(m) => {
+					this.__onDelete(m);
+				},
+				{
+					concurrency: p_a,
+				}
+			);
+		}, p_b);
+
+		// process at most 12 messages per 1 second
+		const s_3: {
+			o: Discord.Message | Discord.PartialMessage;
+			n: Discord.Message | Discord.PartialMessage;
+		}[] = [];
+		this.__client.on("messageUpdate", (omsg, nmsg) => {
+			s_3.push({ o: omsg, n: nmsg });
+		});
+		setInterval(() => {
+			promise.map(
+				s_3.splice(1, p_a),
+				(m) => {
+					this.__onUpdate(m.o, m.n);
+				},
+				{
+					concurrency: p_a,
+				}
+			);
+		}, p_b);
 		if (this.debug === "full") this.__client.on("debug", (e) => this.logger.debug(e));
 	}
 
@@ -220,10 +277,10 @@ export class SucklessBot extends EventEmitter {
 	 * Triggers when SucklessBot receives a message
 	 *
 	 * @private
-	 * @param {Discord.Message} message Chat message
+	 * @param {Discord.Message | Discord.PartialMessage} message Chat message
 	 * @memberof SucklessBot
 	 */
-	private __onMessage = async (message: Discord.Message) => {
+	private __onMessage = async (message: Discord.Message | Discord.PartialMessage) => {
 		const msg = message.content.replace(this.configs.get("core.json")["prefix"], "").trim();
 		const arg = msg.split(/ +/);
 		const cmd = arg.shift().toLocaleLowerCase(); // command
@@ -254,10 +311,10 @@ export class SucklessBot extends EventEmitter {
 	 * Triggers when SucklessBot detects a deleted message
 	 *
 	 * @private
-	 * @param {Discord.Message} message
+	 * @param {Discord.Message | Discord.PartialMessage} message
 	 * @memberof SucklessBot
 	 */
-	private __onDelete = async (message: Discord.Message) => {
+	private __onDelete = async (message: Discord.Message | Discord.PartialMessage) => {
 		let i = -1;
 		while (++i < this.mods.length) {
 			if (this.mods[i].onMsgDelete) {
@@ -275,11 +332,14 @@ export class SucklessBot extends EventEmitter {
 	 * Triggers when SucklessBot detects a deleted message
 	 *
 	 * @private
-	 * @param {Discord.Message} old message
-	 * @param {Discord.Message} new message
+	 * @param {Discord.Message | Discord.PartialMessage} old message
+	 * @param {Discord.Message | Discord.PartialMessage} new message
 	 * @memberof SucklessBot
 	 */
-	private __onUpdate = async (oldMessage: Discord.Message, newMessage: Discord.Message) => {
+	private __onUpdate = async (
+		oldMessage: Discord.Message | Discord.PartialMessage,
+		newMessage: Discord.Message | Discord.PartialMessage
+	) => {
 		let i = -1;
 		while (++i < this.mods.length) {
 			if (this.mods[i].onMsgUpdate) {

@@ -69,6 +69,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
 exports.SucklessBot = void 0;
 var Discord = __importStar(require("discord.js"));
@@ -77,6 +80,7 @@ var fs = __importStar(require("fs"));
 var path_1 = require("path");
 var CommandManager_1 = require("./manager/CommandManager");
 var Logger_1 = require("./utils/Logger");
+var bluebird_1 = __importDefault(require("bluebird"));
 var path = (0, path_1.dirname)(require.main.filename);
 var SucklessBot = (function (_super) {
     __extends(SucklessBot, _super);
@@ -108,7 +112,7 @@ var SucklessBot = (function (_super) {
                     mod = new (require("".concat(path, "/mods/").concat(item))["default"])();
                 }
                 catch (e) {
-                    _this.logger.error("[LOADER] Failed to load mod \"".concat(item, "\"\n").concat(e));
+                    _this.logger.error("[CORE] Failed to load mod \"".concat(item, "\"\n").concat(e));
                     return;
                 }
                 if (mod.disabled)
@@ -126,7 +130,7 @@ var SucklessBot = (function (_super) {
                     catch (e) {
                         _this.logger.error("[".concat(mod.name, "] ").concat(e, "\n").concat(e.stack));
                     }
-                _this.logger.log("[LOADER] Loaded mod: ".concat(mod.name, " (").concat(item, ")"));
+                _this.logger.log("[CORE] Loaded mod: ".concat(mod.name, " (").concat(item, ")"));
                 if (mod.aliases)
                     _this.logger.log("- ".concat(mod.name, " registered Aliases: ").concat((_a = mod.aliases) === null || _a === void 0 ? void 0 : _a.toString()));
                 _this.logger.log("- ".concat(mod.name, " registered Commands: ").concat((_b = mod.command) === null || _b === void 0 ? void 0 : _b.toString()));
@@ -134,14 +138,14 @@ var SucklessBot = (function (_super) {
             });
             if (_this.__clientOptions.intents.toString() !== "")
                 intents = _this.__clientOptions.intents;
-            _this.logger.log("Requested Intents: ".concat(intents));
-            _this.logger.log("Allowed Intents: ".concat(intents, " ").concat(_this.__clientOptions.intents.toString() !== "" ? "(as in SucklessBot options)" : "(from mods)"));
+            _this.logger.log("[CORE] Requested Intents: ".concat(intents));
+            _this.logger.log("[CORE] Allowed Intents: ".concat(intents, " ").concat(_this.__clientOptions.intents.toString() !== "" ? "(as in SucklessBot options)" : "(from mods)"));
             _this.__client = new Discord.Client(Object.assign({}, _this.__clientOptions, { intents: intents }));
             _this.mods.sort(function (m1, m2) {
                 return m2.priority - m1.priority;
             });
-            _this.logger.log("Mods priority (execution order):");
-            _this.mods.forEach(function (m) { return _this.logger.log("[".concat(m.priority, "] ").concat(m.name)); });
+            _this.logger.log("[CORE] Mods priority (execution order):");
+            _this.mods.forEach(function (m) { return _this.logger.log("- [".concat(m.priority, "] ").concat(m.name)); });
         };
         _this.__onConnect = function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -237,9 +241,42 @@ var SucklessBot = (function (_super) {
         this.__init();
         this.__client.login(this.configs.get("core.json")["token"]);
         this.__client.on("ready", this.__onConnect.bind(this));
-        this.__client.on("messageCreate", this.__onMessage.bind(this));
-        this.__client.on("messageDelete", this.__onDelete.bind(this));
-        this.__client.on("messageUpdate", this.__onUpdate.bind(this));
+        var p_a = this.configs.get("core.json")["process"]["amount"] || 5;
+        var p_b = this.configs.get("core.json")["process"]["interval"] || 250;
+        this.logger.log("[CORE] Processing messages at a rate of ".concat(p_a, " / ").concat(p_b, "ms"));
+        var s_1 = [];
+        this.__client.on("messageCreate", function (msg) {
+            s_1.push(msg);
+        });
+        setInterval(function () {
+            bluebird_1["default"].map(s_1.splice(1, p_a), function (m) {
+                _this.__onMessage(m);
+            }, {
+                concurrency: p_a
+            });
+        }, p_b);
+        var s_2 = [];
+        this.__client.on("messageDelete", function (msg) {
+            s_2.push(msg);
+        });
+        setInterval(function () {
+            bluebird_1["default"].map(s_2.splice(1, p_a), function (m) {
+                _this.__onDelete(m);
+            }, {
+                concurrency: p_a
+            });
+        }, p_b);
+        var s_3 = [];
+        this.__client.on("messageUpdate", function (omsg, nmsg) {
+            s_3.push({ o: omsg, n: nmsg });
+        });
+        setInterval(function () {
+            bluebird_1["default"].map(s_3.splice(1, p_a), function (m) {
+                _this.__onUpdate(m.o, m.n);
+            }, {
+                concurrency: p_a
+            });
+        }, p_b);
         if (this.debug === "full")
             this.__client.on("debug", function (e) { return _this.logger.debug(e); });
     };

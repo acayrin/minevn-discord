@@ -1,5 +1,9 @@
 {
 	"token": "<YOUR-BOT-TOKEN>",
 	"prefix": "-",
-	"color": "#719D66"
+	"color": "#719D66",
+	"process": {
+		"interval": 200,
+		"amount": 5
+	}
 }

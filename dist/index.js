@@ -8,8 +8,8 @@ new SucklessBot_1.SucklessBot({
         presence: {
             activities: [
                 {
-                    name: "over the monkeys",
-                    type: "WATCHING"
+                    name: "minevn.net",
+                    type: "PLAYING"
                 },
             ]
         }
