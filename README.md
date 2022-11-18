@@ -45,8 +45,6 @@ tho some are not publically available due to _reasons_
 
 A quick example
 ```typescript
-import { exec } from 'child_process';
-import { resolve } from 'path';
 import Yujin from '../../core/yujin';
 
 export default class extends Yujin.Mod {
