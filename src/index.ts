@@ -1,16 +1,18 @@
-import { SucklessBot } from "./core/SucklessBot";
+import Yujin from './core/yujin';
 
-new SucklessBot({
-	debug: true, // may set to "full" for DJS's debug as well
-	clientOptions: {
-		intents: [], // leave it empty so the bot will use what the mods require
-		presence: {
-			activities: [
-				{
-					name: "minevn.net",
-					type: "PLAYING",
-				},
-			],
+new Yujin.Launcher({
+	clusterOptions: {
+		totalClusters: 1,
+		totalShards: 1,
+		guildsPerShard: 1_000,
+		statsInterval: 30,
+		clientOptions: {
+			intents: ['all'],
+			compress: true,
+			defaultImageFormat: 'webp',
+			defaultImageSize: 1024,
+			messageLimit: 10,
+			restMode: true,
 		},
 	},
-}).start();
+}).startCluster();

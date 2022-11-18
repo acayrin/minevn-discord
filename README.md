@@ -1,97 +1,83 @@
-# MineVN discord bot
+# yujin
 
-A suckass bot mainly used in MineVN's Discord server
+a (definitely not skidded) discord bot abomination written in Typescript using Eris and other libraries
 
-This project was made mainly for fun, and for the purpose of learning Typescript (~~why when i could just stick with java instead~~)
+## what the fudge does this do?
 
-## Current features
+think of it like running a minecraft server
 
--   Vote system - vote (un)mute someone (with anti-spam, channel lock and vote cooldown)
--   Message snipe - snipe a deleted/modified message (with full file support and custom history lookup)
--   Minecraft status - a simple minecraft server tracker (Hẻo đã hẻo)
--   Random weeb shit - send random images from nekos.fun/nekos.life
--   Music player - a simple, suckass youtube audio player but it works out of the box (keep getting hit with rate-limits tho)
--   Chat filtering - a fast chat filtering system (less than 1 seconds on lengthy messages - around 1.5 for nitro users)
--   [Testing] Ticket - a dead simple ticket support system
--   To be added:
-    -   basic moderation features? most likely no
-    -   full size minecraft server tracker?
-    -   credit syste- wait wut
-    -   image options??? wtf does that even mean
-    -   clowns - we need happiness
+## how do i use it?
 
-## Requirements
+requirements
 
--   NodeJS `16.x and above`
--   Knowledge about Typescript/Javascript
--   Time to rethink about the purpose of this thing that i made
+-   Node: **16+**
+-   Bun: lastest version (or NPM/Yarn)
+-   OS: Linux is preferable
 
-## Installation and Usage
+for now just put a mod source in the **src/mods** folder then compile the project
+
+**oh and please check the source for maliscious code that may harm/steal your things**
 
 ```
-yarn            // install dependencies [or npm i]
-yarn build      // compile the project (optional) [or npm run build]
-yarn start      // start the bot [or npm start]
+yarn          // or npm
+yarn build    // or bun, npm
+yarn start 	  // or bun, npm
 ```
 
-## Configuration
+env vars
 
-Configurations are stored in the `config` folder
-
-To get a config object (JSON), you'll need to call the `configs` variable from a `SucklessBot` object then get it using a valid config file name
-
-as example
-
-```JS
-Suckless.configs.get(<config_file.json>)['some_json_key']
+```
+YUJIN_TOKEN 		- bot token
+YUJIN_PREFIX 		- bot prefix
+YUJIN_COLOR 		- bot embed color
+YUJIN_DISABLED_MODS - list of disabled mods by name
 ```
 
-Core configuration is stored in `core.json`, this is where you set your bot token, prefix, embed color, etc.
+for mods config/data, they are stored in the **mods_data/** folder in root directory
 
-## Creating a mod
+## what's inlucded?
 
-Simply create your mod logics and put them inside the `mods` folder, then create a default export class file to declare your mod to be hooked up (extending `SucklessMod` object)
+some mods i made during the bugs and errors creation of this thing
 
-## Example
+tho some are not publically available due to _reasons_
 
-### `mods/Ping.ts`
+## docs?
 
-```ts
-import { Intents, Message } from "discord.js";
-import { SucklessBot } from "../core/SucklessBot";
-import { SucklessMod } from "../core/interface/SucklessMod";
+A quick example
+```typescript
+import { exec } from 'child_process';
+import { resolve } from 'path';
+import Yujin from '../../core/yujin';
 
-export default class Ping extends SucklessMod {
+export default class extends Yujin.Mod {
 	constructor() {
+		const description = "A test mod";
+
 		super({
-			name: "Ping",
-			author: "acayrin",
-			intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
-			command: ["ping"],
-			aliases: ["p"],
-			description: "Simple ping pong!",
-			usage: "%prefix%<command/alias>",
-			priority: 69,
-			single: false,
-			events: {
-				onMsgCreate: (msg: Message, args: string[], bot: SucklessBot) => {
-					if (msg.content === "Ping") {
-						msg.reply({
-							content: "Pong!",
-						});
-					}
+			name: 'Test',
+			group: 'Test',
+			author: 'acayrin',
+			intents: ['guilds', 'guildMessages'],
+			description,
+			commands: [
+				{
+					name: 'test',
+					description,
+					type: 'message',
+					process: async (m) => {
+						m.reply('This is a test');
+					},
 				},
-			},
+				{
+					name: 'test',
+					description,
+					type: 'slash',
+					process: async (i) => {
+						i.reply('This is a test');
+					},
+				},
+			],
 		});
 	}
 }
 ```
-
-You may find more "interest" things inside the `mods` folder
-
-## Todos
-
--   ~~custom configs~~
--   more events
--   idk, more random mods
--   make it sucks less

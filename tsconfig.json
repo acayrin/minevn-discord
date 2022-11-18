@@ -1,10 +1,21 @@
 {
 	"compilerOptions": {
 		"module": "commonjs",
-		"moduleResolution": "Node",
-		"noImplicitAny": true,
+		"target": "esnext",
+		"moduleResolution": "node",
+		"importHelpers": true,
 		"removeComments": true,
 		"esModuleInterop": true,
+		"sourceMap": true,
+		"declaration": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitAny": true,
+		"pretty": true,
+		"diagnostics": true,
+		"allowJs": true,
+		"checkJs": true,
+		"incremental": true,
 		"outDir": "./dist"
 	},
 	"include": ["src"],

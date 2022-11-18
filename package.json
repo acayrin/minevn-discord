@@ -1,41 +1,58 @@
 {
-	"name": "suckless-bot",
+	"name": "yujin",
 	"version": "1.0.0",
-	"description": "a suck less discord bot",
-	"engines": {
-		"node": "16.x"
-	},
+	"description": "an abomination of discord bot",
 	"main": "index.js",
 	"type": "commonjs",
 	"scripts": {
-		"build": "rm -rf dist && ./node_modules/typescript/bin/tsc",
-		"start": "LD_PRELOAD=libmimalloc.so node dist/index.js"
+		"build": "./node_modules/typescript/bin/tsc",
+		"clean": "rm -rf dist",
+		"clean-build": "bun clean && bun build",
+		"start": "node --harmony -gc-interval=10 --disallow-code-generation-from-strings --always-opt dist/index.js",
+		"cbs": "bun run clean && bun run build && bun start",
+		"obf": "javascript-obfuscator dist/ --output dist_obf/ --compact true --self-defending true --simplify true --seed 240801 --numbers-to-expressions true --split-strings true --split-strings-chunk-length 4 --transform-object-keys true --unicode-escape-sequence true --target node"
 	},
 	"author": "acayrin <iacayrin@gmail.com>",
 	"license": "MIT",
 	"dependencies": {
-		"@discordjs/rest": "^0.3.0",
-		"@discordjs/voice": "^0.7.5",
-		"bluebird": "^3.7.2",
-		"bufferutil": "^4.0.5",
-		"colors-cli": "^1.0.28",
-		"discord-api-types": "^0.27.3",
-		"discord-ytdl-core": "^5.0.4",
-		"discord.js": "13.3.1",
-		"ffmpeg-static": "^4.4.0",
-		"libsodium-wrappers": "^0.7.9",
-		"node-fetch": "2.6.6",
-		"opusscript": "^0.0.8",
-		"tesseract.js": "^2.1.5",
-		"utf-8-validate": "^5.0.7",
-		"ytdl-core": "^4.9.1",
-		"ytpl": "^2.2.3",
-		"ytsr": "^3.5.3",
-		"zlib-sync": "^0.1.7"
+		"colors-cli": "latest",
+		"dotenv": "latest",
+		"eris": "latest",
+		"eventemitter3": "latest",
+		"node-fetch": "2.6.6"
+	},
+	"optionalDependencies": {
+		"canvas": "^2.10.2",
+		"discord-ytdl-core": "latest",
+		"ffmpeg-static": "latest",
+		"https-proxy-agent": "latest",
+		"libsodium-wrappers": "latest",
+		"mal-scraper": "latest",
+		"mcproto": "latest",
+		"mineflayer": "^4.5.1",
+		"mysql": "^2.18.1",
+		"opusscript": "latest",
+		"prismarine-viewer": "^1.23.0",
+		"socks-proxy-agent": "latest",
+		"three": "^0.146.0",
+		"three-stlexporter": "^1.0.0",
+		"utf-8-validate": "latest",
+		"vec3": "^0.1.7",
+		"ytdl-core": "latest",
+		"ytpl": "latest",
+		"ytsr": "latest",
+		"zlib-sync": "latest"
 	},
 	"devDependencies": {
-		"@types/bluebird": "^3.5.36",
-		"typescript": "^4.5.2"
+		"@types/mysql": "^2.15.21",
+		"@types/node-fetch": "latest",
+		"@types/three": "^0.146.0",
+		"@types/ws": "latest",
+		"@typescript-eslint/eslint-plugin": "latest",
+		"@typescript-eslint/parser": "latest",
+		"eslint": "latest",
+		"tslib": "latest",
+		"typescript": "latest"
 	},
-	"repository": "https://github.com/acayrin/somewhat-suckless-discord-bot.git"
+	"repository": "https://github.com/acayrin/minevn-discord-bot.git"
 }
