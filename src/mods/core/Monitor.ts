@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import Eris from 'eris';
 import { build_chart } from '../../core/utils/chart';
 
@@ -57,9 +57,9 @@ export default class extends Yujin.Mod {
 							time_start: new Date(0),
 							time_client_uptime: new Date(0),
 							memory: Number(
-								execSync(`pmap -x ${process.pid} | tail -n 1 | awk '/[0-9]/{print $4}' `).toString(),
+								spawnSync(`pmap -x ${process.pid} | tail -n 1 | awk '/[0-9]/{print $4}' `).toString(),
 							),
-							cpu: Number(execSync(`ps -o %cpu ${process.pid} | tail -n 1`).toString().trim()),
+							cpu: Number(spawnSync(`ps -o %cpu ${process.pid} | tail -n 1`).toString().trim()),
 						};
 						seen.forEach((c) => (data.messages += c.count));
 						data.time_start.setSeconds(process.uptime());
@@ -140,13 +140,15 @@ export default class extends Yujin.Mod {
 					setInterval(() => {
 						if (process_usage.cpu.length >= 90) process_usage.cpu.shift();
 						process_usage.cpu.push(
-							parseFloat(execSync(`ps -o %cpu ${process.pid} | tail -n 1`).toString().trim()),
+							parseFloat(
+								spawnSync(`ps -o %cpu ${process.pid} | tail -n 1`, { shell: false }).toString().trim(),
+							),
 						);
 
 						if (process_usage.mem.length >= 90) process_usage.mem.shift();
 						process_usage.mem.push(
 							Number(
-								execSync(`pmap -x ${process.pid} | tail -n 1 | awk '/[0-9]/{print $4}' `).toString(),
+								spawnSync(`pmap -x ${process.pid} | tail -n 1 | awk '/[0-9]/{print $4}' `).toString(),
 							) / 1024,
 						);
 					}, 10_000);
