@@ -26,7 +26,7 @@ export class Logger {
 		const f = `log_${d.getHours()}-${d.getMinutes()}-${d.getSeconds()}_${d.getDate()}-${d.getMonth()}-${d.getFullYear()}_${d.getTime()}.txt`;
 		this.file = `${this.directory}/latest.log`;
 
-		const files = fs.readdirSync(this.directory, 'utf-8').sort((f1, f2) => {
+		const files = fs.readdirSync(this.directory, 'utf8').sort((f1, f2) => {
 			return (
 				Number.parseFloat(f2.split('.').at(0).split('_').at(-1)) -
 				Number.parseFloat(f1.split('.').at(0).split('_').at(-1))
@@ -107,6 +107,6 @@ export class Logger {
 	#flush(msg: string) {
 		const data = fs.existsSync(this.file) ? `${fs.readFileSync(this.file)}\n` : '';
 		// eslint-disable-next-line no-control-regex
-		fs.writeFileSync(this.file, `${data}${msg.replaceAll(/\x1b\[[0-9;]*m/g, '')}`, 'utf-8');
+		fs.writeFileSync(this.file, `${data}${msg.replaceAll(/\x1b\[[0-9;]*m/g, '')}`, 'utf8');
 	}
 }

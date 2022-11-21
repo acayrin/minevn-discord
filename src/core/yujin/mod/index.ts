@@ -97,104 +97,87 @@ export class BaseMod {
 		this.priority = o.priority || 1;
 		this.disabled = o.disabled || false;
 	}
-	// ====================================== Mod variables ======================================
 
 	/**
-	 * @description Is the mod disabled and not be loaded by the bot
-	 * @type {boolean}
+	 * Whether the mod is disabled and should be ignored during boot time
 	 */
 	readonly disabled?: boolean;
 
 	/**
-	 * @description Yujin bot instance that loaded this mod
-	 * @type {Yujin.Bot}
-	 * @memberof BaseMod
+	 * Yujin Bot instance that run this mod
 	 */
 	bot: Yujin.Bot;
 
 	/**
-	 * @description Mod name, unique
-	 * @type {string}
+	 * Mod display name
 	 */
 	readonly name: string;
 
 	/**
-	 * @description Mod group
-	 * @type {string | string[]}
+	 * Mod group(s), if any
 	 */
 	readonly group?: string | string[];
 
 	/**
-	 * @description Mod author, optional
-	 * @type {string}
+	 * Mod author
 	 */
 	readonly author?: string;
 
 	/**
-	 * @description Mod icon, as a URL, optional
-	 * @type {string}
+	 * Mod icon, as an image URL
 	 */
 	readonly icon?: string;
 
 	/**
-	 * @description Mod description, optional
-	 * @type {string}
+	 * Mod description
 	 */
 	readonly description?: string;
 
 	/**
-	 * @description Mod required intents, optional - will be overwritten by global bot options
-	 * @type {Eris.IntentStrings[]}
+	 * @deprecated
+	 * Mod intents
 	 */
 	readonly intents?: Eris.IntentStrings[];
 
 	/**
-	 * @description Mod execution priority, determines when will the mod be executed, optional
-	 * @type {number}
+	 * Mod execution priorty
 	 */
 	readonly priority?: number = 0;
 
 	/**
-	 * @description Mod cooldown, cooldown between usages, optional - default 5 seconds
-	 * @type {number}
+	 * Mod command cooldown
 	 */
 	readonly cooldown?: number = 5;
 
 	/**
-	 * @description Mod commands
-	 * @type (ModCommand[])
+	 * Mod commands
 	 */
 	readonly commands?: ModCommand[] = [];
 
 	// Mod events
 	readonly events?: {
-		// ====================================== Mod self ======================================
 		/**
-		 * @description Mod's callback function for mod initialization event
+		 * Mod's callback function for mod initialization event
 		 */
 		onInit?: (mod: Yujin.Mod) => Promise<unknown>;
 
-		// ====================================== Messages ======================================
-
 		/**
-		 * @description Mod's callback function for message create event
+		 * Mod's callback function for message create event
 		 */
 		onMsgCreate?: (msg: Eris.Message, opt: { mod: Yujin.Mod }) => Promise<unknown>;
 
 		/**
-		 * @description Mod's callback function for message delete event
+		 * Mod's callback function for message delete event
 		 */
 		onMsgDelete?: (msg: Eris.Message, opt: { mod: Yujin.Mod }) => Promise<unknown>;
 
 		/**
-		 * @description Mod's callback function for message update event
+		 * Mod's callback function for message update event
 		 */
 		onMsgUpdate?: (newMsg: Eris.Message, oldMsg: Eris.OldMessage, opt: { mod: Yujin.Mod }) => Promise<unknown>;
 
-		// ====================================== Voice state ======================================
-
 		/**
-		 * @description Mod's callback function for voice state update event
+		 * Mod's callback function for voice state update event
 		 */
 		onVoiceUpdate?: (
 			member: Eris.Member,
@@ -205,7 +188,7 @@ export class BaseMod {
 		) => Promise<unknown>;
 
 		/**
-		 * @description Mod's callback function for voice channel join event
+		 * Mod's callback function for voice channel join event
 		 */
 		onVoiceJoin?: (
 			member: Eris.Member,
@@ -216,7 +199,7 @@ export class BaseMod {
 		) => Promise<unknown>;
 
 		/**
-		 * @description Mod's callback function for voice channel leave event
+		 * Mod's callback function for voice channel leave event
 		 */
 		onVoiceLeave?: (
 			member: Eris.Member,
@@ -227,7 +210,7 @@ export class BaseMod {
 		) => Promise<unknown>;
 
 		/**
-		 * @description Mod's callback function for voice switch event
+		 * Mod's callback function for voice switch event
 		 */
 		onVoiceSwitch?: (
 			member: Eris.Member,
@@ -238,9 +221,8 @@ export class BaseMod {
 			},
 		) => Promise<unknown>;
 
-		// ====================================== User change ======================================
 		/**
-		 * @description Mod's callback function for user changes
+		 * Mod's callback function for user changes
 		 */
 		onUserChange?: (
 			user: Eris.User,
@@ -256,36 +238,31 @@ export class BaseMod {
 	};
 
 	/**
-	 * @description Local config list
-	 * @export
-	 * @class BaseMod
+	 * Mod configs
 	 */
 	#configs: Map<string, any> = new Map();
 
 	/**
-	 * @description Local datastore list
-	 * @export
-	 * @class BaseMod
+	 * Mod datastores
 	 */
 	#datastores: Map<string, Yujin.Datastore> = new Map();
 
 	/**
-	 * @description Assign bot instance to this mod
-	 * @param {Yujin.Bot} bot
-	 * @memberof BaseMod
+	 * Assign bot instance to this mod
+	 * @param bot Yujin bot instance
 	 */
 	assign(bot: Yujin.Bot) {
 		this.bot = bot;
 	}
 
 	/**
-	 * @description Print invalid usage
-	 * @param {Eris.Message} msg
-	 * @param {Yujin.Bot} bot
-	 * @returns {*}  {Promise<unknown>}
-	 * @memberof BaseMod
+	 * Print invalid command usage
+	 * @param msg Message to reference
+	 * @param cmd Command to search for
+	 * @param bot Bot instance
+	 * @returns Created message
 	 */
-	printInvalidUsage(msg: Eris.Message, cmd: string, bot: Yujin.Bot): Promise<unknown> {
+	printInvalidUsage(msg: Eris.Message, cmd: string, bot: Yujin.Bot): Promise<Eris.Message> {
 		const command = this.commands.find((c) => c.name === cmd);
 
 		if (command instanceof ModMessageCommand)
@@ -300,9 +277,8 @@ export class BaseMod {
 	}
 
 	/**
-	 * @description Get default config directory
-	 * @returns {*}  {string}
-	 * @memberof BaseMod
+	 * Get mod default config directory path
+	 * @returns Path to folder
 	 */
 	getConfigDir(): string {
 		if (!fs.existsSync(path.resolve(`./mods_data/${this.name}`)))
@@ -312,19 +288,18 @@ export class BaseMod {
 	}
 
 	/**
-	 * @description Get a config, if no name was given, it will use 'config' as default
-	 * @param {string} [name='config']
-	 * @param {boolean} [forced] force read config from disk instead of local cache
-	 * @returns {*}  {Yujin.Datastore}
-	 * @memberof BaseMod
+	 * Get a mod config from data folder, all configs are JSON files
+	 * @param name Name of the config file, defaults to 'config'
+	 * @param forced Whether read the config from disk and re-cache it or not
+	 * @returns
 	 */
 	getConfig(name = 'config', forced?: boolean): any {
 		if (this.#configs.has(name) && !forced) return this.#configs.get(name);
 
 		let data = undefined;
-		fs.recursiveLookup(this.getConfigDir(), (file: string) => {
+		fs.recursiveLookup(this.getConfigDir(), (file) => {
 			if (path.basename(file) === `${name}.json`) {
-				data = JSON.parse(fs.readFileSync(file, 'utf-8'));
+				data = JSON.parse(fs.readFileSync(file, 'utf8'));
 			}
 		});
 
@@ -333,11 +308,10 @@ export class BaseMod {
 	}
 
 	/**
-	 * @description Get a datastore, if no name was given, it will use 'default' as default
-	 * @param {string} [name='default']
-	 * @param {boolean} [forced]
-	 * @returns {*}  {Yujin.Datastore}
-	 * @memberof BaseMod
+	 * Get a datastore from data folder
+	 * @param name Name of the datastore, defaults to 'default'
+	 * @param forced Whehter to forcefully read from file instead of cache
+	 * @returns
 	 */
 	getDatastore(name = 'default', forced?: boolean): Yujin.Datastore {
 		if (this.#datastores.has(name) && !forced) return this.#datastores.get(name);
@@ -349,17 +323,12 @@ export class BaseMod {
 	}
 
 	/**
-	 * @description Generate default config, if no name was given, it will use 'config' as default
-	 * @param {unknown} defaultValue
-	 * @param {string} [filename]
-	 * @memberof BaseMod
+	 * Generate default config file
+	 * @param defaultValue Value to store
+	 * @param filename Name of the config, defaults to 'config'
 	 */
-	generateDefaultConfig(defaultValue: unknown, filename?: string): void {
-		fs.writeFileSync(
-			`${this.getConfigDir()}/${filename || 'config'}.json`,
-			JSON.stringify(defaultValue, undefined, 4),
-			'utf-8',
-		);
+	generateConfig(defaultValue: unknown, filename = 'config'): void {
+		fs.writeFileSync(`${this.getConfigDir()}/${filename}.json`, JSON.stringify(defaultValue, undefined, 4), 'utf8');
 		this.#configs.set(filename, defaultValue);
 	}
 }

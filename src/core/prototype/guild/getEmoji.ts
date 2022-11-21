@@ -1,22 +1,21 @@
 import Eris from 'eris';
 
 declare module 'eris' {
-  export interface Guild {
-    /**
-		 * @description Get an emoji in this guild based on given query
-		 * @author acayrin
-		 * @param {string} query
-		 * @returns {(Eris.GuildEmoji | undefined)}
-		 * @memberof Guild
+	export interface Guild {
+		/**
+		 * Get an emoji in this guild based on given query
+		 * @param query Name or ID of the emoji
 		 */
-    getEmoji(query: string): Eris.GuildEmoji | undefined;
-  }
+		getEmoji(query: string): Eris.GuildEmoji | undefined;
+	}
 }
 
 Eris.Guild.prototype.getEmoji = function (this: Eris.Guild, query: string) {
-  this.emojis.forEach((e) => {
-    if (e.id === query || e.name === query) return new Eris.GuildEmoji(e);
-  });
+	let result: Eris.GuildEmoji;
 
-  return undefined;
+	this.emojis.forEach((emoji) => {
+		if (emoji.id === query || emoji.name === query) result = new Eris.GuildEmoji(emoji);
+	});
+
+	return result;
 };

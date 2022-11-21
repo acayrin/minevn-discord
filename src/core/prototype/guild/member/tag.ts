@@ -1,12 +1,10 @@
-import Eris from "eris";
+import Eris from 'eris';
 
-declare module "eris" {
+declare module 'eris' {
 	interface Member {
 		/**
-		 * @descriptio Get member's tag
-		 * @author acayrin
-		 * @returns {string}
-		 * @memberof Member
+		 * Get a member's user tag
+		 * @returns Tag string
 		 */
 		tag: () => string;
 	}

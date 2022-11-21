@@ -18,7 +18,7 @@ export default class extends Yujin.Mod {
 							!message.member?.roles.includes('371537555734396928')
 						)
 							return;
-						if (opt.args.length < 0) return this.printInvalidUsage(message, opt.command, opt.mod.bot);
+						if (opt.args.length < 1) return this.printInvalidUsage(message, opt.command, opt.mod.bot);
 
 						const target = message.guild().getUser(opt.args?.shift());
 						if (!target) return message.reply("Can't find any matching user");
@@ -51,7 +51,7 @@ export default class extends Yujin.Mod {
 							!message.member?.roles.includes('371537555734396928')
 						)
 							return;
-						if (opt.args.length < 0) return this.printInvalidUsage(message, opt.command, opt.mod.bot);
+						if (opt.args.length < 1) return this.printInvalidUsage(message, opt.command, opt.mod.bot);
 
 						const target = message.guild().getUser(opt.args?.shift());
 						if (!target) return message.reply("Can't find any matching user");
@@ -84,7 +84,7 @@ export default class extends Yujin.Mod {
 							!message.member?.roles.includes('371537555734396928')
 						)
 							return;
-						if (opt.args.length < 0) return this.printInvalidUsage(message, opt.command, opt.mod.bot);
+						if (opt.args.length < 1) return this.printInvalidUsage(message, opt.command, opt.mod.bot);
 
 						const target = message.guild().getUser(opt.args?.shift());
 						if (!target) return message.reply("Can't find any matching user");

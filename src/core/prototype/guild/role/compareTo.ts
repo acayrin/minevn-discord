@@ -1,13 +1,11 @@
-import * as Eris from "eris";
+import * as Eris from 'eris';
 
-declare module "eris" {
+declare module 'eris' {
 	export interface Role {
 		/**
-		 * @description Compare this role to another by their positions
-		 * @author acayrin
-		 * @param {Eris.Role} role
-		 * @returns {*}  {number}
-		 * @memberof Role
+		 * Compare this role to another by their positions
+		 * @param role Role to compare with
+		 * @returns Difference
 		 */
 		compareTo: (role: Eris.Role) => number;
 	}

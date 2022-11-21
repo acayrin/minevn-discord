@@ -93,6 +93,7 @@ export async function invite(data: {
 					}
 					reject();
 				});
-			});
+			})
+			.catch((e) => data.message.report(e, __filename));
 	});
 }

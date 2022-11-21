@@ -36,11 +36,9 @@ export async function onMessageDelete(message: Eris.Message, opt: { mod: Yujin.M
 	// get embeds
 	const embeds: Eris.Embed[] = [];
 	if (message.embeds?.length > 0) {
-		await Promise.all(
-			message.embeds.map((embed) => {
-				embeds.push(embed);
-			}),
-		);
+		message.embeds.forEach((embed) => {
+			embeds.push(embed);
+		});
 	}
 
 	// add record

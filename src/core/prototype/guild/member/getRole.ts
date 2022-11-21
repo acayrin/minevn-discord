@@ -1,30 +1,25 @@
 import Eris from 'eris';
 
 declare module 'eris' {
-  export interface Member {
-    /**
-		 * @description Get a role of this user
-		 * @author acayrin
-		 * @param {string} query
-		 * @returns {Eris.Role | undefined}
-		 * @memberof Member
+	export interface Member {
+		/**
+		 * Get a role of this member, if any
+		 * @param query ID or name of the role
 		 */
-    getRole(query: string): Eris.Role | undefined;
-  }
+		getRole(query: string): Eris.Role | undefined;
+	}
 }
 
 Eris.Member.prototype.getRole = function (this: Eris.Member, query: string) {
-  for (const r of this.roles) {
-    const role = this.guild.getRole(r);
+	let result: Eris.Role;
 
-    if (role) {
-      if (role.id.toString().includes(query)) {
-        return role;
-      } else if (role.name.includes(query)) {
-        return role;
-      }
-    }
-  }
+	for (const r of this.roles) {
+		const role = this.guild.getRole(r);
 
-  return undefined;
+		if (role && (role.id.toString().includes(query) || role.name.includes(query))) {
+			result = role;
+		}
+	}
+
+	return result;
 };

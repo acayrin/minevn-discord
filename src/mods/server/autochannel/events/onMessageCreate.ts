@@ -107,7 +107,7 @@ export async function onMessageCreate(
 			const max = msg.guild().maxBitrate();
 
 			if (!opt.args[0]) return msg.reply(`Usage: ${opt.mod.bot.prefix}${opt.command} bitrate <number>`);
-			if (isNaN(br)) return msg.reply(`Invalid bitrate **${opt.args[0]}**`);
+			if (Number.isNaN(br)) return msg.reply(`Invalid bitrate **${opt.args[0]}**`);
 
 			if (br < 8) br = 64;
 			if (br > max) br = max;
@@ -172,12 +172,12 @@ export async function onMessageCreate(
 
 			voice
 				.edit({
-					userLimit: isNaN(limit) || limit < 0 || limit > 99 ? 0 : limit,
+					userLimit: Number.isNaN(limit) || limit < 0 || limit > 99 ? 0 : limit,
 				})
 				.then(() => {
 					return msg.reply(
 						`Set voice channel limit to **${
-							isNaN(limit) || limit < 0 || limit > 99 ? 'Unlimited' : limit
+							Number.isNaN(limit) || limit < 0 || limit > 99 ? 'Unlimited' : limit
 						}**`,
 					);
 				})

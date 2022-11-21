@@ -15,7 +15,7 @@ export default class extends Yujin.Mod {
 			events: {
 				onInit: async () => {
 					if (!this.getConfig())
-						this.generateDefaultConfig({
+						this.generateConfig({
 							no_text: {
 								emote_amount: 10,
 							},

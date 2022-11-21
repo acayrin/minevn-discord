@@ -9,18 +9,16 @@ export default class EventVoiceJoin extends EventBase {
 			description: 'voice channel join event handler',
 			event: 'voiceChannelJoin',
 			process: async (member: Eris.Member, channel: Eris.VoiceChannel | Eris.StageChannel) => {
-				Promise.all(
-					this.bot.mods.map((mod) => {
-						mod.events?.onVoiceJoin?.(member, channel, { mod }).catch((e) =>
-							this.bot.error({
-								name: mod.name,
-								message: e.message,
-								cause: e.cause,
-								stack: e.stack,
-							}),
-						);
-					}),
-				);
+				this.bot.mods.forEach((mod) => {
+					mod.events?.onVoiceJoin?.(member, channel, { mod }).catch((e) =>
+						this.bot.error({
+							name: mod.name,
+							message: e.message,
+							cause: e.cause,
+							stack: e.stack,
+						}),
+					);
+				});
 			},
 		});
 	}

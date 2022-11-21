@@ -3,51 +3,33 @@ import fs from 'fs';
 import { basename, dirname } from 'path';
 import { Writer } from './steno';
 
-/**
- * A Datastore object
- *
- * @export
- * @class BaseDatastore
- * @typedef {BaseDatastore}
- */
 export class BaseDatastore {
 	/**
 	 * Path to local file
-	 *
-	 * @type {string}
 	 */
 	#file: string;
 	/**
 	 * Path to backup folder
-	 *
-	 * @type {string}
 	 */
 	#backup_dest: string;
 	/**
 	 * Steno writer instance to write files
-	 *
-	 * @type {Writer}
 	 */
 	#writer: Writer;
 	/**
 	 * Data of this instance
-	 *
-	 * @type {*}
 	 */
 	#data: any = {
 		__GLOBAL__: {},
 	};
 	/**
 	 * Encode for saving files
-	 *
-	 * @type {BufferEncoding}
 	 */
 	#encoding: BufferEncoding;
 
 	/**
 	 * Creates an instance of BaseDatastore.
 	 *
-	 * @constructor
 	 * @param {string} file
 	 * @param {?{
 				autosave_interval?: number;
@@ -69,7 +51,7 @@ export class BaseDatastore {
 		this.#file = file;
 		this.#backup_dest = `${file}_backups`;
 		this.#writer = new Writer(file);
-		this.#encoding = opt?.encoding || 'utf-8';
+		this.#encoding = opt?.encoding || 'utf8';
 
 		// init
 		if (!fs.existsSync(file)) {
@@ -83,9 +65,9 @@ export class BaseDatastore {
 
 		// attempt to parse and bind data
 		try {
-			this.#data = JSON.parse(Buffer.from(fs.readFileSync(file, 'utf-8'), this.#encoding).toString());
+			this.#data = JSON.parse(Buffer.from(fs.readFileSync(file, 'utf8'), this.#encoding).toString());
 		} catch (e) {
-			console.log(`An error occured while reading data file: ${file}`);
+			console.error(`An error occured while reading data file: ${file}`);
 			console.error(e);
 			process.abort();
 		}
@@ -122,7 +104,7 @@ export class BaseDatastore {
 			fs.readFile(
 				file,
 				{
-					encoding: 'utf-8',
+					encoding: 'utf8',
 				},
 				(err, data) => {
 					if (!err) this.#data = JSON.parse(Buffer.from(data, this.#encoding).toString());
@@ -133,10 +115,8 @@ export class BaseDatastore {
 
 	/**
 	 * Add a new group to this instance
-	 *
-	 * @async
-	 * @param {string} name
-	 * @returns {Promise<BaseDatastore>}
+	 * @param Name of the group
+	 * @returns Datastore instance for chain function
 	 */
 	async addGroup(name: string): Promise<BaseDatastore> {
 		if (!this.#data[name]) {
@@ -148,10 +128,8 @@ export class BaseDatastore {
 
 	/**
 	 * Remove a group and all of its data in this instance
-	 *
-	 * @async
-	 * @param {string} name
-	 * @returns {Promise<BaseDatastore>}
+	 * @param Name of the group
+	 * @returns Datastore instance for chain function
 	 */
 	async removeGroup(name: string): Promise<BaseDatastore> {
 		delete this.#data[name];
@@ -161,18 +139,16 @@ export class BaseDatastore {
 
 	/**
 	 * Insert new data to this instance, optionally in a group
-	 *
-	 * @async
-	 * @param {({ key: string; value: any } | { key: string; value: any }[])} opt
-	 * @param {?string} [group]
-	 * @returns {Promise<BaseDatastore>}
+	 * @param value Value to set
+	 * @param group Group to set to instead of global
+	 * @returns Datastore instance for chain function
 	 */
 	async set(
-		opt: { key: string; value: any } | { key: string; value: any }[],
+		value: { key: string; value: any } | { key: string; value: any }[],
 		group?: string,
 	): Promise<BaseDatastore> {
-		if (opt instanceof Array) {
-			opt.forEach((o) => {
+		if (value instanceof Array) {
+			value.forEach((o) => {
 				// create group if not found
 				if (group && !this.#data[group]) this.#data[group] = {};
 
@@ -182,7 +158,7 @@ export class BaseDatastore {
 			// same as above
 			if (group && !this.#data[group]) this.#data[group] = {};
 
-			this.#data[group || '__GLOBAL__'][opt.key] = opt.value;
+			this.#data[group || '__GLOBAL__'][value.key] = value.value;
 		}
 
 		return await this.save();
@@ -190,11 +166,8 @@ export class BaseDatastore {
 
 	/**
 	 * Remove data from this instance, optionally in a group
-	 *
-	 * @async
-	 * @param {(string | string[])} key
-	 * @param {?string} [group]
-	 * @returns {Promise<BaseDatastore>}
+	 * @param key Remove one or multiple keys from datastore
+	 * @returns Datastore instance of chain function
 	 */
 	async remove(key: string | string[], group?: string): Promise<BaseDatastore> {
 		if (key instanceof Array) {
@@ -210,10 +183,9 @@ export class BaseDatastore {
 
 	/**
 	 * Get data from this instance, optionally in a group
-	 *
-	 * @param {string} key
-	 * @param {?string} [group]
-	 * @returns {*}
+	 * @param key Key of object to get for
+	 * @param group Group to look in instead of global
+	 * @returns Data of that key
 	 */
 	get(key: string, group?: string): any {
 		return group && !this.#data[group] ? undefined : this.#data[group || '__GLOBAL__'][key];
@@ -221,9 +193,8 @@ export class BaseDatastore {
 
 	/**
 	 * List data from this instance, optionally in a group
-	 *
-	 * @param {?string} [group]
-	 * @returns {*}
+	 * @param group Group to list all
+	 * @returns Data from group or all
 	 */
 	list(group?: string): any {
 		if (group) {
@@ -240,10 +211,8 @@ export class BaseDatastore {
 
 	/**
 	 * Save data to file, optionally define how many attempts to retry if fail
-	 *
-	 * @async
-	 * @param {?number} [count]
-	 * @returns {Promise<BaseDatastore>}
+	 * @param count
+	 * @returns Datastore instance for chain function
 	 */
 	async save(count?: number): Promise<BaseDatastore> {
 		if (count > 20) {

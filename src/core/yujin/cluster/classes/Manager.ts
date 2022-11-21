@@ -335,14 +335,14 @@ class ClusterManager extends EventEmitter {
 			this.stats.shardsCounted += msg.shards;
 
 			if (this.stats.clustersCounted === this.clusters.size) {
-				function compare(a: Yujin.ClusterStats, b: Yujin.ClusterStats): number {
-					if (a.clusterID < b.clusterID) return -1;
-					if (a.clusterID > b.clusterID) return 1;
+				this.stats.clusters = this.stats.clusters.sort(
+					(a: Yujin.ClusterStats, b: Yujin.ClusterStats): number => {
+						if (a.clusterID < b.clusterID) return -1;
+						if (a.clusterID > b.clusterID) return 1;
 
-					return 0;
-				}
-
-				this.stats.clusters = this.stats.clusters.sort(compare);
+						return 0;
+					},
+				);
 
 				this.emit('stats', this.stats);
 				this.broadcast(0, {

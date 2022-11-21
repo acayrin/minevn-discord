@@ -3,7 +3,7 @@ import Eris from 'eris';
 
 import Yujin from '../../../core/yujin';
 import { invite } from '../utils/Invite';
-import { validate } from '../utils/Validate';
+import { validate as validateData } from '../utils/Validate';
 
 export default class extends Yujin.Mod {
 	constructor() {
@@ -75,7 +75,7 @@ export default class extends Yujin.Mod {
 						};
 
 						// validate data
-						const val = await validate(data);
+						const val = await validateData(data);
 						if (!val) return;
 						else data.amount = val.amount;
 

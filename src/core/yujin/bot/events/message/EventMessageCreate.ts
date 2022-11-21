@@ -32,7 +32,7 @@ export default class EventMessageCreate extends EventBase {
 							?.filter((cmd) => cmd.name.toLowerCase() === command.toLowerCase())
 							?.map(async (cmd) => {
 								if (cmd.type === 'message')
-									cmd.process(message, { command, args, mod }).catch((e: Error) => {
+									await cmd.process(message, { command, args, mod }).catch((e: Error) => {
 										this.bot.error({
 											name: mod.name,
 											message: e.message,
@@ -41,13 +41,13 @@ export default class EventMessageCreate extends EventBase {
 										});
 									});
 							}),
-					);
+					).catch(e => this.bot.error(e));
 				}
 
 				// trigger all mods as normal message
 				Promise.all(
-					this.bot.mods.map((mod) => {
-						mod.events?.onMsgCreate?.(message, { mod })?.catch((e: Error) =>
+					this.bot.mods.map(async (mod) => {
+						await mod.events?.onMsgCreate?.(message, { mod })?.catch((e: Error) =>
 							this.bot.error({
 								name: mod.name,
 								message: e.message,
@@ -56,7 +56,7 @@ export default class EventMessageCreate extends EventBase {
 							}),
 						);
 					}),
-				);
+				).catch(e => this.bot.error(e));
 			},
 		});
 	}

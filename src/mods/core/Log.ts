@@ -23,7 +23,7 @@ export default class extends Yujin.Mod {
 						exec(`/usr/bin/tail -n 500 ${resolve('./')}/logs/latest.log`, (err, out) => {
 							if (err) return m.report(err, __filename);
 							return m.reply('', {
-								file: Buffer.from(out, 'utf-8'),
+								file: Buffer.from(out, 'utf8'),
 								name: 'log.txt',
 							});
 						});
@@ -39,7 +39,7 @@ export default class extends Yujin.Mod {
 						exec(`/usr/bin/tail -n 500 ${resolve('./')}/logs/latest.log`, async (err, out) => {
 							if (err) return (await i.getOriginalMessage()).report(err, __filename);
 							return i.createFollowup('', {
-								file: Buffer.from(out, 'utf-8'),
+								file: Buffer.from(out, 'utf8'),
 								name: 'log.txt',
 							});
 						});

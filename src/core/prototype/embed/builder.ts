@@ -20,12 +20,7 @@ declare module 'eris' {
 	}
 
 	/**
-	 * @description Create aa message embed object
-	 * @author acayrin
-	 * @export
-	 * @class Embed
-	 * @implements {Eris.EmbedOptions}
-	 * @implements {Eris.Embed}
+	 * Create aa message embed object
 	 */
 	export class Embed implements Eris.EmbedOptions, Eris.Embed {}
 }
@@ -63,16 +58,16 @@ Eris.Embed = class {
 
 	setImage(url: string): Eris.Embed {
 		this.image = {
-			url: url,
+			url,
 		};
 		return this;
 	}
 
 	setAuthor(name: string, url?: string, icon_url?: string): Eris.Embed {
 		this.author = {
-			name: name,
-			url: url,
-			icon_url: icon_url,
+			name,
+			url,
+			icon_url,
 		};
 		return this;
 	}
@@ -81,8 +76,8 @@ Eris.Embed = class {
 		if (!this.fields) this.fields = [];
 
 		this.fields.push({
-			name: name,
-			value: value,
+			name,
+			value,
 			inline: inline || false,
 		});
 
@@ -107,8 +102,8 @@ Eris.Embed = class {
 		if (!this.fields) this.fields = [];
 
 		this.fields.unshift({
-			name: name,
-			value: value,
+			name,
+			value,
 			inline: inline || false,
 		});
 
@@ -150,8 +145,8 @@ Eris.Embed = class {
 
 	setFooter(text: string, icon_url?: string): Eris.Embed {
 		this.footer = {
-			text: text,
-			icon_url: icon_url,
+			text,
+			icon_url,
 		};
 
 		return this;
@@ -165,7 +160,7 @@ Eris.Embed = class {
 
 	setThumbnail(url: string): Eris.Embed {
 		this.thumbnail = {
-			url: url,
+			url,
 		};
 
 		return this;

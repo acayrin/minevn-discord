@@ -10,7 +10,7 @@ export default class extends Yujin.Mod {
 			events: {
 				onInit: async (mod) => {
 					if (!this.getConfig())
-						this.generateDefaultConfig({
+						this.generateConfig({
 							currency: 'mvn_coin',
 							bet: {
 								min: 0,

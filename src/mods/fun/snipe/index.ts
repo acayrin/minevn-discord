@@ -70,7 +70,7 @@ export default class extends Yujin.Mod {
 			events: {
 				onInit: async () => {
 					if (!this.getConfig())
-						this.generateDefaultConfig({
+						this.generateConfig({
 							limit: 30,
 						});
 					this.bot.client.on('messageDeleteBulk', (messages) => {

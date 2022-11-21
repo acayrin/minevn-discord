@@ -112,7 +112,7 @@ function Overseer() {
 					con = net.connect(`${__data_dir}/${name}.socket`);
 					console.log(`[M] Connected to ${name}.socket`);
 					con.on('data', (d) => {
-						d.toString('utf-8')
+						d.toString('utf8')
 							.split('\n')
 							.forEach((l) => {
 								if (l !== '') console.log(`[C] ${l}`);
@@ -140,7 +140,7 @@ function Overseer() {
 						con = net.connect(`${__data_dir}/${f}`);
 
 						console.log(`[M] Connected to ${f}\r`);
-						con.on('data', (d) => process.stdout.write(`[C] ${d.toString('utf-8').replace(/\n+/g, '\n')}`));
+						con.on('data', (d) => process.stdout.write(`[C] ${d.toString('utf8').replace(/\n+/g, '\n')}`));
 
 						fs.watch(`${__data_dir}/${f}`).on('change', () => {
 							if (!fs.existsSync(`${__data_dir}/${f}`)) {
@@ -270,7 +270,7 @@ function OverseerRun(opt: {
 		});
 
 		socket.on('data', (data) => {
-			const res = JSON.parse(data.toString('utf-8'));
+			const res = JSON.parse(data.toString('utf8'));
 			if (res.__signal && res.__signal.includes('SIGTERM')) {
 				socket.write(`Received signal ${res.__signal}\n`);
 
@@ -284,8 +284,8 @@ function OverseerRun(opt: {
 			// process
 			if (!opt.command) return;
 			cpp = child_process.exec(opt.command);
-			cpp.stdout?.setEncoding('utf-8');
-			cpp.stderr?.setEncoding('utf-8');
+			cpp.stdout?.setEncoding('utf8');
+			cpp.stderr?.setEncoding('utf8');
 			cpp.stdout?.on('data', (d) => soc?.write(d));
 			cpp.stderr?.on('data', (d) => soc?.write(d));
 			cpp.on('close', (code, signal) => {

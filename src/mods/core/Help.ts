@@ -13,7 +13,7 @@ const project_stats: {
 fs.recursiveLookup(path.resolve('./src'), (item: string) => {
 	if (!item.endsWith('.ts')) return;
 	project_stats.files++;
-	project_stats.lines += fs.readFileSync(item, 'utf-8').split('\n').length;
+	project_stats.lines += fs.readFileSync(item, 'utf8').split('\n').length;
 });
 
 async function getHelp(

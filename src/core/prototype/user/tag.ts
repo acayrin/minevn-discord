@@ -3,10 +3,8 @@ import Eris from 'eris';
 declare module 'eris' {
 	interface User {
 		/**
-		 * @description Get the user's tag
-		 * @author acayrin
-		 * @returns {*}  {string}
-		 * @memberof User
+		 * Get the user's tag
+		 * @returns Tag string
 		 */
 		tag: () => string;
 	}

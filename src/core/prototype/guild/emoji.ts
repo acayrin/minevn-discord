@@ -1,6 +1,6 @@
-import Eris from "eris";
+import Eris from 'eris';
 
-declare module "eris" {
+declare module 'eris' {
 	export interface GuildEmoji {
 		getIdentifier: () => string;
 		toString: () => string;
@@ -17,6 +17,9 @@ declare module "eris" {
 	}
 }
 
+/**
+ * An object representing a guild emoji, since eris has none
+ */
 Eris.GuildEmoji = class {
 	id: string;
 	name: string;
@@ -37,7 +40,7 @@ Eris.GuildEmoji = class {
 	}
 
 	getIdentifier() {
-		return `${this.animated ? "a" : ""}:${this.name}:${this.id}`;
+		return `${this.animated ? 'a' : ''}:${this.name}:${this.id}`;
 	}
 
 	toString() {

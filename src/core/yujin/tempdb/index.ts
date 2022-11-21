@@ -52,14 +52,13 @@ export class TempDatabase<T = unknown> {
 		if (!this.#dbs.has(name) || !requester) return undefined;
 
 		const db = this.#dbs.get(name);
-		let data = undefined;
 		if (db.opt?.public || db.owner === requester || (db.opt?.secret && db.opt.secret === secret)) {
-			data = db.data;
+			return db.data;
 		}
 
 		// debug
 		//db.owner.bot.info(`[TempDB] ${requester.name} requested data from '${name}'`);
-		return data;
+		return undefined;
 	}
 
 	/**
@@ -75,15 +74,14 @@ export class TempDatabase<T = unknown> {
 		if (!this.#dbs.has(name) || !requester) return false;
 
 		const db = this.#dbs.get(name);
-		let status = false;
 		if (db.opt?.public || db.owner === requester || (db.opt?.secret && db.opt.secret === secret)) {
 			this.set(name, db.owner, data, db.opt);
-			status = true;
+			return true;
 		}
 
 		// debug
 		//db.owner.bot.info(`[TempDB] ${requester.name} updated data in '${name}'`);
-		return status;
+		return false;
 	}
 
 	/**
@@ -106,13 +104,12 @@ export class TempDatabase<T = unknown> {
 	delete(name: string, owner: Yujin.Mod): boolean {
 		if (!this.has(name) || !owner) return false;
 
-		let status = false;
 		if (this.#dbs.get(name).owner === owner) {
-			status = this.#dbs.delete(name);
+			return this.#dbs.delete(name);
 		}
 
 		// debug
 		//owner.bot.info(`[TempDB] ${owner.name} deleted database '${name}'`);
-		return status;
+		return false;
 	}
 }

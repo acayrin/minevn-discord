@@ -9,18 +9,16 @@ export default class EventVoiceLeave extends EventBase {
 			description: 'voice channel leave event handler',
 			event: 'voiceChannelLeave',
 			process: async (member: Eris.Member, channel: Eris.VoiceChannel | Eris.StageChannel) => {
-				Promise.all(
-					this.bot.mods.map((mod) => {
-						mod.events?.onVoiceLeave?.(member, channel, { mod }).catch((e) =>
-							this.bot.error({
-								name: mod.name,
-								message: e.message,
-								cause: e.cause,
-								stack: e.stack,
-							}),
-						);
-					}),
-				);
+				this.bot.mods.forEach((mod) => {
+					mod.events?.onVoiceLeave?.(member, channel, { mod }).catch((e) =>
+						this.bot.error({
+							name: mod.name,
+							message: e.message,
+							cause: e.cause,
+							stack: e.stack,
+						}),
+					);
+				});
 			},
 		});
 	}

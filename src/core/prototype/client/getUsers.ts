@@ -3,10 +3,8 @@ import Eris from 'eris';
 declare module 'eris' {
 	export interface Client {
 		/**
-		 * @description Get a users from guilds
-		 * @author acayrin
-		 * @returns {Eris.Member[]}
-		 * @memberof Client
+		 * Get all members from all guilds
+		 * @returns List of members from all guilds
 		 */
 		getUsers: () => Eris.Member[];
 	}

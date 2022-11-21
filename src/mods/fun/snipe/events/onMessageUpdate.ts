@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Eris from 'eris';
 import fetch from 'node-fetch';
 
@@ -39,11 +38,9 @@ export const onMessageUpdate = async (newMsg: Eris.Message, oldMsg: Eris.OldMess
 	// get embeds
 	const embeds: Eris.Embed[] = [];
 	if (oldMsg.embeds?.length > 0) {
-		await Promise.all(
-			oldMsg.embeds.map((embed) => {
-				embeds.push(embed);
-			}),
-		);
+		oldMsg.embeds.forEach((embed) => {
+			embeds.push(embed);
+		});
 	}
 
 	// add record

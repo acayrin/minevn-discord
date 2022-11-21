@@ -3,20 +3,14 @@ import fs from 'fs';
 
 declare module 'fs' {
 	/**
-	 * @description Lookup a directory recursively and execute callback on found files
-	 * @author acayrin
-	 * @export
-	 * @param {string} path
-	 * @param {(...opt: any) => any} callback
+	 * Lookup a directory recursively and execute callback on found files
+	 * @param path Path to lookup
+	 * @param callback Callback function to execute per entry found
 	 */
-	export function recursiveLookup(path: string, callback: (...opt: any[]) => any): void;
+	export function recursiveLookup(path: string, callback: (opt: string) => unknown): void;
 	/**
-	 * @description Lookup a directory recursively and list all items
-	 * @author acayrin
-	 * @export
-	 * @param {string} path
-	 * @param {(...opt: any) => any} callback
-	 * @return {string[]}
+	 * Lookup a directory recursively and list all items
+	 * @param path Path to lookup
 	 */
 	export function recursiveList(path: string): string[];
 }

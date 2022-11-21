@@ -47,8 +47,13 @@ class MessageCollector extends EventEmitter {
 	}
 }
 
+/**
+ * Create a message listener in this channel
+ * @param options Options to apply to this message listener
+ * @returns
+ */
 export const awaitMessages = (options: {
-	channel: Eris.Channel;
+	channel: Eris.TextableChannel;
 	filter: (message: Eris.Message<Eris.PossiblyUncachedTextableChannel>) => boolean;
 	client: Eris.Client;
 	time?: number;

@@ -4,7 +4,7 @@ import Yujin from '../../../../core/yujin';
 
 export async function onInit(o: { mod: Yujin.Mod }) {
 	if (!o.mod.getConfig())
-		o.mod.generateDefaultConfig({
+		o.mod.generateConfig({
 			channels: ['976150648561238077', '838016418180104247'],
 			interval: 10,
 			name: "%username%'s channel",

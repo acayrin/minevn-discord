@@ -1,12 +1,10 @@
-import Eris from "eris";
+import Eris from 'eris';
 
-declare module "eris" {
+declare module 'eris' {
 	export interface Guild {
 		/**
-		 * @description Guild's maximum bitrate
-		 * @author acayrin
-		 * @returns {*}  {number}
-		 * @memberof Guild
+		 * Get guild's maximum bitrate
+		 * @returns Guild bitrate
 		 */
 		maxBitrate: () => number;
 	}

@@ -1,17 +1,14 @@
 import Eris from 'eris';
 
 declare module 'eris' {
-  export interface Message {
-    /**
-		 * @description Get the guild
-		 * @author acayrin
-		 * @returns {(Eris.Guild | undefined)}
-		 * @memberof Message
+	export interface Message {
+		/**
+		 * Get the guild of this message
 		 */
-    guild(): Eris.Guild | undefined;
-  }
+		guild(): Eris.Guild;
+	}
 }
 
 Eris.Message.prototype.guild = function (this: Eris.Message) {
-  return this.member?.guild;
+	return this.channel.client.getGuild(this.guildID);
 };

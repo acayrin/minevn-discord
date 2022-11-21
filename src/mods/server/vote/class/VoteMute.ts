@@ -35,10 +35,6 @@ export class VoteMute extends Vote {
 			: this.target.edit({
 					communicationDisabledUntil: new Date(Date.now() + this._config.duration * 60_000),
 			  });
-		job.catch(() => {
-			// user left server before the vote ends
-			return this.msg.reply(`User **${this.target.tag()}** can't be abused cuz they ran away like a wimp`);
-		});
 		job.then(() => {
 			// recent mute
 			// remove after 2x[mute duration] (1x to equals the mute duration, 2x is the main cooldown)
@@ -52,6 +48,9 @@ export class VoteMute extends Vote {
 				},
 				this.guild.id,
 			);
+		}).catch(() => {
+			// user left server before the vote ends
+			return this.msg.reply(`User **${this.target.tag()}** can't be abused cuz they ran away like a wimp`);
 		});
 	}
 }

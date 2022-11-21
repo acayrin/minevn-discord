@@ -40,7 +40,7 @@ export default class extends Yujin.Mod {
 			events: {
 				onInit: async () => {
 					if (!this.getConfig())
-						this.generateDefaultConfig({
+						this.generateConfig({
 							user_token: process.env.MINEVN_ANTIPIG_TOKEN || 'insert a user token here',
 						});
 				},
@@ -71,11 +71,9 @@ export default class extends Yujin.Mod {
 			usernames: (db.get(u.id)?.usernames || [u.username]).join(', '),
 		};
 
-		await Promise.all(
-			u.roles.map((_r) => {
-				if (g.roles.get(_r).name !== '@everyone') o.roles += `${g.roles.get(_r).mention} `;
-			}),
-		);
+		u.roles.forEach((_r) => {
+			if (g.roles.get(_r).name !== '@everyone') o.roles += `${g.roles.get(_r).mention} `;
+		});
 
 		const m = JSON.parse(
 			await (

@@ -89,10 +89,10 @@ export default class extends Yujin.Mod {
 							});
 						});
 
-						// fs.writeFileSync("/home/yujin/Downloads/test.json", JSON.stringify(B), "utf-8");
+						// fs.writeFileSync("/home/yujin/Downloads/test.json", JSON.stringify(B), "utf8");
 						msg.reply(new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }), {
 							name: `backup_${msg.guildID}_${Date.now()}.json`,
-							file: Buffer.from(JSON.stringify(B, null, 4), 'utf-8'),
+							file: Buffer.from(JSON.stringify(B, null, 4), 'utf8'),
 						});
 					},
 				},

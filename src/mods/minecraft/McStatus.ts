@@ -49,7 +49,7 @@ export default class extends Yujin.Mod {
 			events: {
 				onInit: async (): Promise<void> => {
 					if (!this.getConfig())
-						this.generateDefaultConfig({
+						this.generateConfig({
 							background: 'https://yujin-cdn.vercel.app/bg_1.jpg',
 							font_family: 'Helvetica',
 							font_color: '#FFFFFF',

@@ -3,27 +3,25 @@ import Eris from 'eris';
 declare module 'eris' {
 	export interface CommandInteraction {
 		/**
-		 * @description Get the guild from interaction
-		 * @author acayrin
-		 * @returns {(Eris.Guild)}
-		 * @memberof CommandInteraction
+		 * Get the guild from interaction
+		 * @returns Guild
 		 */
 		guild: () => Eris.Guild;
 		/**
-		 * @description Reply the current interaction
-		 * @param content message content
-		 * @param file file content
-		 * @returns A message
+		 * Create a referencing message for this interaction
+		 * @param content Message content
+		 * @param file File attachments
+		 * @returns Created message
 		 */
 		reply: (
 			content: string | Eris.InteractionContent,
 			file?: Eris.FileContent | Eris.FileContent[],
 		) => Promise<Eris.Message>;
 		/**
-		 * @description Report error of this interaction
+		 * Report runtime error directly to channel
 		 * @param error Error instance
 		 * @param file File occured
-		 * @returns A message
+		 * @returns Created message
 		 */
 		report: (error: Error, file: string) => Promise<Eris.Message>;
 	}
@@ -44,14 +42,15 @@ Eris.CommandInteraction.prototype.reply = function (
 Eris.CommandInteraction.prototype.report = function (this: Eris.Message, error: Error, file: string) {
 	const lines = [];
 	let line = 'external';
+
 	if (error.stack)
-		for (const lne of error.stack.split('\n')) {
-			if (`${error.name}: ${error.message}`.split('\n').includes(lne)) {
+		for (const stackLine of error.stack.split('\n')) {
+			if (`${error.name}: ${error.message}`.split('\n').includes(stackLine)) {
 				continue;
 			}
-			lines.push(lne);
-			if (lne.includes(file)) {
-				line = lne;
+			lines.push(stackLine);
+			if (stackLine.includes(file)) {
+				line = stackLine;
 				break;
 			}
 			if (lines.length > 6) {

@@ -14,7 +14,7 @@ export default class extends Yujin.Mod {
 			events: {
 				onInit: async () => {
 					if (!this.getConfig())
-						this.generateDefaultConfig({
+						this.generateConfig({
 							bypass_roles: [],
 							replace: {
 								normal: '<:mvncat:861078127551971338>',

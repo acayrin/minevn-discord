@@ -3,24 +3,18 @@ import Eris from 'eris';
 declare module 'eris' {
 	export interface Guild {
 		/**
-		 * @description Get a role of this guild
-		 * @author acayrin
-		 * @param {(string | number)} query search query
-		 * @returns {(Eris.Role | undefined)} result role
-		 * @memberof Guild
+		 * Get a role of this guild
+		 * @param query Name or ID of the role
+		 * @returns Guild role else undefined if not found
 		 */
-		getRole: (query: string | number) => Eris.Role | undefined;
+		getRole: (query: string) => Eris.Role | undefined;
 	}
 }
 
-Eris.Guild.prototype.getRole = function (this: Eris.Guild, query: string | number): Eris.Role | undefined {
-	try {
-		const gr = this.roles;
+Eris.Guild.prototype.getRole = function (this: Eris.Guild, query: string): Eris.Role | undefined {
+	let result: Eris.Role;
 
-		return !Number.isNaN(Number(query))
-			? gr.find((r: Eris.Role) => r.id.includes(`${query}`)) // if role is an id
-			: gr.find((r: Eris.Role) => r.name.includes(query.toString())); // if role is a name
-	} catch (e) {
-		return undefined;
-	}
+	for (const role of this.roles) if (role[1].id === query || role[1].name.includes(query)) result = role[1];
+
+	return result;
 };

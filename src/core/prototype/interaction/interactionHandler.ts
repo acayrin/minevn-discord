@@ -5,10 +5,9 @@ import { EventEmitter } from 'events';
 declare module 'eris' {
 	export interface Message {
 		/**
-		 * @description Get the message interaction handler
-		 * @author acayrin
-		 * @returns {(InteractionHandler)}
-		 * @memberof Message
+		 * Create a new message interaction listener
+		 * @param options Additional options for this listener
+		 * @returns
 		 */
 		interactionHandler: (options?: {
 			permanent?: boolean;

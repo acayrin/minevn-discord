@@ -14,7 +14,7 @@ export default class InventoryCore extends Yujin.Mod {
 			events: {
 				onInit: async () => {
 					if (!this.getConfig()) {
-						this.generateDefaultConfig({
+						this.generateConfig({
 							test: 'value',
 						});
 					}
@@ -23,7 +23,7 @@ export default class InventoryCore extends Yujin.Mod {
 						if (!path.basename(item).endsWith('.json')) return;
 
 						try {
-							const get = JSON.parse(fs.readFileSync(item, 'utf-8'));
+							const get = JSON.parse(fs.readFileSync(item, 'utf8'));
 							if (this.#is_Item(get)) {
 								const match = this.#item_registry.find((i) => i.id === get.id);
 								if (match) {
@@ -81,14 +81,14 @@ export default class InventoryCore extends Yujin.Mod {
 		const list: Map<string, { item: Item; count: number }> = new Map();
 		const res: string[] = [];
 
-		items.map((item) => {
+		items.forEach((item) => {
 			list.set(item.id, {
 				item: item,
 				count: list.has(item.id) ? list.get(item.id).count + 1 : 1,
 			});
 		});
 
-		Array.from(list.entries()).map((i) => {
+		Array.from(list.entries()).forEach((i) => {
 			res.push(`${i[1].count}x ${i[1].item.name} ${i[1].item.icon}`);
 		});
 
@@ -187,7 +187,7 @@ export default class InventoryCore extends Yujin.Mod {
 		const items: Item[] = [];
 
 		if (query) {
-			this.findItem(query).map((item) => {
+			this.findItem(query).forEach((item) => {
 				items.push(item);
 			});
 			return items;

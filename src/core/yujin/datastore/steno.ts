@@ -41,7 +41,7 @@ export class Writer {
 		this.#locked = true;
 		try {
 			// Atomic write
-			await fs.promises.writeFile(this.#tempFilename, data, 'utf-8');
+			await fs.promises.writeFile(this.#tempFilename, data, 'utf8');
 			await fs.promises.rename(this.#tempFilename, this.#filename);
 
 			// Call resolve

@@ -1,6 +1,9 @@
 import Eris from 'eris';
 
 declare module 'eris' {
+	/**
+	 * An interaction builder, since eris has none
+	 */
 	export interface InteractionBuilder {
 		addButton: (o?: {
 			label: string;
@@ -47,6 +50,9 @@ declare module 'eris' {
 		removeComponent: (index: number) => Eris.InteractionBuilder;
 		toComponent: () => Eris.ActionRow[];
 	}
+	/**
+	 * An interaction builder, since eris has none
+	 */
 	export class InteractionBuilder {}
 	export enum ButtonColor {
 		blurple = 1,

@@ -12,26 +12,24 @@ export default class EventMessageCreate extends EventBase {
 				if (interaction instanceof Eris.CommandInteraction) {
 					await interaction.acknowledge();
 
-					Promise.all(
-						this.bot.mods.map((mod) =>
-							mod.commands
-								?.filter((cmd) => cmd.name.toLowerCase() === interaction.data.name.toLowerCase())
-								?.map((cmd) => {
-									if (cmd.type === 'slash')
-										cmd.process(interaction, {
-											mod,
-											args: interaction.data.options || [],
-											command: interaction.data.name,
-										}).catch((e: Error) => {
-											this.bot.error({
-												name: mod.name,
-												message: e.message,
-												cause: e.cause,
-												stack: e.stack,
-											});
+					this.bot.mods.forEach((mod) =>
+						mod.commands
+							?.filter((cmd) => cmd.name.toLowerCase() === interaction.data.name.toLowerCase())
+							?.forEach((cmd) => {
+								if (cmd.type === 'slash')
+									cmd.process(interaction, {
+										mod,
+										args: interaction.data.options || [],
+										command: interaction.data.name,
+									}).catch((e: Error) => {
+										this.bot.error({
+											name: mod.name,
+											message: e.message,
+											cause: e.cause,
+											stack: e.stack,
 										});
-								}),
-						),
+									});
+							}),
 					);
 				}
 			},

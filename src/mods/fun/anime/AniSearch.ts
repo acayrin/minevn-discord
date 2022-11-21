@@ -85,7 +85,7 @@ export default class extends Yujin.Mod {
 		};
 
 		if (o.type === 'manga' || o.type === 'anime') opt.args.shift();
-		if (!isNaN(Number(o.index))) o.index = Number(o.index) - 1 < 0 ? 0 : Number(o.index) - 1;
+		if (!Number.isNaN(Number(o.index))) o.index = Number(o.index) - 1 < 0 ? 0 : Number(o.index) - 1;
 		else o.index = 0;
 
 		o.results = await search.search(o.type[0] === 'manga' ? 'manga' : 'anime', { term: o.term });

@@ -1,12 +1,10 @@
-import Eris from "eris";
+import Eris from 'eris';
 
-declare module "eris" {
+declare module 'eris' {
 	export interface Member {
 		/**
-		 * @description Get highest role
-		 * @author acayrin
-		 * @returns {(Eris.Role | undefined)} result role
-		 * @memberof Member
+		 * Get the highest role of a member
+		 * @returns Highest role else undefined if member has none
 		 */
 		getHighestRole: () => Eris.Role | undefined;
 	}

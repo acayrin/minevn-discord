@@ -158,39 +158,15 @@ async function load(args: string, nsfw = false) {
 			}.donmai.us/posts.json?tags=${args}&random=true&rating=safe&limit=100`,
 		].map(async (url) => {
 			const data = await (await fetch(url)).json();
-			if (Array.isArray(data.data?.children)) {
-				await Promise.all(
-					data.data.children.map(
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						(post: any) => {
-							const json = post.data;
-							if (
-								!json.secure_media &&
-								json.is_reddit_media_domain &&
-								json.url_overridden_by_dest &&
-								!json.is_gallery &&
-								!list.includes(json)
-							)
-								list.push({
-									title: json.title,
-									source: `https://www.reddit.com${json.permalink}`,
-									image: json.url_overridden_by_dest,
-									rating: `${json.ups} / ${json.downs}`,
-								});
-						},
-					),
-				);
-			} else if (Array.isArray(data)) {
-				await Promise.all(
-					data.map((booru) => {
-						list.push({
-							title: `Booru #${booru.id}`,
-							source: `https://${nsfw ? 'danbooru' : 'safebooru'}.donmai.us/posts/${booru.id}`,
-							image: booru.large_file_url,
-							rating: `${booru.up_score} / ${booru.down_score}`,
-						});
-					}),
-				);
+			if (Array.isArray(data)) {
+				data.forEach((booru) => {
+					list.push({
+						title: `Booru #${booru.id}`,
+						source: `https://${nsfw ? 'danbooru' : 'safebooru'}.donmai.us/posts/${booru.id}`,
+						image: booru.large_file_url,
+						rating: `${booru.up_score} / ${booru.down_score}`,
+					});
+				});
 			}
 		}),
 	)

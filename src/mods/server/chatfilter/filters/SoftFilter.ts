@@ -82,11 +82,9 @@ export class SoftFilter {
 			}
 		});
 
-		await Promise.all(
-			this.#list.map((reg) => {
-				msg = msg.replace(reg, this.#emoji_normal);
-			}),
-		);
+		this.#list.forEach((reg) => {
+			msg = msg.replace(reg, this.#emoji_normal);
+		});
 
 		for (const rep of emotes.keys()) {
 			msg = msg.replaceAll(emotes.get(rep), rep);

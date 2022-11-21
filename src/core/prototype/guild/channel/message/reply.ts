@@ -1,14 +1,12 @@
-import Eris from "eris";
+import Eris from 'eris';
 
-declare module "eris" {
+declare module 'eris' {
 	export interface Message {
 		/**
-		 * @description Reply this message
-		 * @author acayrin
-		 * @param {Eris.MessageContent} content messag econtent
-		 * @param {(Eris.FileContent | Eris.FileContent[])} [file] attachments
-		 * @returns {Promise<Eris.Message>} message reply
-		 * @memberof Message
+		 * Generate a message referencing this message
+		 * @param content Content of the message
+		 * @param file File attachments
+		 * @returns Created message
 		 */
 		reply: (content: Eris.MessageContent, file?: Eris.FileContent | Eris.FileContent[]) => Promise<Eris.Message>;
 	}
@@ -19,24 +17,25 @@ Eris.Message.prototype.reply = function (
 	content: string | Eris.AdvancedMessageContent,
 	file?: Eris.FileContent | Eris.FileContent[],
 ): Promise<Eris.Message> {
-	if (typeof content === "string") {
-		return this.channel.createMessage(
-			{
-				content: content.toString(),
-				messageReference: {
-					messageID: this.id,
+	switch (typeof content) {
+		case 'string':
+			return this.channel.createMessage(
+				{
+					content: content.toString(),
+					messageReference: {
+						messageID: this.id,
+					},
 				},
-			},
-			file || [],
-		);
-	} else {
-		return this.channel.createMessage(
-			Object.assign(content, {
-				messageReference: {
-					messageID: this.id,
-				},
-			}),
-			file || [],
-		);
+				file || [],
+			);
+		default:
+			return this.channel.createMessage(
+				Object.assign(content, {
+					messageReference: {
+						messageID: this.id,
+					},
+				}),
+				file || [],
+			);
 	}
 };

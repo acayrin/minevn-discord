@@ -3,15 +3,10 @@ import Eris from 'eris';
 declare module 'eris' {
 	export interface TextChannel {
 		/**
-		 * @description Send a one-time webhook message, generally slower then fetching existing ones but safer
-		 * @author acayrin
-		 * @param {Eris.WebhookPayload} payload
-		 * @param {{
-		 * 				name: string;
-		 * 				avatar: string;
-		 * 			}} [hookOptions]
-		 * @returns {*}  {Promise<void>}
-		 * @memberof TextChannel
+		 * Send a one-time webhook message, generally slower then fetching existing ones but safer
+		 * @param payload Webhook payload
+		 * @param hookOptions Additional webhook options
+		 * @returns
 		 */
 		disposalWebhook: (
 			payload: Eris.WebhookPayload,

@@ -11,16 +11,9 @@ import { EventBase } from './events/base/EventBase';
 //const project_root = path.resolve('./');
 const file_root = path.dirname(__dirname);
 
-/**
- * @description Yujin bot instance
- * @export
- * @class BaseBot
- * @extends {Base}
- */
 export default class BaseBot extends Base {
 	/**
 	 * Create a new bot instance
-	 * @memberof BaseBot
 	 */
 	constructor(props?: Yujin.BaseClassProps, clientOptions?: Eris.ClientOptions) {
 		if (props) super(props);
@@ -36,57 +29,57 @@ export default class BaseBot extends Base {
 	}
 
 	/**
-	 * @description Bot logger
-	 * @type {Logger}
-	 * @memberof BaseBot
+	 * Bot logger
 	 */
 	readonly logger: Logger;
 
 	/**
-	 * @description Bot Client options
-	 * @type {Eris.ClientOptions}
-	 * @memberof BaseBot
+	 * Bot Client options
 	 */
 	#clientOptions: Eris.ClientOptions;
 
 	/**
-	 * @description Bot command manager
-	 * @type {CommandManager}
-	 * @memberof BaseBot
+	 * Bot command manager
 	 */
 	readonly commandManager: CommandManager = new CommandManager();
 
 	/**
-	 * @description Bot mod list
-	 * @type {Yujin.Mod[]}
-	 * @memberof BaseBot
+	 * Bot mod list
 	 */
 	readonly mods: Yujin.Mod[] = [];
 
 	/**
-	 * @description Bot's prefix
-	 * @type {string}
-	 * @memberof BaseBot
+	 * Bot's prefix
 	 */
 	readonly prefix: string = process.env.YUJIN_PREFIX || '>>';
 
 	/**
-	 * @description Bot's primary color (mainly for embed)
-	 * @type {string}
-	 * @memberof BaseBot
+	 * Bot's primary color (mainly for embed)
 	 */
 	readonly color: string = process.env.YUJIN_COLOR || '#ff3333';
 
 	/**
-	 * @description Bot runtime database, for storing temporal data
-	 * @type {Map<string, any>}
-	 * @memberof BaseBot
+	 * Bot runtime database, for storing temporal data
 	 */
 	readonly database: Yujin.TempDB<any> = new Yujin.TempDB();
 
 	/**
-	 * @description Log info message
-	 * @memberof BaseBot
+	 * Log verbose message
+	 * @param msg Message to log
+	 */
+	verbose(msg: string) {
+		if (this.logger) return this.logger.debug(msg);
+
+		if (this.client.ready)
+			this.client.shards.forEach((shard) => {
+				this.client.emit('verbose', msg, shard.id);
+			});
+		else this.client.emit('verbose', msg);
+	}
+
+	/**
+	 * Log info message
+	 * @param msg Message to log
 	 */
 	info(msg: string) {
 		if (this.logger) return this.logger.info(msg);
@@ -99,8 +92,8 @@ export default class BaseBot extends Base {
 	}
 
 	/**
-	 * @description Log warn message
-	 * @memberof BaseBot
+	 * Log warn message
+	 * @param msg Message to log
 	 */
 	warn(msg: string) {
 		if (this.logger) return this.logger.warn(msg);
@@ -113,8 +106,8 @@ export default class BaseBot extends Base {
 	}
 
 	/**
-	 * @description Log error message
-	 * @memberof BaseBot
+	 * Log error message
+	 * @param msg Message to log
 	 */
 	error(err: Error) {
 		if (this.logger) return this.logger.error(err);
@@ -127,8 +120,7 @@ export default class BaseBot extends Base {
 	}
 
 	/**
-	 * @description Bot init
-	 * @memberof BaseBot
+	 * Bot init
 	 */
 	init() {
 		if (!this.client) {
@@ -141,8 +133,7 @@ export default class BaseBot extends Base {
 	}
 
 	/**
-	 * @description Bot start phase
-	 * @memberof BaseBot
+	 * Bot start phase
 	 */
 	async #start() {
 		this.info('[CORE] Booting up the bot, please hold...');
@@ -161,7 +152,7 @@ export default class BaseBot extends Base {
 		await this.#loadEventListeners();
 		this.#loadSlashCommands();
 
-		this.client.editStatus('online', undefined);
+		this.client.editStatus('online');
 		this.info(
 			`[CORE] Setup completed - Logged in as ${this.client.user.tag()}  (took ${Math.round(
 				(Date.now() - start) / 1_000,
@@ -170,7 +161,6 @@ export default class BaseBot extends Base {
 
 		this.client.on('disconnect', () => {
 			this.warn('[CORE] Bot has been disconnected from server, reconnecting soon');
-			// this.__client.connect();
 		});
 
 		process.on('unhandledRejection', (e: Error) => {
@@ -193,8 +183,7 @@ export default class BaseBot extends Base {
 	}
 
 	/**
-	 * @description Bot mods loading phase
-	 * @memberof BaseBot
+	 * Bot mods loading phase
 	 */
 	async #loadMods() {
 		this.info('[CORE] Loading mods...');
@@ -208,10 +197,7 @@ export default class BaseBot extends Base {
 					const mod = new (await import(item)).default();
 					if (!(mod instanceof Yujin.Mod)) return this.warn(`[CORE] Skipping invalid mod file ${item}`);
 
-					if (!mod) {
-						// this.error(`[CORE] Failed to load mod "${item}"`);
-						return;
-					}
+					if (!mod) return;
 
 					// ignore disabled
 					if (process.env.YUJIN_DISABLED_MODS?.split(',').includes(mod.name.toLowerCase()) || mod.disabled)
@@ -242,8 +228,7 @@ export default class BaseBot extends Base {
 	}
 
 	/**
-	 * @description Bot slash commands loading phase
-	 * @memberof BaseBot
+	 * Bot slash commands loading phase
 	 */
 	async #loadSlashCommands() {
 		this.info('[CORE] Removing unused slash commands...');
@@ -327,8 +312,7 @@ export default class BaseBot extends Base {
 	}
 
 	/**
-	 * @description Bot init hooks phase
-	 * @memberof BaseBot
+	 * Bot init hooks phase
 	 */
 	async #loadInitHooks() {
 		this.info('[CORE] Running init hooks...');
@@ -352,8 +336,7 @@ export default class BaseBot extends Base {
 	}
 
 	/**
-	 * @description Bot event listeners loading phase
-	 * @memberof BaseBot
+	 * Bot event listeners loading phase
 	 */
 	async #loadEventListeners() {
 		// load event listeners

@@ -69,7 +69,7 @@ export class CommandManager extends BaseManager {
 		if (mod) return mod;
 
 		for (const [cmd, mod] of Array.from(this.#links)) {
-			if (mod.name.toLowerCase() === query.toLowerCase() || cmd?.toLowerCase() === query.toLowerCase()) {
+			if (mod && (mod.name.toLowerCase() === query.toLowerCase() || cmd?.toLowerCase() === query.toLowerCase())) {
 				return mod;
 			}
 		}

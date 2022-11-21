@@ -1,14 +1,12 @@
-import Eris from "eris";
+import Eris from 'eris';
 
-declare module "eris" {
+declare module 'eris' {
 	export interface Message {
 		/**
-		 * @description Report a runtime error to chat
-		 * @author acayrin
-		 * @param {Error} error Error object
-		 * @param {string} file set it to ``__filename``
-		 * @returns {Promise<Eris.Message>} created message
-		 * @memberof Message
+		 * Report runtime error directly in chat
+		 * @param error Error instance
+		 * @param file File occurred
+		 * @returns Created message
 		 */
 		report: (error: Error, file: string) => Promise<Eris.Message>;
 	}
@@ -16,15 +14,16 @@ declare module "eris" {
 
 Eris.Message.prototype.report = function (this: Eris.Message, error: Error, file: string) {
 	const lines = [];
-	let line = "external";
+	let line = 'external';
+
 	if (error.stack)
-		for (const lne of error.stack.split("\n")) {
-			if (`${error.name}: ${error.message}`.split("\n").includes(lne)) {
+		for (const stackLine of error.stack.split('\n')) {
+			if (`${error.name}: ${error.message}`.split('\n').includes(stackLine)) {
 				continue;
 			}
-			lines.push(lne);
-			if (lne.includes(file)) {
-				line = lne;
+			lines.push(stackLine);
+			if (stackLine.includes(file)) {
+				line = stackLine;
 				break;
 			}
 			if (lines.length > 6) {
@@ -34,10 +33,10 @@ Eris.Message.prototype.report = function (this: Eris.Message, error: Error, file
 
 	return this.channel.createMessage({
 		embed: new Eris.Embed()
-			.setTitle("An error has occured. Please try again or contact the author.")
-			.setColor("#ff0000")
-			.addField("**Message**", "```" + `${error.name}: ${error.message}` + "```")
-			.addField("**File occured**", `\`\`\`${line}\`\`\``)
-			.addField("**Stacktrace**", `\`\`\`${lines.join("\n")}\`\`\``),
+			.setTitle('An error has occured. Please try again or contact the author.')
+			.setColor('#ff0000')
+			.addField('**Message**', `\`\`\`${error.name}: ${error.message}\`\`\``)
+			.addField('**File occured**', `\`\`\`${line}\`\`\``)
+			.addField('**Stacktrace**', `\`\`\`${lines.join('\n')}\`\`\``),
 	});
 };

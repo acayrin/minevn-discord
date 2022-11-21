@@ -1,24 +1,22 @@
-import Eris from "eris";
+import Eris from 'eris';
 
-import * as Permission from "../../../../utils/permission/Permission";
+import * as Permission from '../../../../utils/permission/Permission';
 
-declare module "eris" {
+declare module 'eris' {
 	export interface GuildChannel {
 		/**
-		 * @description Check if the channel has a role permission overwrite
-		 * @author acayrin
-		 * @param {Eris.Role} role role to look in
-		 * @param {Permission.types} perms permission to check for
-		 * @returns {boolean}
-		 * @memberof GuildChannel
+		 * Check if the channel has a role or member permission overwrite
+		 * @param role Role to check for
+		 * @param perms Permissions to check for
+		 * @returns
 		 */
-		hasPermission: (role: Eris.Role, perms: Permission.types) => boolean;
+		hasPermission: (role: Eris.Role | Eris.Member, perms: Permission.types) => boolean;
 	}
 }
 
 Eris.GuildChannel.prototype.hasPermission = function (
 	this: Eris.GuildChannel,
-	role: Eris.Role,
+	role: Eris.Role | Eris.Member,
 	perm: Permission.types,
 ): boolean {
 	// perm = bigint_1

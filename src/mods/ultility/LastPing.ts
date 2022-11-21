@@ -111,7 +111,7 @@ export default class extends Yujin.Mod {
 			events: {
 				onInit: async () => {
 					if (!this.getConfig())
-						this.generateDefaultConfig({
+						this.generateConfig({
 							clean_interval: 14_400_000,
 							remove_on_command: false,
 						});

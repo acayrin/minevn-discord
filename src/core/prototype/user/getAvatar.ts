@@ -3,9 +3,9 @@ import Eris from 'eris';
 declare module 'eris' {
 	interface User {
 		/**
-		 * @description Get a user's avatar
-		 * @author acayrin
-		 * @memberof User
+		 * Get a user's avatar
+		 * @param type Image encode type
+		 * @returns Static avatar url
 		 */
 		getAvatar: (type?: 'webp' | 'png' | 'jpg') => string;
 	}
@@ -13,8 +13,8 @@ declare module 'eris' {
 
 Eris.User.prototype.getAvatar = function (this: Eris.User, type?: 'webp' | 'png' | 'jpg') {
 	let ava = this.avatarURL.slice(0, -10);
-	if (ava.endsWith('.webp')) ava = ava.slice(0, -5);
-	else ava = ava.slice(0, -4);
+	ava = ava.endsWith('.webp') ? ava.slice(0, -5) : ava.slice(0, -4);
+
 	return (
 		(type === 'webp'
 			? `${ava}.webp`

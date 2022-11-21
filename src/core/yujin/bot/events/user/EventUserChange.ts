@@ -16,18 +16,16 @@ export default class EventUserChange extends EventBase {
 					discriminator: string;
 				},
 			) => {
-				Promise.all(
-					this.bot.mods.map((mod) => {
-						mod.events?.onUserChange?.(user, changes, { mod }).catch((e) =>
-							this.bot.error({
-								name: mod.name,
-								message: e.message,
-								cause: e.cause,
-								stack: e.stack,
-							}),
-						);
-					}),
-				);
+				this.bot.mods.forEach((mod) => {
+					mod.events?.onUserChange?.(user, changes, { mod }).catch((e) =>
+						this.bot.error({
+							name: mod.name,
+							message: e.message,
+							cause: e.cause,
+							stack: e.stack,
+						}),
+					);
+				});
 			},
 		});
 	}

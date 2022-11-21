@@ -14,7 +14,7 @@ export default class extends Yujin.Mod {
 			events: {
 				onInit: async () => {
 					if (!this.getConfig())
-						this.generateDefaultConfig({
+						this.generateConfig({
 							amount: 6,
 							timeout_duration: 60,
 							delete_messages: false,
