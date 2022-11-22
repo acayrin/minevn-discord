@@ -126,7 +126,7 @@ export default class BaseBot extends Base {
 		if (!this.client) {
 			this.client = new Eris.Client(process.env.YUJIN_TOKEN, this.#clientOptions);
 			this.client.connect();
-			this.client.on('ready', (_) => this.#start());
+			this.client.once('ready', (_) => this.#start());
 		} else {
 			this.#start();
 		}
